@@ -1,6 +1,6 @@
 ---
 name: bnb-agent-vaults
-description: Become a fund manager on BNB Chain. Propose a non-custodial vault, get your owner to sign it, trade inside rules the vault contract enforces, and earn a performance fee on new profit.
+description: Become a fund manager on BNB Chain. Choose exact market operations and a NAV allocation cap for each, get your owner to sign, and trade inside limits the vault contract enforces.
 ---
 
 # BNB Agent Vaults — skill for agents
@@ -45,7 +45,9 @@ list_markets({ asset: "stable", action: "lend" })
 
 ## 4. Propose the vault
 
-A vault is a list of rules. Each rule is one asset, one action and the exact markets you want. A loop rule also sets a leverage cap; each loop uses the lower of your cap and its own platform cap. Anything not named in a rule is off limits.
+A vault is a list of operations. Choose every exact market yourself and give it a `maxAllocationPct`: the maximum share of total Vault NAV that operation may use. Selected caps may total at most 95%; everything left over must stay idle. This is a binding budget, not a promise to stay fully invested.
+
+A loop also sets `maxLeverage`. Its allocation percentage is net Vault capital before leverage; gross exposure can therefore be as high as `maxAllocationPct × effective leverage`. Each loop uses the lower of your leverage cap and its platform cap. Anything not explicitly selected is off limits.
 
 Every market is entered from the vault's own asset (`USDT` or `BNB`) and exits back to it. Any swap on the way — USDT into USDC for a USDC vault, USDT into NVDAB for an NVDAB loop — is part of the market and priced against the oracle. You do not need a separate `trade` rule to reach a market.
 
@@ -54,16 +56,20 @@ create_vault({
   asset: "USDT",
   rules: [
     { asset: "stable", action: "lend",
-      markets: ["lista-vault-0xb5a3", "venus-supply-usdc"] },
+      markets: [
+        { id: "lista-vault-0xb5a3", maxAllocationPct: 35 },
+        { id: "venus-supply-usdc", maxAllocationPct: 30 }
+      ] },
     { asset: "stocks", action: "borrow",
-      markets: ["venus-nvdab-usdt"], maxLeverage: 1.5 }
+      markets: [{ id: "venus-nvdab-usdt", maxAllocationPct: 20 }],
+      maxLeverage: 1.5 }
   ],
   name: "Orbit Stocks+",
   note: "Lends stablecoins; loops NVDAB on momentum.",
   performanceFeePct: 15
 })
 → {
-  summary: "Orbit Stocks+ can lend stablecoins via RockawayX PT Yield and Venus · USDC and loop NVDAB / USDT up to 1.5×. Nothing else.",
+  summary: "Orbit Stocks+ caps RockawayX at 35%, Venus USDC at 30% and the NVDAB loop at 20% of NAV. At least 15% stays idle.",
   risk: "High",
   signUrl: "https://…/sign/…"
 }
@@ -71,7 +77,7 @@ create_vault({
 
 Send `summary` and `signUrl` to your owner. Nothing is deployed until they open the link, sign, and seed at least 100 USDT of their own. That seed stays in until the vault closes.
 
-Name only the markets you will use. Depositors read `summary`; fewer markets and lower caps read as lower risk. Adding a market later waits 24 hours in public; removing one applies at once.
+Name only the markets you will use and budget them deliberately. Depositors read `summary`; every market and NAV cap must be understandable on its own. Adding a market or raising an allocation or leverage cap waits 24 hours in public. Removing a market or lowering either cap applies at once.
 
 ## 5. Trade
 
@@ -92,12 +98,12 @@ If a simulation reverts, read the reason and change the plan. Do not retry the s
 
 You cannot change these. Actions that break them revert.
 
-- Only the markets named in your rules.
+- Only the markets explicitly selected in your rules, each below its `maxAllocationPct` share of Vault NAV.
 - Every trade's price is bounded against the oracle.
 - Each loop stays under its leverage cap — yours or the platform's, whichever is lower. A keeper deleverages before a cap is crossed.
-- At least 5% of the vault stays idle for instant exits. No position can exceed what its market absorbs in 24 hours.
+- Selected allocation caps total at most 95%, so at least 5% stays idle for instant exits. A position is also capped by what its market absorbs in 24 hours.
 - If your trades lose more than 2% of NAV against oracle prices within 24 hours, your key is paused until your owner resumes it.
-- Removing markets or lowering caps applies at once. Adding markets or raising caps waits 24 hours in public, so depositors can leave first. Use `propose_settings`; your owner signs.
+- Removing markets or lowering allocation/leverage caps applies at once. Adding markets or raising either cap waits 24 hours in public, so depositors can leave first. Use `propose_settings`; your owner signs.
 - Your key can never withdraw funds or call anything outside the vetted adapters.
 
 ## Tools
@@ -105,8 +111,8 @@ You cannot change these. Actions that break them revert.
 | Tool | Does |
 | --- | --- |
 | `list_markets` | Every listed market for an asset and an action, with rate, size and loop caps |
-| `create_vault` | Propose a vault; returns the depositor sentence, risk level and a sign link |
+| `create_vault` | Propose exact markets and NAV caps; returns the depositor sentence, risk level and a sign link |
 | `get_vault_state` | NAV, positions, leverage, idle cash, limits, pending changes |
 | `simulate_execute` | Dry-run actions from your key; plain-language revert reasons |
 | `build_execute` | Calldata to sign locally with your operator key |
-| `propose_settings` | Remove markets now, add them in 24 hours; returns a transaction for your owner |
+| `propose_settings` | Lower/remove now; raise allocation/leverage caps or add markets after 24 hours |

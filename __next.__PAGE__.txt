@@ -1,6 +1,6 @@
 1:"$Sreact.fragment"
 2:I[81384,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js"],"PrototypePage"]
-3:T6d12,
+3:T6d45,
 
 <header class="masthead float" id="mh">
   <div class="wrap">
@@ -66,7 +66,7 @@
     </div>
     <div class="stmt"><span class="n">01</span><h3>Awake at every block.</h3><p>Your agent reads every market on BNB Chain and acts in seconds. It doesn't sleep, doesn't flinch and doesn't forget.</p></div>
     <div class="stmt"><span class="n">02</span><h3>Trusted by no one.</h3><p>A bot with a hot wallet can sign anything. That is exactly why nobody sends it their money.</p></div>
-    <div class="stmt"><span class="n">03</span><h3>Until it takes rules it can't break.</h3><p>Which assets, which actions, how much leverage — three choices, checked by the vault contract on every trade. The money never leaves the vault.</p></div>
+    <div class="stmt"><span class="n">03</span><h3>Until it takes rules it can't break.</h3><p>Which exact market, how much of Vault NAV it may use, and how much leverage — checked by the contract on every trade. The money never leaves the vault.</p></div>
     <div class="stmt"><span class="n">04</span><h3>Then it's a fund manager.</h3><p>Outside capital, a track record anyone can verify, and a cut of every dollar of new profit.</p></div>
   </div>
 </section>
@@ -90,7 +90,7 @@
           <div>
             <div class="big-n"><small>Day</small>0</div>
             <h3>It writes its own rules.</h3>
-            <p>Hedgeframe proposes its vault through MCP, one rule at a time: an asset, what it does with it, and the exact markets — with a leverage cap on loops. Its owner reads one sentence, signs once and seeds 100 USDT.</p>
+            <p>Hedgeframe proposes its vault through MCP, one operation at a time: an exact market and its maximum share of Vault NAV — plus a leverage cap for a loop. Its owner reads one sentence, signs once and seeds 100 USDT.</p>
             <ul><li>The owner's wallet and the agent's key are always separate</li><li>Protocols and markets come from a platform-vetted list</li><li>Loosening the rules later waits 24 hours in public</li></ul>
           </div>
           <div class="ui-card">
@@ -130,7 +130,7 @@
           <div>
             <div class="big-n"><small>Day</small>14</div>
             <h3>It trades. The contract checks every move.</h3>
-            <p>No votes, no waiting. Hedgeframe acts whenever it wants and stacks moves freely — anything outside its rules reverts before it touches a dollar.</p>
+            <p>No votes, no waiting. Hedgeframe acts whenever it wants — but any unselected market or position above its NAV allocation cap reverts before it touches a dollar.</p>
             <ul><li>Every trade priced against the oracle</li><li>Lose 2% of NAV in a day and its key pauses itself</li><li>Every action and its reason on the vault's timeline</li></ul>
           </div>
           <div class="ui-card">
@@ -321,7 +321,7 @@
     <table class="ba" data-ba-panel="mgr">
       <thead><tr><th></th><th>Before</th><th class="after">With BNB Agent Vaults</th></tr></thead>
       <tbody>
-        <tr><td>Launching a fund</td><td class="before">Write, test and audit bespoke fund contracts.</td><td class="after">Add rules one at a time — an asset, an action, the exact markets — then seed 100 USDT and sign once. The factory deploys the vault with its rules.</td></tr>
+        <tr><td>Launching a fund</td><td class="before">Write, test and audit bespoke fund contracts.</td><td class="after">Choose each exact market and its maximum share of Vault NAV, then seed 100 USDT and sign once. Unallocated NAV stays idle.</td></tr>
         <tr><td>Earning trust</td><td class="before">Ask depositors to trust your key management.</td><td class="after">Show a mandate the contract enforces, not one you promise to follow.</td></tr>
         <tr><td>Track record</td><td class="before">Screenshots and self-reported PnL.</td><td class="after">A live, verifiable on-chain NAV history — 7D, 30D, 90D and since inception.</td></tr>
         <tr><td>Getting paid</td><td class="before">Manual invoicing and disputes over marks.</td><td class="after">High-water-mark fees accrue onchain on terms fixed at launch.</td></tr>
@@ -332,7 +332,7 @@
       <thead><tr><th></th><th>Before</th><th class="after">With BNB Agent Vaults</th></tr></thead>
       <tbody>
         <tr><td>Custody</td><td class="before">Funds sit in a wallet or sub-account the operator controls.</td><td class="after">Funds stay in an ERC-4626 contract. The agent cannot move them out.</td></tr>
-        <tr><td>Permissions</td><td class="before">Anything the key can sign — any contract, any token.</td><td class="after">Only the assets and actions in its rules, on markets the platform has vetted.</td></tr>
+        <tr><td>Permissions</td><td class="before">Anything the key can sign — any contract, any token.</td><td class="after">Only selected vetted markets, each limited to the NAV allocation cap the manager disclosed.</td></tr>
         <tr><td>Rule changes</td><td class="before">Made silently. You find out afterwards.</td><td class="after">Announced 24 hours ahead. Leave first if you disagree.</td></tr>
         <tr><td>Performance</td><td class="before">Headline APR, emissions and marked-to-model gains.</td><td class="after">Live on-chain NAV per share after fees. A stale oracle pauses deposits and exits.</td></tr>
         <tr><td>Exiting mid-strategy</td><td class="before">First out takes the estimate; losses fall on whoever remains.</td><td class="after">Exit any time at live NAV; you pay only your own slippage, shown up front.</td></tr>
@@ -388,7 +388,7 @@
       <div><dt>Custody</dt><dd>Held by the vault contract. Agents hold no withdrawal rights.</dd></div>
       <div><dt>Management fee</dt><dd><b>≤ 5.00%</b> per annum · 0 by default</dd></div>
       <div><dt>Performance fee</dt><dd><b>≤ 30.00%</b> above the post-fee high-water mark</dd></div>
-      <div><dt>Rules</dt><dd><b>Asset × action × exact markets</b><br>Plus a leverage cap per loop · checked on every trade</dd></div>
+      <div><dt>Operations</dt><dd><b>Exact market × maximum % of Vault NAV</b><br>Selected caps total at most 95% · loop leverage is capped separately</dd></div>
       <div><dt>Platform fee</dt><dd>3% (low / medium risk) or 5% (high) of profit + 15% of the creator's fee</dd></div>
       <div><dt>Redemptions</dt><dd>Instant from idle · ≤ 12 hours otherwise · you pay your own slippage</dd></div>
       <div><dt>Oversight</dt><dd>24-hour timelock on rule changes · owner can pause the agent at once · risk council can pause, never move funds</dd></div>
@@ -401,7 +401,7 @@
 <section class="cta">
   <div class="wrap">
     <h2>Your agent is ready. Give it a fund.</h2>
-    <p class="lede">A few rules, 100 USDT and one signature. The contract does the rest.</p>
+    <p class="lede">Choose the operations, give each one a NAV budget, seed 100 USDT and sign once.</p>
     <div class="btns">
       <a class="btn" href="/bnb-agent-vaults-site/create/">Launch an agent vault <span class="arr">→</span></a>
       <a class="btn ghost" href="/bnb-agent-vaults-site/vaults/">Explore vaults</a>
@@ -487,7 +487,7 @@
   BAV.lineChart($("#shot-chart"), BAV.navSeries(v), { height: 280, left: 0, label: "Bluechip Momentum NAV per share since inception" });
 })();
 8:X
-0:{"buildId":"UBeXQa5AfAx0sz01fMwGE","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"bodyClass":"","html":"$3","runtimeVersion":"f677ee6b844a","script":"$4","pageKey":"landing"}],["$L5"],"$L6"]}],"isPartial":"$@7","staleTime":"$8","varyParams":null},{"rsc":"$L9","isPartial":"$@a","staleTime":"$8","varyParams":null},{"rsc":"$Lb","isPartial":"$@c","staleTime":"$8","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@d","rootVaryParams":null,"needsRuntimeRequest":"$@e"}
+0:{"buildId":"w8M32aUJ1r4M5vue90itq","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"bodyClass":"","html":"$3","runtimeVersion":"60f4844a753a","script":"$4","pageKey":"landing"}],["$L5"],"$L6"]}],"isPartial":"$@7","staleTime":"$8","varyParams":null},{"rsc":"$L9","isPartial":"$@a","staleTime":"$8","varyParams":null},{"rsc":"$Lb","isPartial":"$@c","staleTime":"$8","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@d","rootVaryParams":null,"needsRuntimeRequest":"$@e"}
 f:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
 10:"$Sreact.suspense"
 12:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]
@@ -495,11 +495,11 @@ f:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"Outle
 14:I[27201,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"IconMark"]
 15:I[39756,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default"]
 16:I[37457,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default"]
-:HL["/bnb-agent-vaults-site/_next/static/chunks/3nnboc6_7w6kx.css","style"]
+:HL["/bnb-agent-vaults-site/_next/static/chunks/1yt1cn5fjjyfx.css","style"]
 5:["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js","async":true}]
 6:["$","$Lf",null,{"children":["$","$10",null,{"name":"Next.MetadataOutlet","children":"$@11"}]}]
 9:["$","$1","h",{"children":[null,["$","$L12",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","div",null,{"hidden":true,"children":["$","$L13",null,{"children":["$","$10",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"BNB Agent Vaults — Agent-managed funds on BNB Chain"}],["$","meta","1",{"name":"description","content":"Launch and follow non-custodial, policy-bound agent vaults on BNB Chain."}],["$","meta","2",{"name":"codex-preview","content":"development"}],["$","link","3",{"rel":"shortcut icon","href":"/bnb-agent-vaults-site/favicon.svg"}],["$","link","4",{"rel":"icon","href":"/bnb-agent-vaults-site/favicon.svg"}],["$","$L14","5",{}]]}]}]}],null]}]
-b:["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/3nnboc6_7w6kx.css","precedence":"next"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L15",null,{"parallelRouterKey":"children","template":["$","$L16",null,{}],"notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]]}]}]}]]}]
+b:["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/1yt1cn5fjjyfx.css","precedence":"next"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L15",null,{"parallelRouterKey":"children","template":["$","$L16",null,{}],"notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]]}]}]}]]}]
 11:null
 e:true
 8:300
