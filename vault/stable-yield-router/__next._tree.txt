@@ -1,2 +1,2 @@
-:HL["/bnb-agent-vaults-site/_next/static/chunks/1vx9rxbml4x49.css","style"]
-0:{"tree":{"name":"","param":null,"prefetchHints":4176,"slots":{"children":{"name":"vault","param":null,"prefetchHints":4192,"slots":{"children":{"name":"slug","param":{"type":"d","key":"stable-yield-router","siblings":[]},"prefetchHints":4192,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}}}},"staleTime":300,"buildId":"-4JLNBC5A8b26tRhCu965"}
+:HL["/bnb-agent-vaults-site/_next/static/chunks/0dg1tulv5etgh.css","style"]
+0:{"tree":{"name":"","param":null,"prefetchHints":4176,"slots":{"children":{"name":"vault","param":null,"prefetchHints":4192,"slots":{"children":{"name":"slug","param":{"type":"d","key":"stable-yield-router","siblings":[]},"prefetchHints":4192,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}}}},"staleTime":300,"buildId":"cYofe8MjKLLIImG4qJ2ji"}

@@ -467,7 +467,7 @@
           <nav class="nav">${nav.map(([h, l]) => `<a href="${h}" class="${active === h ? "active" : ""}">${l}</a>`).join("")}</nav>
           <div class="head-right">
             <span class="chain"><img class="logo" src="assets/logos/bnbchain.jpg" alt="">BNB Smart Chain · 56</span>
-            <button class="btn sm" data-wallet>Connect Wallet</button>
+            <button class="btn sm" data-wallet><span class="full">Connect Wallet</span><span class="short">Connect</span></button>
             <button class="menu-btn" aria-label="Menu"><span></span></button>
           </div>
         </div>
@@ -502,14 +502,39 @@
   function wireShell() {
     const mh = $(".masthead");
     const mb = $(".menu-btn");
-    if (mb) mb.addEventListener("click", () => mh.classList.toggle("open"));
+    const setMenu = (open) => { mh.classList.toggle("open", open); document.body.classList.toggle("menu-open", open); };
+    if (mb) mb.addEventListener("click", () => setMenu(!mh.classList.contains("open")));
+    $$(".nav a", mh).forEach((a) => a.addEventListener("click", () => setMenu(false)));
+    window.addEventListener("resize", () => { if (window.innerWidth > 960) setMenu(false); });
     $$("[data-wallet]").forEach((b) => b.addEventListener("click", () => {
       const on = b.dataset.connected === "1";
       b.dataset.connected = on ? "0" : "1";
-      b.textContent = on ? "Connect Wallet" : "0x7a3F…c91E";
+      b.innerHTML = on ? '<span class="full">Connect Wallet</span><span class="short">Connect</span>' : '<span class="full">0x7a3F…c91E</span><span class="short">0x7a3F…</span>';
       b.classList.toggle("ghost", !on);
       toast(on ? "Wallet disconnected" : "Demo wallet connected — no transactions will be sent");
     }));
+    stackTables();
+  }
+
+  // On small screens `.tbl.stack` rows render as cards; each cell borrows its column header as a label.
+  function stackTables(root = document) {
+    $$("table.stack", root).forEach((t) => {
+      if (t.dataset.stacked) return;
+      t.dataset.stacked = "1";
+      const apply = () => {
+        const heads = $$("thead th", t).map((th) => th.textContent.trim());
+        $$("tbody tr, tfoot tr", t).forEach((tr) => {
+          let i = 0;
+          Array.from(tr.children).forEach((td) => {
+            const span = td.colSpan || 1;
+            if (span === 1 && heads[i] && td.dataset.label !== heads[i]) td.dataset.label = heads[i];
+            i += span;
+          });
+        });
+      };
+      apply();
+      new MutationObserver(apply).observe(t, { childList: true, subtree: true });
+    });
   }
 
   let toastEl, toastT;
@@ -524,7 +549,7 @@
   window.BAV = {
     TODAY, DAY, SLOTS, ASSETS, VENUES, AGENT_STACK, VAULTS,
     $, $$, esc, fmt, perf, periodDays, historyTag, riskMeter, statusTag,
-    rng, hexAddr, short, navSeries, sparkline, lineChart, logo, agentCanvas,
+    rng, hexAddr, short, navSeries, sparkline, lineChart, logo, agentCanvas, stackTables,
     shell, footerHTML, wireShell, toast, SEAL,
     vault: (slug) => VAULTS.find((v) => v.slug === slug),
   };
