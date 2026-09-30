@@ -3,136 +3,114 @@
 3:I[37457,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default"]
 4:I[81384,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js"],"PrototypePage"]
 b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default",1]
-:HL["/bnb-agent-vaults-site/_next/static/chunks/14j5olz08x8ko.css","style"]
-5:T2549,
+:HL["/bnb-agent-vaults-site/_next/static/chunks/3nnboc6_7w6kx.css","style"]
+5:T3152,
 
 <section class="page-head">
   <div class="wrap wide">
     <div class="row">
       <div>
         <h1>Launch a vault</h1>
-        <p class="lede">Start from a preset, switch on what your agent may do, seed 100 USDT. Timelocks, oracles and exit rules are fixed by the protocol, so depositors only read what you chose.</p>
+        <p class="lede" id="lede"></p>
+        <div class="seg who-seg" role="tablist" aria-label="Who is launching">
+          <button type="button" data-who="human" role="tab">I'm a human</button>
+          <button type="button" data-who="agent" role="tab">I'm an agent</button>
+        </div>
       </div>
-      <div class="summary" style="grid-template-columns:repeat(3,minmax(120px,1fr))">
+      <div class="summary three human-only" style="grid-template-columns:repeat(3,minmax(120px,1fr))">
         <div><div class="label">Risk</div><div class="v" id="s-risk">—</div></div>
-        <div><div class="label">Counted in</div><div class="v" id="s-asset">—</div></div>
-        <div><div class="label">Checks</div><div class="v" id="s-checks">—</div></div>
+        <div><div class="label">Vault currency</div><div class="v" id="s-asset">—</div></div>
+        <div><div class="label">Max leverage</div><div class="v" id="s-lev">—</div></div>
       </div>
     </div>
   </div>
 </section>
 
-<div class="wrap wide">
+<!-- ============================== HUMAN: three steps ============================== -->
+<div class="wrap wide human-only">
   <div class="create-grid">
     <nav class="toc" id="toc">
-      <a href="#s-1"><span class="rn">01</span>Start<span class="ck"></span></a>
-      <a href="#s-2"><span class="rn">02</span>Agent<span class="ck"></span></a>
-      <a href="#s-3"><span class="rn">03</span>Mandate<span class="ck"></span></a>
-      <a href="#s-4"><span class="rn">04</span>Name &amp; fees<span class="ck"></span></a>
-      <a href="#s-5"><span class="rn">05</span>Seed &amp; launch<span class="ck"></span></a>
+      <a href="#s-1"><span class="rn">01</span>Rules<span class="ck"></span></a>
+      <a href="#s-2"><span class="rn">02</span>Name &amp; fees<span class="ck"></span></a>
+      <a href="#s-3"><span class="rn">03</span>Seed &amp; sign<span class="ck"></span></a>
     </nav>
 
     <form id="f" autocomplete="off" onsubmit="return false">
       <section class="article" id="s-1">
-        <header><span class="rn">01</span><h2>Start</h2><p>A preset only pre-fills the mandate. Everything stays editable.</p></header>
+        <header><span class="rn">01</span><h2>Rules</h2><p>Add one rule at a time: an asset, what the vault does with it, and the exact markets. Anything not listed here is off limits.</p></header>
         <div class="body">
-          <div class="tpl-grid" id="presets"></div>
-          <div class="fields" style="margin-top:24px">
-            <div class="field"><span>Counted in <em>deposits, NAV and redemptions</em></span>
+          <div class="fields">
+            <div class="field"><span>Vault currency <em>used for deposits, returns and withdrawals</em></span>
               <div class="radio-row" id="asset-row"><label><input type="radio" name="asset" value="USDT" checked>USDT</label><label><input type="radio" name="asset" value="BNB">BNB</label></div></div>
-            <label class="field"><span>Benchmark <em>what you are ranked against</em></span><select id="bench"></select></label>
+            <div class="field"><span>Quick start <em>optional · replaces your rules</em></span><div class="quick-row" id="quick"></div></div>
           </div>
+
+          <div class="sub-h"><span>Your rules</span><em id="legs-count"></em></div>
+          <div class="legs" id="legs"></div>
+
+          <div class="builder" id="builder">
+            <div class="builder-h"><b id="b-title">Add a rule</b><ol class="stepper" id="stepper"></ol></div>
+            <div class="builder-b" id="b-body"></div>
+            <div class="builder-f"><button type="button" class="btn ghost sm" id="b-back">Back</button><span class="fine" id="b-hint"></span><button type="button" class="btn sm" id="b-next">Next</button></div>
+          </div>
+
+          <details class="excl" style="margin-top:22px">
+            <summary>Optional promises · shown as badges on your vault</summary>
+            <div style="margin-top:12px">
+              <div class="toggle-row">
+                <div class="t">Drawdown pause<small>Stop new trades if NAV falls this far below its peak.</small></div>
+                <div class="ctl"><div class="suffix"><input id="ddv" value="20" inputmode="decimal" disabled><b>%</b></div><input type="checkbox" class="sw" id="ddon" aria-label="Drawdown pause"></div>
+              </div>
+              <div class="toggle-row">
+                <div class="t">Capacity cap<small id="cap-hint"></small></div>
+                <div class="ctl"><div class="suffix"><input id="capv" inputmode="decimal" disabled><b class="unit-a">USDT</b></div><input type="checkbox" class="sw" id="capon" aria-label="Capacity cap"></div>
+              </div>
+            </div>
+          </details>
+
+          <p class="fine" style="margin-top:18px">Every market is entered from the vault's own asset and exits back to it; any swap on the way is part of the market and priced against the oracle. Same for every vault: at least 5% stays idle for instant exits, no position can exceed what its market absorbs in 24 hours, and deposits pause if a full exit would cost more than 5%. Rates are today's (2026-09-30) from Venus and Lista, not a forecast; reward tokens are not counted. <a href="/bnb-agent-vaults-site/#terms" style="text-decoration:underline">All rules</a></p>
         </div>
       </section>
 
       <section class="article" id="s-2">
-        <header><span class="rn">02</span><h2>Agent</h2><p>Your wallet owns the vault. The agent trades with its own key, inside the mandate.</p></header>
+        <header><span class="rn">02</span><h2>Name &amp; fees</h2><p>Set the creator fee. The platform adds a risk-based fee; the full split is always shown to depositors.</p></header>
         <div class="body fields">
-          <div class="field full"><span>Demo owner <em>local simulation · no wallet required</em></span><div class="owner-box" id="owner"></div></div>
-          <div class="field full"><span>Agent <em>simulated ERC-8004 agents available to this owner</em></span><div class="mkt-list" id="agents"></div></div>
-          <div class="field full hide" id="op-override"><span>Operator address <em>replaces the agent's registered wallet</em></span><input id="operator" class="mono" placeholder="0x…">
-            <div class="cli" style="margin-top:8px"><b>$</b> npx bnb-agent-vaults operator new &nbsp;→ creates a key in your system keychain and prints its address</div></div>
-          <p class="fine" style="grid-column:1/-1">The operator is the agent's own wallet from its ERC-8004 registration. It can only call <span class="mono">execute</span> inside this mandate and can never withdraw. You can pause it instantly; switching to a new key waits 24 hours. If its trades lose more than 2% of NAV against oracle prices within 24 hours, it pauses itself until you resume it. <button type="button" class="link" id="op-toggle" style="margin-left:6px">Use a different key</button></p>
+          <label class="field"><span>Vault name</span><input id="name"></label>
+          <div class="field"><span>Share symbol</span><div class="locked"><span id="symbol">—</span><span class="label">Auto</span></div></div>
+          <label class="field full"><span>Strategy note <em>shown under the rules, not binding</em></span><textarea id="note" placeholder="What you are trying to do, in one or two sentences."></textarea></label>
+          <label class="field"><span>Creator performance fee <em>max 30%</em></span><div class="suffix"><input id="pf" inputmode="decimal"><b>%</b></div></label>
+          <div class="field"><span>Platform performance fee <em>set by risk level</em></span><div class="locked"><span id="platform-fee">3%</span><span class="label">Automatic</span></div></div>
+          <label class="field"><span>Creator management fee <em>max 5%</em></span><div class="suffix"><input id="mf" value="0" inputmode="decimal"><b>% p.a.</b></div></label>
+          <label class="field full"><span>Ranked against <em>benchmark on the leaderboard</em></span><select id="bench"></select></label>
         </div>
       </section>
 
       <section class="article" id="s-3">
-        <header><span class="rn">03</span><h2>Mandate</h2><p>Switch on what the agent may do. Later, tightening applies at once; loosening waits 24 hours in public.</p></header>
-        <div class="body">
-          <div id="blocks"></div>
-          <div class="blk">
-            <div class="blk-h static"><div class="t">Vault-wide limits<small>Apply to every block above.</small></div></div>
-            <div class="blk-b fields" id="vaultwide"></div>
-          </div>
-          <div style="margin-top:8px">
-            <div class="toggle-row">
-              <div class="t">Drawdown pause<small>Stop new trades if NAV falls this far below its peak. Off by default.</small></div>
-              <div class="ctl"><div class="suffix"><input id="ddv" value="30" inputmode="decimal" disabled><b>%</b></div><input type="checkbox" class="sw" id="ddon" aria-label="Drawdown pause"></div>
-            </div>
-            <div class="toggle-row">
-              <div class="t">Capacity cap<small id="cap-hint"></small></div>
-              <div class="ctl"><div class="suffix"><input id="capv" inputmode="decimal" disabled><b class="unit-a">USDT</b></div><input type="checkbox" class="sw" id="capon" aria-label="Capacity cap"></div>
-            </div>
-            <p class="fine" style="margin-top:14px">Whatever you set here, deposits pause automatically when a full exit would cost more than 5%, and no single position can exceed what its market absorbs in 24 hours.</p>
-          </div>
-        </div>
-      </section>
-
-      <section class="article" id="s-4">
-        <header><span class="rn">04</span><h2>Name &amp; fees</h2><p>Depositors see one fee number. The platform's share comes out of it.</p></header>
-        <div class="body fields">
-          <label class="field"><span>Vault name</span><input id="name"></label>
-          <div class="field"><span>Share symbol</span><div class="locked"><span id="symbol">—</span><span class="label">Auto</span></div></div>
-          <label class="field full"><span>Strategy note <em>shown under the rules, not binding</em></span><textarea id="note" placeholder="What the agent is trying to do, in one or two sentences."></textarea></label>
-          <label class="field"><span>Your performance fee <em>max 30%</em></span><div class="suffix"><input id="pf" inputmode="decimal"><b>%</b></div></label>
-          <label class="field"><span>Your management fee <em>max 5%</em></span><div class="suffix"><input id="mf" value="0" inputmode="decimal"><b>% p.a.</b></div></label>
-        </div>
-      </section>
-
-      <section class="article" id="s-5">
-        <header><span class="rn">05</span><h2>Seed &amp; launch</h2><p>Your own money goes in first and stays in until the vault closes.</p></header>
+        <header><span class="rn">03</span><h2>Seed &amp; sign</h2><p>Your own money goes in first and stays in until the vault closes.</p></header>
         <div class="body">
           <div class="fields">
             <label class="field"><span>Seed <em id="seed-min">min 100 USDT</em></span><div class="suffix"><input id="seed" inputmode="decimal"><b class="unit-a">USDT</b></div></label>
             <div class="field"><span>Locked until close</span><div class="locked"><span id="seed-usd">—</span><span class="label">Owner stake</span></div></div>
+            <div class="field full"><span>Your wallet <em>local simulation · no wallet required</em></span><div class="owner-box" id="owner"></div></div>
           </div>
-          <div class="fixed-terms" style="margin-top:24px">
-            <div><b>24 h</b><span>Timelock on loosening the rules</span></div>
-            <div><b>≤ 12 h</b><span>Longest redemption</span></div>
-            <div><b>24 h</b><span>Deposit cooldown</span></div>
-            <div><b>Chainlink · Atlas · RedStone</b><span>Majors, via Venus ResilientOracle</span></div>
-            <div><b>Atlas · APRO</b><span>bStocks, plus PancakeSwap TWAP check; LP valued by oracle</span></div>
-            <div><b>Oracle-bound</b><span>Every trade's slippage is capped against oracle price</span></div>
-            <div><b>High-water mark</b><span>Performance fees only on new profit</span></div>
-            <div><b>No arbitrary calls</b><span>Approved, non-upgradeable adapters only</span></div>
-            <div><b>New · &lt; 30 days</b><span>Tag shown until the vault has a track record</span></div>
-          </div>
-          <div class="launch-grid" id="launch">
-            <div>
-              <div class="launch-h"><h3>Launch checks</h3><span class="tag" id="m-state">Draft</span></div>
-              <ul class="checks" id="checks"></ul>
-            </div>
-            <div>
-              <button type="button" class="btn ghost block" id="dry">Run fork dry-run</button>
-              <ul class="dry" id="dryl"></ul>
-              <button type="button" class="btn block" id="deploy" style="margin-top:14px" disabled>Complete launch checks</button>
-              <p class="fine" style="margin-top:12px">Demo mode: the dry-run and launch are simulated locally. No wallet signature or blockchain transaction is requested.</p>
-              <div id="launch-result"></div>
-              <button type="button" class="link" id="toggle-json" style="margin-top:16px">View manifest JSON</button>
-              <div class="json hide" id="json" style="margin-top:12px"></div>
-              <button type="button" class="btn ghost block" id="dl" style="margin-top:12px">Download manifest (.json)</button>
-            </div>
-          </div>
+          <p class="fine" style="margin-top:12px">You trade from the vault page with this wallet. The same rules apply to you as to any agent: every trade is checked against them and priced against the oracle, and if your trades lose 2% of NAV in 24 hours, trading pauses until you resume it. You can never withdraw depositors' money.</p>
+          <ul class="checks" id="issues" style="margin-top:22px"></ul>
+          <button type="button" class="btn block" id="sign" style="margin-top:18px">Sign &amp; launch</button>
+          <ul class="dry" id="steps"></ul>
+          <div id="launch-result" style="margin-top:12px"></div>
+          <p class="fine" style="margin-top:12px">Demo mode: signing simulates the fork check and the launch in this browser. No wallet or transaction is used. <button type="button" class="link" id="toggle-json" style="margin-left:6px">View manifest</button></p>
+          <div class="json hide" id="json" style="margin-top:12px"></div>
         </div>
       </section>
     </form>
 
     <aside class="aside" id="mandate">
       <div class="panel">
-        <div class="panel-h"><h3>Mandate</h3><span class="tag">Binding</span></div>
+        <div class="panel-h"><h3>What depositors read</h3><span class="tag">Binding</span></div>
         <div class="panel-b">
+          <p class="sentence" id="sentence"></p>
+          <div class="meta-row" id="meta"></div>
           <ul class="rules" id="rules"></ul>
-          <div class="ai-sum"><span class="tag sim">AI summary · not binding</span><div id="ai"></div></div>
           <div style="margin-top:22px;font-size:13px;color:var(--ink-2)" id="split-title"></div>
           <div class="split" id="split"></div>
           <div class="split-legend" id="split-legend"></div>
@@ -142,441 +120,506 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
   </div>
 </div>
 
-<div class="mobile-cta"><span class="mc-state" id="mc-state"></span><a class="btn" href="#launch">Review launch</a></div>
+<!-- ============================== AGENT: MCP tutorial ============================== -->
+<div class="wrap wide agent-only">
+  <div class="am-grid">
+    <div>
+      <section class="article">
+        <header><span class="rn">Step 0</span><h2>Send this to your agent</h2><p>Works with Claude Code, Codex, OpenClaw or any MCP client.</p></header>
+        <div class="body">
+          <div class="copy-line"><code id="skill-line"></code><button type="button" class="btn sm" id="copy-skill">Copy</button></div>
+          <ol class="am-steps">
+            <li><b>Send this to your agent.</b><span>It reads the skill, connects to our MCP and makes its own trading key.</span></li>
+            <li><b>It proposes a vault and sends you a sign link.</b><span>The same rules a human builds: asset, action and exact markets, with a leverage cap on loops. It registers an ERC-8004 identity first if it has none.</span></li>
+            <li><b>You open the link, read one sentence and sign.</b><span>Seed 100 USDT and the vault is live. Nothing is deployed until you sign.</span></li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="article">
+        <header><span class="rn">MCP</span><h2>Tutorial for agents</h2><p>The same steps are in <a id="skill-link" href="#" style="text-decoration:underline">skill.md</a>. <span class="tag sim" style="margin-left:6px">Preview · not live</span></p></header>
+        <div class="body">
+          <div class="tut">
+            <div class="tut-step"><span class="n">1</span><div><b>Connect</b><p>Add the MCP server. Any other client: add the same URL as a streamable HTTP server.</p><pre class="code" id="mcp-add"></pre></div></div>
+            <div class="tut-step"><span class="n">2</span><div><b>Make your trading key</b><p>The key lives in your system keychain and is always separate from your owner's wallet. Never ask your owner for their private key or seed phrase.</p><pre class="code">npx bnb-agent-vaults operator new</pre></div></div>
+            <div class="tut-step"><span class="n">3</span><div><b>Find markets</b><p>Every listed market for an asset and an action, with today's rate, size and — for loops — the leverage cap.</p><pre class="code">list_markets({ asset: "stable", action: "lend" })
+→ [ { id: "lista-vault-0xb5a3", name: "RockawayX PT Yield", apy: 4.14, kind: "Vault" },
+    { id: "venus-supply-usdc", name: "Venus · USDC", apy: 3.87, kind: "Market" }, … ]</pre></div></div>
+            <div class="tut-step"><span class="n">4</span><div><b>Propose the vault</b><p>One rule per asset and action, each with its exact markets. You get back the sentence depositors will read, a risk level and a sign link for your owner.</p><pre class="code">create_vault({
+  asset: "USDT",
+  rules: [
+    { asset: "stable", action: "lend",
+      markets: ["lista-vault-0xb5a3", "venus-supply-usdc"] },
+    { asset: "stocks", action: "borrow",
+      markets: ["venus-nvdab-usdt"], maxLeverage: 1.5 }
+  ],
+  name: "Orbit Stocks+",
+  performanceFeePct: 15
+})
+→ { summary: "Orbit Stocks+ can lend stablecoins via RockawayX PT Yield and Venus · USDC and loop NVDAB / USDT up to 1.5×. Nothing else.",
+    risk: "High", signUrl: "https://…/sign/0x9b1e…" }</pre></div></div>
+            <div class="tut-step"><span class="n">5</span><div><b>Trade inside the rules</b><p>Simulate, build, then sign locally with your trading key. Every action carries a reason, shown on the vault's public timeline.</p><pre class="code">simulate_execute(vault, [
+  { market: "venus-supply-usdc", op: "increase", amount: "1000",
+    reason: "Venus USDC 3.87% beats USDT 3.25%" }
+])
+build_execute(vault, actions)  → { to, data }  // sign with your trading key</pre></div></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <aside class="aside">
+      <div class="panel">
+        <div class="panel-h"><h3>Tools</h3><span class="tag">MCP</span></div>
+        <div class="panel-b" style="padding-top:6px"><ul class="tools" id="tools"></ul></div>
+      </div>
+      <div class="panel">
+        <div class="panel-h"><h3>The contract enforces</h3></div>
+        <div class="panel-b" style="padding-top:6px"><ul class="tools" id="enforced"></ul></div>
+      </div>
+      <p class="fine" style="margin-top:16px">Want to run the vault yourself? Switch to <button type="button" class="link" data-who-go="human" style="font-size:11px">I'm a human</button>.</p>
+    </aside>
+  </div>
+</div>
+
+<div class="mobile-cta human-only"><span class="mc-state" id="mc-state"></span><a class="btn" href="#s-3">Review &amp; sign</a></div>
 
 
 
-6:Taecf,
+6:T7c39,
 (function () {
-  const { $, $$, esc, ASSETS, OPS, fmt, toast, logo, short, demo, DEMO_OWNER } = BAV;
+  const { $, $$, esc, ASSETS, fmt, toast, logo, demo, DEMO_OWNER, riskMeter } = BAV;
   BAV.shell("create.html");
 
-  /* ---------------- Data (snapshot 2026-09-30, simulated where noted) ---------------- */
   const BNB_USD = 758.28;
-  const MY_AGENTS = [ // ERC-8004 agents the demo wallet owns (simulated registry lookup)
-    { id: 942, name: "Orbit Agent", runtime: "Claude Code", operator: "0x4f2A9c81D07b3E5a6C91e0B2d7F84a13C5e9b7D0" },
-    { id: 1790, name: "Mirror Labs", runtime: "BNB Agent Studio", operator: "0x9C07e3B15aF4d8621E0b7A9c3D5f1284B6e0aC3F" },
-  ];
-  const STABLES = ["USDT", "USDC", "USD1", "U"];
-  const MAJORS = ["BNB", "BTCB", "ETH"];
-  const BSTOCKS = [
-    { name: "Deep", hint: "Sell $100K for under 1%", list: ["NVDAB", "TSLAB", "SPYB", "QQQB", "AAPLB", "GOOGLB", "BABAB", "SPCXB"] },
-    { name: "Medium", hint: "Sell $10K for under 1%", list: ["MSFTB", "AMZNB", "HOODB", "MSTRB", "CRCLB", "SKHYB", "SNDKB", "GMEB", "BNCB"] },
-    { name: "Thin", hint: "Sell $10K for 1–10%", list: ["METAB", "TSMB", "NFLXB", "INTCB", "MUB", "MRNAB", "BMNRB", "DJTB", "FLNCB", "AMCB", "NOKB", "SNXXB", "SOXLB", "SOXSB", "TQQQB", "SQQQB"] },
-  ];
-  const NO_POOL = 45;
-  const TRADEABLE = BSTOCKS.flatMap((t) => t.list);
-  const LEV = new Set(["TQQQB", "SQQQB", "SOXLB", "SOXSB"]);
-
-  // Loop pairs, generated from Lista (on-chain LLTV + available liquidity) and Venus (collateral factors) on 2026-09-30.
-  // [id, kind, venue, collateral, loan, liquidation LTV %, pair LTV cap, default, borrow %, LISTA reward %, USD available, sub, collateral yield %, DEX discount %, slisBNB]
-  const PAIR_ROWS = [["venus-slisbnb-bnb","corr","venus","slisBNB","BNB",72,65,55,0.39,0,379000000,"",0.834,0.17,1],["venus-asbnb-bnb","corr","venus","asBNB","BNB",60,53,43,0.39,0,379000000,"",null,0.3,0],["lista-slisbnb-bnb-fixed-term","corr","lista","slisBNB","BNB",96.5,90,80,0.5,0,142384587,"fixed-term",0.834,0.17,1],["lista-slisbnb-bnb-lp-bnb-smart-lending","corr","lista","slisBNB-BNB LP","BNB",96.5,90,80,0.5,0,7650810,"Smart Lending",null,0.1,1],["lista-slisbnb-bnb","corr","lista","slisBNB","BNB",96.5,90,80,0.29,0,5772283,"",0.834,0.17,1],["lista-slisbnb-bnb-lp-bnb-smart-lending-1","corr","lista","slisBNB-BNB LP","BNB",91.5,85,75,1.0,0,82038,"Smart Lending",null,0.1,1],["lista-asbnb-bnb","corr","lista","asBNB","BNB",96.5,90,80,0.29,0,8771,"",null,0.3,0],["lista-slisbnb-bnb-1","corr","lista","slisBNB","BNB",91.5,85,75,2.37,0,4474,"",0.834,0.17,1],["venus-susde-usdt","stable","venus","sUSDe","USDT",75,68,58,5.0,0,45800000,"",5.16,0.1,0],["venus-usde-usdt","stable","venus","USDe","USDT",70,63,53,5.0,0,45800000,"",null,0.1,0],["venus-susde-u","stable","venus","sUSDe","U",75,68,58,4.1,0,10200000,"",5.16,0.1,0],["venus-usde-u","stable","venus","USDe","U",70,63,53,4.1,0,10200000,"",null,0.1,0],["venus-susde-usdc","stable","venus","sUSDe","USDC",75,68,58,5.35,0,7900000,"",5.16,0.1,0],["venus-usde-usdc","stable","venus","USDe","USDC",70,63,53,5.35,0,7900000,"",null,0.1,0],["lista-usdt-usdc-lp-usd1-smart-lending","stable","lista","USDT-USDC LP","USD1",96.5,90,80,0.47,0.45,2164988,"Smart Lending",null,0.1,0],["lista-usd1-usdt-lp-u-smart-lending","stable","lista","USD1-USDT LP","U",96.5,90,80,0.03,0,399163,"Smart Lending",null,0.1,0],["lista-lisusd-usdt-lp-u-smart-lending","stable","lista","lisUSD-USDT LP","U",96.5,90,80,0.03,0,384333,"Smart Lending",null,0.1,0],["lista-usd1-usdt-lp-usd1-smart-lending","stable","lista","USD1-USDT LP","USD1",96.5,90,80,0.03,0,292946,"Smart Lending",null,0.1,0],["lista-lisusd-usdt-lp-usd1-smart-lending","stable","lista","lisUSD-USDT LP","USD1",96.5,90,80,0.03,0,271843,"Smart Lending",null,0.1,0],["lista-usdt-usdc-lp-u-smart-lending","stable","lista","USDT-USDC LP","U",96.5,90,80,1.0,0.47,228884,"Smart Lending",null,0.1,0],["lista-asusdf-usd1","stable","lista","asUSDF","USD1",91.5,85,75,0.08,0,205542,"",null,0.3,0],["lista-usdt-usdc-lp-usdc-smart-lending","stable","lista","USDT-USDC LP","USDC",96.5,90,80,1.46,0,100009,"Smart Lending",null,0.1,0],["lista-u-usdt-lp-usdt-smart-lending","stable","lista","U-USDT LP","USDT",96.5,90,80,6.08,0,10567,"Smart Lending",null,0.1,0],["lista-susde-usdt","stable","lista","sUSDe","USDT",91.5,85,75,6.16,0,9992,"",5.16,0.1,0],["lista-u-usdt-lp-usd1-smart-lending","stable","lista","U-USDT LP","USD1",96.5,90,80,1.7,0,2006,"Smart Lending",null,0.1,0],["lista-asusdf-usdt","stable","lista","asUSDF","USDT",91.5,85,75,31.34,0,1089,"",null,0.3,0],["venus-btcb-usdt","long","venus","BTCB","USDT",80,60,45,5.0,0,45800000,"",null,0.04,0],["venus-eth-usdt","long","venus","ETH","USDT",80,60,45,5.0,0,45800000,"",null,0.43,0],["venus-bnb-usdt","long","venus","BNB","USDT",80,60,45,5.0,0,45800000,"",null,0.06,0],["venus-wbeth-usdt","long","venus","wBETH","USDT",80,60,45,5.0,0,45800000,"",null,0.3,0],["venus-solvbtc-usdt","long","venus","SolvBTC","USDT",75,55,40,5.0,0,45800000,"",null,0.2,0],["venus-slisbnb-usdt","long","venus","slisBNB","USDT",72,52,40,5.0,0,45800000,"",0.834,0.17,1],["venus-nvdab-usdt","long","venus","NVDAB","USDT",60,40,30,5.0,0,45800000,"",null,0.3,0],["venus-tslab-usdt","long","venus","TSLAB","USDT",60,40,30,5.0,0,45800000,"",null,0.47,0],["venus-spcxb-usdt","long","venus","SPCXB","USDT",50,30,20,5.0,0,45800000,"",null,0.33,0],["venus-skhyb-usdt","long","venus","SKHYB","USDT",50,30,20,5.0,0,45800000,"",null,0.26,0],["lista-btcb-usd1","long","lista","BTCB","USD1",70.0,50,40,1.69,0,18124562,"",null,0.04,0],["venus-btcb-u","long","venus","BTCB","U",80,60,45,4.1,0,10200000,"",null,0.04,0],["venus-eth-u","long","venus","ETH","U",80,60,45,4.1,0,10200000,"",null,0.43,0],["venus-bnb-u","long","venus","BNB","U",80,60,45,4.1,0,10200000,"",null,0.06,0],["venus-wbeth-u","long","venus","wBETH","U",80,60,45,4.1,0,10200000,"",null,0.3,0],["venus-solvbtc-u","long","venus","SolvBTC","U",75,55,40,4.1,0,10200000,"",null,0.2,0],["venus-slisbnb-u","long","venus","slisBNB","U",72,52,40,4.1,0,10200000,"",0.834,0.17,1],["venus-nvdab-u","long","venus","NVDAB","U",60,40,30,4.1,0,10200000,"",null,0.3,0],["venus-tslab-u","long","venus","TSLAB","U",60,40,30,4.1,0,10200000,"",null,0.47,0],["venus-spcxb-u","long","venus","SPCXB","U",50,30,20,4.1,0,10200000,"",null,0.33,0],["venus-skhyb-u","long","venus","SKHYB","U",50,30,20,4.1,0,10200000,"",null,0.26,0],["venus-btcb-usdc","long","venus","BTCB","USDC",80,60,45,5.35,0,7900000,"",null,0.04,0],["venus-eth-usdc","long","venus","ETH","USDC",80,60,45,5.35,0,7900000,"",null,0.43,0],["venus-bnb-usdc","long","venus","BNB","USDC",80,60,45,5.35,0,7900000,"",null,0.06,0],["venus-wbeth-usdc","long","venus","wBETH","USDC",80,60,45,5.35,0,7900000,"",null,0.3,0],["venus-solvbtc-usdc","long","venus","SolvBTC","USDC",75,55,40,5.35,0,7900000,"",null,0.2,0],["venus-slisbnb-usdc","long","venus","slisBNB","USDC",72,52,40,5.35,0,7900000,"",0.834,0.17,1],["venus-nvdab-usdc","long","venus","NVDAB","USDC",60,40,30,5.35,0,7900000,"",null,0.3,0],["venus-tslab-usdc","long","venus","TSLAB","USDC",60,40,30,5.35,0,7900000,"",null,0.47,0],["venus-spcxb-usdc","long","venus","SPCXB","USDC",50,30,20,5.35,0,7900000,"",null,0.33,0],["venus-skhyb-usdc","long","venus","SKHYB","USDC",50,30,20,5.35,0,7900000,"",null,0.26,0],["lista-btcb-u","long","lista","BTCB","U",86.0,66,50,2.3,0,1893141,"",null,0.04,0],["lista-slisbnb-u","long","lista","slisBNB","U",86.0,66,50,2.28,0,1789181,"",0.834,0.17,1],["lista-btcb-usd1-fixed-term","long","lista","BTCB","USD1",86.0,66,50,1.8,0,794573,"fixed-term",null,0.04,0],["lista-spyb-usd1","long","lista","SPYB","USD1",85.0,65,50,1.49,2.44,358883,"",null,0.05,0],["lista-btcb-usdc","long","lista","BTCB","USDC",80.0,60,45,0.89,0,318961,"",null,0.04,0],["lista-btcb-usdt","long","lista","BTCB","USDT",80.0,60,45,3.5,0,215018,"",null,0.04,0],["lista-slisbnb-usd1-fixed-term","long","lista","slisBNB","USD1",86.0,66,50,2.0,0,202311,"fixed-term",0.834,0.17,1],["lista-slisbnb-usdc","long","lista","slisBNB","USDC",80.0,60,45,0.02,0,140002,"",0.834,0.17,1],["lista-slisbnb-bnb-lp-usd1-smart-lending","long","lista","slisBNB-BNB LP","USD1",75.0,55,40,1.7,0,116577,"Smart Lending",null,0.1,1],["lista-wbnb-usdc","long","lista","WBNB","USDC",80.0,60,45,0.02,0,100004,"",null,0.06,0],["lista-spyb-u","long","lista","SPYB","U",85.0,65,50,0.57,2.43,88877,"",null,0.05,0],["lista-slisbnb-usdt","long","lista","slisBNB","USDT",80.0,60,45,2.22,0,76533,"",0.834,0.17,1],["lista-crclb-u","long","lista","CRCLB","U",60.0,40,30,0.57,2.17,71226,"",null,0.63,0],["lista-crclb-usd1","long","lista","CRCLB","USD1",60.0,40,30,1.49,2.49,59907,"",null,0.63,0],["lista-sndkb-usdc","long","lista","SNDKB","USDC",50.0,30,20,0.02,0,49999,"",null,0.27,0],["lista-mub-usdc","long","lista","MUB","USDC",65.0,45,35,0.02,0,49999,"",null,9.32,0],["lista-tslab-usdc","long","lista","TSLAB","USDC",75.0,55,40,0.03,0,49978,"",null,0.47,0],["lista-qqqb-u","long","lista","QQQB","U",75.0,55,40,0.58,2.34,47776,"",null,0.01,0],["lista-qqqb-usd1","long","lista","QQQB","USD1",75.0,55,40,0.8,2.3,43755,"",null,0.01,0],["lista-googlb-u","long","lista","GOOGLB","U",70.0,50,40,0.55,7.04,38457,"",null,0.51,0],["lista-crclb-usdc","long","lista","CRCLB","USDC",60.0,40,30,0.83,2.4,25635,"",null,0.63,0],["lista-hoodb-usd1","long","lista","HOODB","USD1",60.0,40,30,0.04,0,24987,"",null,0.77,0],["lista-skhyb-usd1","long","lista","SKHYB","USD1",55.0,35,25,0.03,1.82,24783,"",null,0.26,0],["lista-hoodb-u","long","lista","HOODB","U",60.0,40,30,0.03,0,24534,"",null,0.77,0],["lista-nokb-usd1","long","lista","NOKB","USD1",60.0,40,30,0.03,0.43,23919,"",null,4.83,0],["lista-nvdab-usd1","long","lista","NVDAB","USD1",75.0,55,40,0.85,7.16,23902,"",null,0.3,0],["lista-soxlb-u","long","lista","SOXLB","U",50.0,30,20,0.19,0,23522,"",null,5.59,0],["lista-nokb-u","long","lista","NOKB","U",60.0,40,30,0.03,0.23,22938,"",null,4.83,0],["lista-metab-u","long","lista","METAB","U",70.0,50,40,0.13,0,22844,"",null,1.06,0],["lista-babab-usd1","long","lista","BABAB","USD1",65.0,45,35,0.03,0.38,22547,"",null,0.42,0],["lista-skhyb-u","long","lista","SKHYB","U",55.0,35,25,0.04,0.13,21394,"",null,0.26,0],["lista-soxlb-usd1","long","lista","SOXLB","USD1",50.0,30,20,0.04,13.84,20795,"",null,5.59,0],["lista-babab-u","long","lista","BABAB","U",65.0,45,35,0.04,0.38,20091,"",null,0.42,0],["lista-nvdab-usdc","long","lista","NVDAB","USDC",75.0,55,40,0.02,0,20000,"",null,0.3,0],["lista-wbeth-usdt","long","lista","wBETH","USDT",80.0,60,45,3.44,0,17174,"",null,0.3,0],["lista-spcxb-usdc","long","lista","SPCXB","USDC",50.0,30,20,0.92,0.43,11137,"",null,0.33,0],["lista-slisbnb-bnb-lp-usdc-smart-lending","long","lista","slisBNB-BNB LP","USDC",80.0,60,45,1.61,0,10000,"Smart Lending",null,0.1,1],["lista-tslab-usd1","long","lista","TSLAB","USD1",75.0,55,40,0.22,0.03,7546,"",null,0.47,0],["lista-mub-usd1","long","lista","MUB","USD1",65.0,45,35,0.41,1.47,6876,"",null,9.32,0],["lista-nvdab-u","long","lista","NVDAB","U",75.0,55,40,2.16,4.87,6036,"",null,0.3,0],["lista-wbeth-usd1","long","lista","wBETH","USD1",80.0,60,45,1.09,0,5875,"",null,0.3,0],["lista-tslab-u","long","lista","TSLAB","U",75.0,55,40,0.27,0.03,5738,"",null,0.47,0],["lista-msftb-usd1","long","lista","MSFTB","USD1",75.0,55,40,1.52,0.29,5581,"",null,0.56,0],["lista-slisbnb-usd1","long","lista","slisBNB","USD1",70.0,50,40,10.8,0,4865,"",0.834,0.17,1],["lista-googlb-usd1","long","lista","GOOGLB","USD1",70.0,50,40,2.28,6.7,4110,"",null,0.51,0],["lista-spcxb-u","long","lista","SPCXB","U",50.0,30,20,2.21,0.87,3872,"",null,0.33,0],["lista-tsmb-usd1","long","lista","TSMB","USD1",65.0,45,35,0.82,0.15,3117,"",null,1.11,0],["lista-tsmb-u","long","lista","TSMB","U",65.0,45,35,2.22,0.15,2598,"",null,1.11,0],["lista-bnb-usd1","long","lista","BNB","USD1",70.0,50,40,1.7,0,2417,"",null,0.06,0],["lista-eth-usd1","long","lista","ETH","USD1",70.0,50,40,1.7,0,1340,"",null,0.43,0]];
-  const PAIRS = PAIR_ROWS.map(([id, kind, venue, coll, loan, lltv, cap, def, borrow, rew, liq, sub, yld, disc, stake]) => ({ id, kind, venue, coll, loan, lltv, cap, def, borrow, rew, liq, sub, yld, disc, stake: !!stake }));
-  const KINDS = { corr: "Correlated", stable: "Stablecoin", long: "Leveraged long" };
-  const VNAME = { lista: "Lista", venus: "Venus" };
-  const money = (n) => (n >= 1e6 ? "$" + (n / 1e6).toFixed(1) + "M" : "$" + Math.round(n / 1e3) + "K");
-
-  const ALL_BLOCKS = ["stable", "spot", "work", "borrow", "loop"];
-  const PRESETS = {
-    fund: { name: "Fund manager", blocks: ["stable", "spot", "work", "loop"], majors: true, stocks: true, desc: "Everything on except borrowing. The agent decides how to split capital between lending, loops, majors and bStocks.", logos: ["venus", "lista", "pancakeswap"], defaultName: "Northstar Multi-Strategy", wide: true },
-    stable: { name: "Stablecoin lending", blocks: ["stable"], desc: "Only lend USDT, USDC, USD1 and U on Venus and Lista.", logos: ["venus", "lista"], defaultName: "Orbit Stable Router" },
-    loop: { name: "Looping", blocks: ["loop"], desc: `Only loops — ${PAIRS.length} pairs across correlated, stablecoin and leveraged long.`, logos: ["lista", "venus"], defaultName: "Loop Book" },
-    bluechip: { name: "Blue-chip spot", blocks: ["spot", "work"], majors: true, stocks: false, desc: "Trade BNB, BTCB and ETH, and put them to work.", logos: ["pancakeswap", "venus", "lista"], defaultName: "Majors Momentum" },
-    stocks: { name: "Tokenized stocks", blocks: ["spot", "work"], majors: false, stocks: true, desc: `Trade bStocks with a DEX pool (${TRADEABLE.length} today), and put them to work.`, logos: ["pancakeswap", "venus", "lista"], defaultName: "Mag 7 Rotation" },
-  };
+  const C = BAV.CATALOG; // shared market catalog, risk rule and depositor sentence (assets/app.js)
+  const { GROUPS, ACTIONS, byId, BSTOCKS, VNAME, levTxt, pct, loopRisk, carry } = C;
+  const money = C.usd;
+  // TODO(product): Benchmarks remain leaderboard metadata; contracts do not enforce them.
   const BENCHMARKS = ["Venus USDT supply rate", "Hold slisBNB", "Hold BNB", "Equal-weight BNB / BTCB / ETH", "Hold SPYB"];
+  const TOOLS = [
+    ["list_markets", "Every listed market for an asset and an action, with rate, size and loop caps"],
+    ["create_vault", "Propose a vault; returns the depositor sentence, risk and a sign link"],
+    ["get_vault_state", "NAV, positions, leverage, idle cash, limits, pending changes"],
+    ["simulate_execute", "Dry-run actions from your key; plain-language revert reasons"],
+    ["build_execute", "Calldata to sign locally with your trading key"],
+    ["propose_settings", "Remove markets now, or add them in 24 hours; your owner signs"],
+  ];
+  const ENFORCED = [
+    ["Only the listed markets", "Each rule names its exact markets; everything else reverts"],
+    ["Oracle-bound prices", "Every trade and every swap inside a market is capped against the oracle"],
+    ["Loop leverage caps", "Your cap per loop, never above the platform's own cap"],
+    ["5% idle, 24h depth", "Cash for instant exits; no position beyond 24h market depth"],
+    ["Loss breaker", "Lose 2% of NAV in 24 hours and your key pauses"],
+    ["No withdrawals", "Your key can trade. It can never move funds out"],
+  ];
 
-  /* ---------------- State ---------------- */
+  /* ================= State ================= */
   const S = {
-    preset: "fund", asset: "USDT", bench: null,
-    on: new Set(PRESETS.fund.blocks), majors: true, stocks: true,
-    ops: new Set(OPS.map((o) => o.id)),
-    stables: new Set(STABLES), majorSet: new Set(MAJORS), excluded: new Set(),
-    pairsOff: new Set(), pairKind: "corr", pairQ: "",
-    p: { nonUsdt: 50, borrowLtv: 30, loopCeil: 90, idle: 5 },
-    agent: 942, opOverride: false, pfEdited: false, nameEdited: false,
-    seed: { USDT: 100, BNB: 0.14 }, dry: "idle",
+    who: location.hash === "#agent" ? "agent" : "human",
+    asset: "USDT", legs: [], draft: null, step: 1, q: "",
+    bench: null, pfEdited: false, nameEdited: false,
+    seed: { USDT: 100, BNB: 0.14 }, launched: null, signing: false,
   };
-  let launchedId = null;
-  const BOUNDS = { nonUsdt: [0, 50, 50], borrowLtv: [1, 50, 50], loopCeil: [10, 90, 90], idle: [5, 100, 50] }; // min, max, slider max
   const num = (v) => parseFloat(String(v).replace(/,/g, ""));
-  const isAddr = (s) => /^0x[0-9a-fA-F]{40}$/.test(s);
-  const join = (a) => (a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1]);
-  const cap1 = (t) => t.charAt(0).toUpperCase() + t.slice(1);
-  const on = (b) => S.on.has(b);
-  const opOn = (id) => S.ops.has(id);
-  const owner = () => DEMO_OWNER;
-  const stocksIn = () => (on("spot") && S.stocks ? TRADEABLE.filter((s) => !S.excluded.has(s)) : []);
-  const majorsIn = () => (on("spot") && S.majors ? MAJORS.filter((m) => S.majorSet.has(m)) : []);
-  const pairsIn = () => (on("loop") ? PAIRS.filter((x) => !S.pairsOff.has(x.id)) : []);
-  const pairCap = (x) => Math.min(x.cap, S.p.loopCeil);
-  const isActive = () => on("spot") || on("borrow") || pairsIn().some((x) => x.kind === "long");
-  const risk = () => (on("spot") || on("borrow") || pairsIn().some((x) => x.kind === "long") ? "High" : on("loop") ? "Medium" : "Low");
-  const platform = () => (isActive() ? 5 : 3);
+  const join = (a, w = "and") => (a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + ` ${w} ` + a[a.length - 1]);
+  const BASE = window.__BAV_BASE_PATH__ || "";
+  const denomFam = () => (S.asset === "BNB" ? "bnb" : "stable");
+  const newDraft = () => ({ g: null, a: null, m: new Set(), lev: 2, editing: null });
+  S.draft = newDraft();
+
+  // Markets available for an asset × action under the current denomination.
+  const marketsFor = (g, a) => C.marketsFor(g, a, S.asset);
+  const legKey = (g, a) => `${g}:${a}`;
+  const findLeg = (g, a) => S.legs.find((l) => l.g === g && l.a === a);
+  const effLev = C.effLev;
+  const legMarkets = C.ruleMarkets;
+  const allMarkets = () => S.legs.flatMap(legMarkets);
+
+  /* ---------- Risk, from the markets actually chosen ---------- */
+  const risk = () => C.riskOf(allMarkets(), S.asset);
+  // TODO(product): When a rule change alters risk, accrue with the old platform
+  // rate first, then switch to the newly derived rate.
+  const platform = () => BAV.platformFeeForRisk(risk());
+  const maxLev = () => C.maxLeverage(S.legs);
   const benchmark = () => S.bench || (S.asset === "BNB" ? "Hold slisBNB" : "Venus USDT supply rate");
+  const vaultName = () => $("#name").value.trim() || "This vault";
 
-  /* ---------------- 01 Start ---------------- */
-  function drawPresets() {
-    $("#presets").innerHTML = Object.entries(PRESETS).map(([id, t]) => `
-      <button type="button" class="tpl ${S.preset === id ? "on" : ""} ${t.wide ? "wide" : ""}" data-preset="${id}">
-        <span class="logo-stack">${t.logos.map((l) => logo(l, "md")).join("")}</span>
-        <h3>${t.name}</h3>
-        <p>${t.desc}</p>
-        <div class="tpl-meta">${t.blocks.map((b) => `<span class="tag">${BAV.BLOCKS[b]}</span>`).join("")}</div>
-      </button>`).join("");
-    $$("[data-preset]").forEach((b) => b.addEventListener("click", () => applyPreset(b.dataset.preset)));
+
+  /* ================= Who is launching ================= */
+  function setWho(who) {
+    S.who = who;
+    document.body.classList.toggle("who-agent", who === "agent");
+    $$("[data-who]").forEach((b) => b.classList.toggle("on", b.dataset.who === who));
+    $("#lede").textContent = who === "agent"
+      ? "You are the fund manager. Read the skill, propose a vault through MCP, and send your owner a link to sign. The contract checks every trade you make against the rules you proposed."
+      : "Design the vault and run it yourself. Add rules one at a time — an asset, what the vault does with it, the exact markets — then seed 100 USDT and sign once. The contract checks every trade against these rules.";
+    history.replaceState(null, "", who === "agent" ? "#agent" : location.pathname);
   }
-  function applyPreset(id) {
-    const t = PRESETS[id];
-    S.preset = id;
-    S.on = new Set(t.blocks);
-    if (t.majors != null) { S.majors = t.majors; S.stocks = t.stocks; }
-    if (!S.nameEdited) $("#name").value = t.defaultName;
-    drawPresets(); drawBlocks(); touched();
+  $$("[data-who]").forEach((b) => b.addEventListener("click", () => setWho(b.dataset.who)));
+  $$("[data-who-go]").forEach((b) => b.addEventListener("click", () => { setWho(b.dataset.whoGo); window.scrollTo({ top: 0, behavior: "smooth" }); }));
+
+  /* ================= Agent tutorial ================= */
+  const siteUrl = (p) => (location.protocol === "file:" ? `https://joooe453-creator.github.io/bnb-agent-vaults-site${p}` : new URL(`${BASE}${p}`, location.href).href);
+  $("#skill-line").textContent = `Read ${siteUrl("/skill.md")} and follow the instructions to launch a vault on BNB Agent Vaults`;
+  $("#skill-link").href = `${BASE}/skill.md`;
+  $("#mcp-add").textContent = `claude mcp add --transport http bnb-agent-vaults ${siteUrl("/mcp")}`;
+  $("#copy-skill").addEventListener("click", () => {
+    const text = $("#skill-line").textContent;
+    (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(() => toast("Copied — paste it to your agent"), () => toast("Select the line and copy it"));
+  });
+  $("#tools").innerHTML = TOOLS.map(([n, d]) => `<li><span class="mono">${n}</span><small>${d}</small></li>`).join("");
+  $("#enforced").innerHTML = ENFORCED.map(([n, d]) => `<li><b>${n}</b><small>${d}</small></li>`).join("");
+
+  /* ================= 01 Rules: saved rules ================= */
+  function legSummary(l) {
+    const ms = legMarkets(l);
+    if (l.a === "borrow") {
+      const top = Math.max(...ms.map((m) => effLev(m, l.lev)));
+      const pn = C.pairNames(ms);
+      return `${ms.length} loop market${ms.length > 1 ? "s" : ""} · up to ${levTxt(top)} · ${pn.slice(0, 2).join(", ")}${pn.length > 2 ? ` +${pn.length - 2}` : ""}`;
+    }
+    const names = ms.map((m) => (m.a === "lend" && m.apy != null ? `${m.name} ${pct(m.apy)}` : m.name));
+    return `${ms.length} ${l.a === "trade" ? "token" : l.a === "lp" ? "pool" : "place"}${ms.length > 1 ? "s" : ""} · ${names.slice(0, 2).join(", ")}${names.length > 2 ? ` +${names.length - 2}` : ""}`;
   }
-  function drawBench() {
-    $("#bench").innerHTML = BENCHMARKS.map((b) => `<option ${b === benchmark() ? "selected" : ""}>${b}</option>`).join("");
+  function drawLegs() {
+    $("#legs-count").textContent = S.legs.length ? `${S.legs.length} rule${S.legs.length > 1 ? "s" : ""} · ${allMarkets().length} markets` : "none yet";
+    $("#legs").innerHTML = S.legs.length
+      ? S.legs.map((l, i) => `<div class="leg ${S.draft.editing === i ? "editing" : ""}"><div class="leg-t"><b>${GROUPS[l.g].name} · ${ACTIONS[l.a].name}</b><small>${esc(legSummary(l))}</small></div><div class="leg-b"><button type="button" class="chip" data-leg-edit="${i}">Edit</button><button type="button" class="chip off" data-leg-del="${i}" style="text-decoration:none">Remove</button></div></div>`).join("")
+      : `<p class="fine legs-empty">No rules yet. Add the first one below, or use a quick start.</p>`;
+    $$("[data-leg-edit]").forEach((b) => b.addEventListener("click", () => {
+      const l = S.legs[+b.dataset.legEdit];
+      S.draft = { g: l.g, a: l.a, m: new Set(l.m), lev: l.lev, editing: +b.dataset.legEdit };
+      S.step = 3; S.q = ""; drawAll(); $("#builder").scrollIntoView({ behavior: "smooth", block: "start" });
+    }));
+    $$("[data-leg-del]").forEach((b) => b.addEventListener("click", () => {
+      S.legs.splice(+b.dataset.legDel, 1);
+      if (S.draft.editing != null) { S.draft = newDraft(); S.step = 1; }
+      drawAll();
+    }));
   }
 
-  /* ---------------- 03 Mandate blocks ---------------- */
-  const slider = (key, label, hint, unit = "%") => {
-    const [, , smax] = BOUNDS[key];
-    return `<label class="field"><span>${label} <em>${hint}</em></span><div class="range-row"><input type="range" class="rng" data-rng="${key}" min="0" max="${smax}" step="1" value="${Math.min(S.p[key], smax)}"><div class="suffix"><input data-p="${key}" value="${S.p[key]}" inputmode="decimal"><b>${unit}</b></div></div></label>`;
+  /* ================= 01 Rules: builder ================= */
+  const STEPS = ["Asset", "Action", "Markets", "Leverage"];
+  function drawBuilder() {
+    const d = S.draft, isLoop = d.a === "borrow";
+    $("#b-title").textContent = d.editing != null ? `Edit rule · ${GROUPS[d.g].name} · ${ACTIONS[d.a].name}` : "Add a rule";
+    $("#stepper").innerHTML = STEPS.filter((_, i) => i < 3 || isLoop || !d.a).map((t, i) => `<li class="${S.step === i + 1 ? "on" : S.step > i + 1 ? "done" : ""}"><i>${i + 1}</i>${t}</li>`).join("");
+    const body = $("#b-body");
+    if (S.step === 1) {
+      body.innerHTML = `<p class="b-q">What will this rule touch? Pick one.</p><div class="pick-grid">${Object.entries(GROUPS).map(([id, g]) => {
+        const fam = id === denomFam() ? `No price risk against ${S.asset}` : `Price risk against ${S.asset}`;
+        return `<button type="button" class="pick ${d.g === id ? "on" : ""}" data-g="${id}"><b>${g.name}</b><small>${g.tokens}</small><small class="pick-risk">${fam}</small><i class="box"></i></button>`;
+      }).join("")}</div>`;
+      $$("[data-g]", body).forEach((b) => b.addEventListener("click", () => { d.g = b.dataset.g; d.a = null; d.m = new Set(); S.step = 2; drawAll(); }));
+    } else if (S.step === 2) {
+      body.innerHTML = `<p class="b-q">What does the vault do with ${GROUPS[d.g].noun}? Pick one — add another rule for more.</p><div class="pick-grid">${Object.entries(ACTIONS).map(([id, a]) => {
+        const ms = marketsFor(d.g, id), best = id === "lend" ? Math.max(...ms.map((m) => m.apy || 0)) : null, have = findLeg(d.g, id);
+        const meta = !ms.length ? "Nothing listed yet" : id === "lend" ? `${ms.length} places · up to ${pct(best)}` : id === "borrow" ? `${ms.length} loops · up to ${levTxt(Math.max(...ms.map((m) => m.loop.max)))}` : `${ms.length} ${id === "trade" ? "tokens" : "pools"}`;
+        return `<button type="button" class="pick ${d.a === id ? "on" : ""}" data-a="${id}" ${ms.length ? "" : "disabled"}><span class="logo-stack">${a.logos.map((l) => logo(l, "md")).join("")}</span><b>${a.name}</b><small>${a.desc}</small><small class="pick-risk">${have ? "In your rules · edit" : meta}</small><i class="box"></i></button>`;
+      }).join("")}</div>`;
+      $$("[data-a]", body).forEach((b) => b.addEventListener("click", () => {
+        const have = findLeg(d.g, b.dataset.a);
+        if (have) { const i = S.legs.indexOf(have); S.draft = { g: have.g, a: have.a, m: new Set(have.m), lev: have.lev, editing: i }; }
+        else { d.a = b.dataset.a; d.m = new Set(); d.lev = 2; }
+        S.step = 3; S.q = ""; drawAll();
+      }));
+    } else if (S.step === 3) {
+      drawMarkets(body);
+    } else {
+      drawLeverage(body);
+    }
+    const nextLabel = S.step === 3 && isLoop ? "Next · leverage" : d.editing != null ? "Save rule" : "Add to rules";
+    $("#b-back").textContent = d.editing != null && S.step <= 3 ? "Cancel" : "Back";
+    $("#b-back").classList.toggle("hide", S.step === 1 && d.editing == null);
+    $("#b-next").classList.toggle("hide", S.step < 3);
+    $("#b-next").textContent = nextLabel;
+    $("#b-next").disabled = S.step >= 3 && !d.m.size;
+    $("#b-hint").textContent = S.step >= 3 ? (d.m.size ? `${d.m.size} selected` : "Select at least one") : "";
+  }
+
+  function row(m, checked) {
+    const tags = [];
+    if (m.kind !== "Token" && m.kind !== "Pool") tags.push(`<span class="mk ${m.kind === "Vault" ? "v" : ""}">${m.kind}</span>`);
+    if (m.tvl != null) tags.push(`<span class="mk ${m.tvl < 1e6 ? "warn" : ""}">${m.tvl < 1e6 ? "Small · " : ""}${money(m.tvl)}</span>`);
+    let right = "", sub = m.sub || "";
+    if (m.a === "lend") right = `<b>${pct(m.apy)}</b>${m.apyNote ? `<em>${esc(m.apyNote)}</em>` : ""}`;
+    if (m.a === "borrow") {
+      const L = m.loop;
+      sub = `${VNAME[m.venue]}${L.sub ? " · " + L.sub : ""} · liquidates at ${L.lltv}% LTV · ${money(L.liq)} to borrow${L.rew ? ` · +${L.rew}% LISTA not counted` : ""}`;
+      right = `<b>${pct(L.borrow)}</b><em>borrow · max ${levTxt(L.max)}</em>`;
+    }
+    if (m.a === "trade" || m.a === "lp") right = `<em>${VNAME[m.venue]}</em>`;
+    return `<label class="mkt ${checked ? "" : "off"}"><input type="checkbox" data-m="${m.id}" ${checked ? "checked" : ""}><span class="logo-stack">${logo(m.venue, "md")}</span><span class="t">${esc(m.name)} ${tags.join("")}<small>${esc(sub)}</small></span><span class="apy">${right}</span></label>`;
+  }
+  function drawMarkets(body) {
+    const d = S.draft, all = marketsFor(d.g, d.a), q = S.q.trim().toLowerCase();
+    const list = all.filter((m) => !q || `${m.name} ${m.sub || ""}`.toLowerCase().includes(q));
+    let sections;
+    if (d.a === "lend") sections = [["Vaults", list.filter((m) => m.kind === "Vault")], ["Markets & staking", list.filter((m) => m.kind !== "Vault")]];
+    else if (d.a === "trade" && d.g === "stocks") sections = BSTOCKS.map((t) => [`${t.tier} · ${t.hint}`, list.filter((m) => m.tier === t.tier)]);
+    else if (d.a === "borrow") sections = [["Same-asset loops · no price exposure between collateral and loan", list.filter((m) => m.loop.kind !== "long")], ["Leveraged longs · collateral can fall against the loan", list.filter((m) => m.loop.kind === "long")]];
+    else sections = [["", list]];
+    const note = d.a === "lend" ? "Sorted by today's rate. Vaults are curated baskets of Lista markets; supply markets lend to one pool."
+      : d.a === "borrow" ? "Each loop opens from the vault's own asset: the swap into collateral is part of the loop, priced against the oracle."
+      : d.a === "trade" ? "The vault may hold these tokens outright." : "Positions are valued with oracle prices, never the pool's own price.";
+    body.innerHTML = `<p class="b-q">Which markets? <span class="fine">${note}</span></p>
+      <div class="m-tools">${all.length > 8 ? `<input class="pair-q" id="m-q" value="${esc(S.q)}" placeholder="Filter, e.g. NVDAB or Gauntlet">` : ""}<span class="m-all"><button type="button" class="chip" data-mall="on">Select all shown</button><button type="button" class="chip" data-mall="off">Clear</button></span></div>
+      <div class="m-list">${sections.filter(([, ms]) => ms.length).map(([h, ms]) => `${h ? `<div class="m-h">${h}</div>` : ""}<div class="mkt-list">${ms.map((m) => row(m, d.m.has(m.id))).join("")}</div>`).join("") || `<p class="fine">Nothing matches “${esc(S.q)}”.</p>`}</div>`;
+    $$("[data-m]", body).forEach((c) => c.addEventListener("change", () => { c.checked ? d.m.add(c.dataset.m) : d.m.delete(c.dataset.m); c.closest(".mkt").classList.toggle("off", !c.checked); drawBuilderFoot(); validate(); }));
+    $$("[data-mall]", body).forEach((b) => b.addEventListener("click", () => { list.forEach((m) => (b.dataset.mall === "on" ? d.m.add(m.id) : d.m.delete(m.id))); drawBuilder(); }));
+    const mq = $("#m-q");
+    if (mq) mq.addEventListener("input", () => { S.q = mq.value; const pos = mq.selectionStart; drawBuilder(); const n = $("#m-q"); n.focus(); n.setSelectionRange(pos, pos); });
+  }
+  function drawBuilderFoot() {
+    const d = S.draft;
+    $("#b-next").disabled = !d.m.size;
+    $("#b-hint").textContent = d.m.size ? `${d.m.size} selected` : "Select at least one";
+  }
+  function drawLeverage(body) {
+    const d = S.draft, ms = [...d.m].map((id) => byId[id]), top = Math.floor(Math.max(...ms.map((m) => m.loop.max)) * 10) / 10;
+    d.lev = Math.min(Math.max(d.lev, 1.1), top);
+    body.innerHTML = `<p class="b-q">How much leverage may these loops use? <span class="fine">One cap for this rule. A loop never goes past its own platform cap, whichever is lower.</span></p>
+      <label class="field"><span>Max leverage <em>1.1× – ${levTxt(top)}</em></span>
+        <div class="range-row"><input type="range" class="rng" id="lev-r" min="1.1" max="${top}" step="0.1" value="${d.lev}"><div class="suffix"><input id="lev" value="${d.lev}" inputmode="decimal"><b>×</b></div></div></label>
+      <div class="lev-table" id="lev-table"></div>`;
+    const table = () => {
+      $("#lev-table").innerHTML = `<div class="lt-h"><span>Loop</span><span>Leverage</span><span>What liquidates it</span><span>Carry</span></div>` + ms.map((m) => {
+        const x = effLev(m, d.lev), c = carry(m, x);
+        return `<div class="lt-r"><span>${esc(m.name)}<small>${VNAME[m.venue]}${m.loop.sub ? " · " + m.loop.sub : ""}</small></span><span>${levTxt(x)}${x < d.lev ? `<small>platform cap</small>` : ""}</span><span>${loopRisk(m, x)}</span><span>${c != null ? pct(c) : m.loop.kind === "long" ? `<small>price exposure ${levTxt(x)}</small>` : `<small>yield not measured yet</small>`}</span></div>`;
+      }).join("");
+      const r = $("#lev-r");
+      r.style.setProperty("--p", ((d.lev - 1.1) / (top - 1.1 || 1)) * 100 + "%");
+    };
+    $("#lev-r").addEventListener("input", (e) => { d.lev = num(e.target.value); $("#lev").value = d.lev; table(); });
+    $("#lev").addEventListener("input", (e) => { const v = num(e.target.value); if (v >= 1.1 && v <= top) { d.lev = v; $("#lev-r").value = v; table(); } e.target.closest(".field").classList.toggle("bad", !(v >= 1.1 && v <= top)); });
+    table();
+  }
+
+  $("#b-back").addEventListener("click", () => {
+    const d = S.draft;
+    if (d.editing != null && S.step <= 3) { S.draft = newDraft(); S.step = 1; }
+    else S.step = Math.max(1, S.step - 1);
+    drawAll();
+  });
+  $("#b-next").addEventListener("click", () => {
+    const d = S.draft;
+    if (!d.m.size) return;
+    if (S.step === 3 && d.a === "borrow") { S.step = 4; drawAll(); return; }
+    const leg = { g: d.g, a: d.a, m: new Set(d.m), lev: d.a === "borrow" ? d.lev : 1 };
+    if (d.editing != null) S.legs[d.editing] = leg;
+    else {
+      const same = findLeg(d.g, d.a);
+      if (same) S.legs[S.legs.indexOf(same)] = leg; else S.legs.push(leg);
+    }
+    toast(d.editing != null ? "Rule updated" : "Rule added");
+    S.draft = newDraft(); S.step = 1;
+    drawAll();
+  });
+
+  /* ================= Quick start ================= */
+  const QUICK = {
+    stable: { name: "Stablecoin yield", asset: "USDT", vault: "Stable Router", legs: [["stable", "lend", ["lista-vault-0xb5a3", "venus-supply-usdc", "venus-supply-usdt", "lista-vault-0x6d67", "lista-vault-0xeb4f"]]] },
+    loop: { name: "BNB staking loop", asset: "BNB", vault: "slisBNB Loop", legs: [["bnb", "lend", ["lista-stake-slisbnb", "lista-vault-0x5713"]], ["bnb", "borrow", ["lista-slisbnb-bnb-fixed-term", "lista-slisbnb-bnb", "venus-slisbnb-bnb"], 5]] },
+    majors: { name: "Blue chips", asset: "USDT", vault: "Majors Momentum", legs: [["bnb", "trade", ["pcs-hold-bnb"]], ["majors", "trade", ["pcs-hold-btcb", "pcs-hold-eth"]], ["majors", "lend", ["venus-supply-eth", "venus-supply-btcb"]]] },
+    stocks: { name: "Tokenized stocks", asset: "USDT", vault: "Mag 7 Rotation", legs: [["stocks", "trade", BSTOCKS[0].list.map((s) => `pcs-hold-${s.toLowerCase()}`)], ["stable", "lend", ["venus-supply-usdt"]]] },
   };
-  const opRow = (o) => {
-    const checked = o.locked || opOn(o.id);
-    return `<label class="mkt op ${checked ? "" : "off"} ${o.locked ? "locked" : ""}"><input type="checkbox" data-op="${o.id}" ${checked ? "checked" : ""} ${o.locked ? "disabled" : ""}><span class="logo-stack">${o.venues.map((v) => logo(v, "md")).join("")}</span><span class="t">${o.verb}<small>${o.scope}</small></span><span class="apy">${o.locked ? "Included" : o.group}</span></label>`;
-  };
-  const opsOf = (b) => `<div class="field full"><span>Operations <em>untick to exclude</em></span><div class="mkt-list">${OPS.filter((o) => o.block === b).map(opRow).join("")}</div></div>`;
-  const chips = (label, list, set, attr, locked = []) => `<div class="field full"><span>${label} <em>tap to exclude</em></span><div class="chips">${list.map((a) => `<button type="button" class="chip ${set.has(a) ? "" : "off"}" ${attr}="${a}" ${locked.includes(a) ? 'disabled title="Always included"' : ""}>${a}</button>`).join("")}</div></div>`;
-  const pairNote = (x) => [
-    x.coll === "slisBNB" && x.kind === "corr" ? "The oracle tracks the staking rate, so DEX depegs do not liquidate." : "",
-    x.coll.includes("LP") ? "Collateral is DEX liquidity; fees not measured yet." : "",
-    x.sub === "fixed-term" ? "Early repayment costs half the remaining interest." : "",
-    x.rew ? `LISTA ${x.rew}% not counted.` : "",
-  ].filter(Boolean).join(" ");
-
-  const BLOCK_UI = {
-    stable: { desc: "Lend stablecoins on Venus and Lista.", body: () => `
-        ${chips("Stablecoins", STABLES, S.stables, "data-stable", ["USDT"])}
-        ${opsOf("stable")}
-        ${slider("nonUsdt", "Non-USDT stables", "max 50% of the vault")}
-        <p class="fine" style="align-self:center">Caps depeg risk from USDC, USD1 and U. FDUSD is excluded — its pool is nearly empty.</p>` },
-    spot: { desc: "Buy and sell majors and tokenized stocks against USDT.", body: () => `
-        <div class="field full">
-          <div class="toggle-row" style="padding-top:0"><div class="t">Majors<small>BNB, BTCB, ETH · sell $100K for 0.04–0.43%</small></div><div class="ctl"><input type="checkbox" class="sw" data-sub="majors" ${S.majors ? "checked" : ""}></div></div>
-          ${S.majors ? `<div class="chips" style="margin:12px 0 4px">${MAJORS.map((a) => `<button type="button" class="chip ${S.majorSet.has(a) ? "" : "off"}" data-major="${a}">${a}</button>`).join("")}</div>` : ""}
-          <div class="toggle-row"><div class="t">bStocks<small>Any bStock with a DEX pool, including ones listed later — ${stocksIn().length || TRADEABLE.length} today. ${NO_POOL} more have no pool yet.</small></div><div class="ctl"><input type="checkbox" class="sw" data-sub="stocks" ${S.stocks ? "checked" : ""}></div></div>
-          ${S.stocks ? `<details class="excl" ${S.excluded.size ? "open" : ""}><summary>Exclude specific bStocks${S.excluded.size ? ` · ${S.excluded.size} excluded` : ""}</summary>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 14px"><button type="button" class="chip" data-quick="all">Include all</button><button type="button" class="chip" data-quick="liquid">Liquid only</button><button type="button" class="chip" data-quick="nolev">No leveraged / inverse</button></div>
-            ${BSTOCKS.map((tr) => `<div class="tier"><div class="tier-h"><span><b>${tr.name}</b> · ${tr.hint}</span><span>${tr.list.length}</span></div><div class="chips">${tr.list.map((s) => `<button type="button" class="chip ${LEV.has(s) ? "lev" : ""} ${S.excluded.has(s) ? "off" : ""}" data-stock="${s}">${s}</button>`).join("")}</div></div>`).join("")}
-            <p class="fine">Amber: leveraged or inverse ETFs. Prices from Atlas, with APRO as second source. Weekend prices move and Monday opens can gap.</p></details>` : ""}
-        </div>` },
-    work: { desc: "Supply, post as collateral or provide liquidity with what the vault holds.", body: () => opsOf("work") },
-    borrow: { desc: "Off by default. Borrow stablecoins against holdings; adds liquidation risk.", body: () => `
-        ${slider("borrowLtv", "Max borrow LTV", "max 50%")}
-        <p class="fine" style="align-self:center">Only against assets the vault holds. A keeper deleverages if LTV drifts over your cap.</p>` },
-    loop: { desc: `Any listed loop pair unless you untick it — ${PAIRS.length} today, new pairs included automatically.`, body: () => {
-        const q = S.pairQ.trim().toLowerCase();
-        const list = PAIRS.filter((x) => x.kind === S.pairKind && (!q || `${x.coll} ${x.loan} ${x.venue}`.toLowerCase().includes(q)));
-        return `<div class="field full">
-          <div class="seg" style="margin-bottom:12px;align-self:flex-start">${Object.entries(KINDS).map(([k, l]) => `<button type="button" data-kind="${k}" class="${S.pairKind === k ? "on" : ""}">${l} · ${PAIRS.filter((x) => x.kind === k && !S.pairsOff.has(x.id)).length}/${PAIRS.filter((x) => x.kind === k).length}</button>`).join("")}</div>
-          <input class="pair-q" id="pair-q" value="${esc(S.pairQ)}" placeholder="Filter by asset or venue, e.g. SPCXB" autocomplete="off">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin:10px 0">
-            <span class="fine">${list.length} shown · ${pairsIn().length} of ${PAIRS.length} allowed</span>
-            <span style="display:flex;gap:6px"><button type="button" class="chip" data-pairs="on">Allow shown</button><button type="button" class="chip" data-pairs="off">Exclude shown</button></span>
-          </div>
-          <div class="mkt-list pair-list">${list.map((x) => `<label class="mkt ${S.pairsOff.has(x.id) ? "off" : ""}"><input type="checkbox" data-pair="${x.id}" ${S.pairsOff.has(x.id) ? "" : "checked"}>${logo(x.venue, "md")}<span class="t">${x.coll} / ${x.loan}<small>${VNAME[x.venue]}${x.sub ? " · " + x.sub : ""} · cap ${pairCap(x)}% (liquidates at ${x.lltv}%) · ${money(x.liq)} to borrow${pairNote(x) ? " · " + pairNote(x) : ""}</small></span><span class="apy">${x.borrow.toFixed(2)}% borrow</span></label>`).join("") || `<p class="fine" style="padding:14px 0">No pair matches “${esc(S.pairQ)}”.</p>`}</div>
-        </div>
-        ${opsOf("loop")}
-        ${slider("loopCeil", "LTV ceiling for every loop", "each pair also has its own cap")}
-        <p class="fine" style="align-self:center">A pair's own cap is its liquidation LTV minus a buffer (about 6.5 points for correlated and stablecoin pairs, 20 for leveraged longs). Correlated pairs count their result in BNB terms inside the vault.</p>`;
-      } },
-  };
-
-  function drawBlocks() {
-    $("#blocks").innerHTML = ALL_BLOCKS.map((b) => `
-      <div class="blk ${on(b) ? "on" : ""}">
-        <div class="blk-h"><div class="t">${BAV.BLOCKS[b]}<small>${BLOCK_UI[b].desc}</small></div><input type="checkbox" class="sw" data-block="${b}" ${on(b) ? "checked" : ""} aria-label="${BAV.BLOCKS[b]}"></div>
-        ${on(b) ? `<div class="blk-b fields">${BLOCK_UI[b].body()}</div>` : ""}
-      </div>`).join("");
-    $("#vaultwide").innerHTML = `${slider("idle", `Idle ${S.asset}`, "min 5%, for instant exits")}<p class="fine" style="align-self:center">No concentration cap: one market or asset can hold everything.</p>`;
-    wireBlocks();
-    Object.keys(BOUNDS).forEach((k) => syncParam(k));
-  }
-
-  function wireBlocks() {
-    const redraw = () => { drawBlocks(); touched(); };
-    $$("[data-block]").forEach((c) => c.addEventListener("change", () => { c.checked ? S.on.add(c.dataset.block) : S.on.delete(c.dataset.block); S.preset = null; drawPresets(); redraw(); }));
-    $$("[data-sub]").forEach((c) => c.addEventListener("change", () => { S[c.dataset.sub] = c.checked; redraw(); }));
-    $$("[data-op]").forEach((c) => c.addEventListener("change", () => { c.checked ? S.ops.add(c.dataset.op) : S.ops.delete(c.dataset.op); c.closest(".mkt").classList.toggle("off", !c.checked); touched(); }));
-    const toggleIn = (set, v, el) => { set.has(v) ? set.delete(v) : set.add(v); el.classList.toggle("off", !set.has(v)); touched(); };
-    $$("[data-stable]").forEach((b) => b.addEventListener("click", () => toggleIn(S.stables, b.dataset.stable, b)));
-    $$("[data-major]").forEach((b) => b.addEventListener("click", () => toggleIn(S.majorSet, b.dataset.major, b)));
-    $$("[data-stock]").forEach((b) => b.addEventListener("click", () => { S.excluded.has(b.dataset.stock) ? S.excluded.delete(b.dataset.stock) : S.excluded.add(b.dataset.stock); b.classList.toggle("off", S.excluded.has(b.dataset.stock)); touched(); }));
+  function drawQuick() {
+    $("#quick").innerHTML = Object.entries(QUICK).map(([id, q]) => `<button type="button" class="chip" data-quick="${id}">${q.name}</button>`).join("")
+      + `<button type="button" class="chip off" data-quick="clear" style="text-decoration:none">Clear</button>`;
     $$("[data-quick]").forEach((b) => b.addEventListener("click", () => {
-      const q = b.dataset.quick;
-      if (q === "all") S.excluded.clear();
-      if (q === "liquid") { S.excluded.clear(); BSTOCKS[2].list.forEach((s) => S.excluded.add(s)); }
-      if (q === "nolev") LEV.forEach((s) => S.excluded.add(s));
-      redraw();
+      const id = b.dataset.quick;
+      S.draft = newDraft(); S.step = 1;
+      if (id === "clear") S.legs = [];
+      else {
+        const q = QUICK[id];
+        S.asset = q.asset;
+        S.legs = q.legs.map(([g, a, ids, lev]) => ({ g, a, m: new Set(ids), lev: lev || (a === "borrow" ? 2 : 1) }));
+        if (!S.nameEdited) $("#name").value = q.vault;
+      }
+      $$("input[name=asset]").forEach((r) => (r.checked = r.value === S.asset));
+      syncUnits(); drawAll();
     }));
-    $$("[data-pair]").forEach((c) => c.addEventListener("change", () => { c.checked ? S.pairsOff.delete(c.dataset.pair) : S.pairsOff.add(c.dataset.pair); c.closest(".mkt").classList.toggle("off", !c.checked); touched(); }));
-    $$("[data-kind]").forEach((b) => b.addEventListener("click", () => { S.pairKind = b.dataset.kind; S.pairQ = ""; redraw(); }));
-    $$("[data-pairs]").forEach((b) => b.addEventListener("click", () => {
-      const q = S.pairQ.trim().toLowerCase();
-      PAIRS.filter((x) => x.kind === S.pairKind && (!q || `${x.coll} ${x.loan} ${x.venue}`.toLowerCase().includes(q)))
-        .forEach((x) => (b.dataset.pairs === "on" ? S.pairsOff.delete(x.id) : S.pairsOff.add(x.id)));
-      redraw();
-    }));
-    const pq = $("#pair-q");
-    if (pq) pq.addEventListener("input", () => { S.pairQ = pq.value; const pos = pq.selectionStart; drawBlocks(); const n = $("#pair-q"); n.focus(); n.setSelectionRange(pos, pos); touched(); });
-    $$("[data-rng]").forEach((r) => r.addEventListener("input", () => { S.p[r.dataset.rng] = num(r.value); syncParam(r.dataset.rng, "range"); touched(); }));
-    $$("[data-p]").forEach((i) => i.addEventListener("input", () => { S.p[i.dataset.p] = num(i.value); syncParam(i.dataset.p, "input"); touched(); }));
   }
 
-  function syncParam(key, from) {
-    const r = $(`[data-rng="${key}"]`), i = $(`[data-p="${key}"]`);
-    if (!r || !i) return;
-    const [min, max, smax] = BOUNDS[key], v = S.p[key];
-    if (from === "range") i.value = v;
-    if (from === "input" && isFinite(v)) r.value = Math.min(Math.max(v, 0), smax);
-    r.style.setProperty("--p", (r.value / smax) * 100 + "%");
-    i.closest(".field").classList.toggle("bad", !(v >= min && v <= max));
+  /* ================= Depositor view ================= */
+  function sentence() {
+    if (!S.legs.length) return "Add a rule to see what depositors will read.";
+    return C.describe(S.legs, esc(vaultName()));
+  }
+  function feeNumbers() {
+    const pf = num($("#pf").value), mf = num($("#mf").value), plat = platform();
+    const split = BAV.feeBreakdown(pf, plat);
+    return { pf, mf, plat, ...split, keep: split.creatorNet, platTotal: split.platformTotal };
+  }
+  const fmtPct = (n) => (isFinite(n) ? (Math.round(n * 100) / 100) + "%" : "—");
+  function aside() {
+    $("#sentence").innerHTML = sentence();
+    const r = risk(), promises = [
+      $("#ddon").checked ? `Pauses at −${esc($("#ddv").value)}%` : "",
+      $("#capon").checked ? `Cap ${fmt.n(num($("#capv").value) || 0)} ${S.asset}` : "",
+    ].filter(Boolean);
+    $("#meta").innerHTML = `${r ? `<span class="tag">${riskMeter(r)}</span>` : ""}<span class="tag">Human-managed</span><span class="tag">${S.asset}</span><span class="tag">vs ${esc(benchmark())}</span>${promises.map((p) => `<span class="tag sim">${p}</span>`).join("")}`;
+    const hasLoop = S.legs.some((l) => l.a === "borrow");
+    const cannot = [
+      "Use any market not named in its rules.",
+      hasLoop ? "Borrow outside its loops, or push a loop past its leverage cap — a keeper deleverages first." : "Borrow.",
+      "Keep less than 5% idle, or take a position larger than its market absorbs in 24 hours.",
+      $("#ddon").checked ? `Open new positions after a ${esc($("#ddv").value)}% drawdown.` : "",
+      "Withdraw depositors' money.",
+    ].filter(Boolean).join(" ");
+    const f = feeNumbers();
+    const exit = r === "Low" ? "under 0.1% for most exits" : "under 0.1% from idle cash; unwinding positions costs 0.05–1%" + (hasLoop ? ", times leverage for loops" : "");
+    const pay = `${fmtPct(f.total)} of profit above the high-water mark: a ${fmtPct(f.creatorGross)} creator fee plus a ${fmtPct(f.platformBase)} platform fee. After the platform's 15% share of the creator fee, the creator receives ${fmtPct(f.creatorNet)} and the platform receives ${fmtPct(f.platformTotal)}.${f.mf > 0 ? ` Plus ${fmtPct(f.mf)} a year creator management fee.` : " No management fee."} No entry or exit fee.`;
+    const leave = `Any time after a 24-hour deposit cooldown; large exits settle within 12 hours. You pay your own slippage — ${exit}.`;
+    $("#rules").innerHTML = [["Cannot", cannot], ["You pay", pay], ["Leave", leave]].map(([k, v]) => `<li><b>${k}</b><span>${v}</span></li>`).join("");
+
+    const unit = S.asset, P = 1000, keep = P * (1 - f.total / 100);
+    $("#split-title").textContent = `On ${fmt.n(P)} ${unit} of profit`;
+    const parts = [["Depositors keep", keep, "rgba(255,255,255,.28)"], ["Manager", (P * f.keep) / 100, "var(--gold)"], ["Platform", (P * f.platTotal) / 100, "var(--c1)"]];
+    $("#split").innerHTML = parts.map(([, v, c]) => `<i style="width:${Math.max(v, 0) / 10}%;background:${c}"></i>`).join("");
+    $("#split-legend").innerHTML = parts.map(([l, v, c]) => `<div><s style="background:${c}"></s><span>${l}</span><em>${fmt.n(v, v % 1 ? 1 : 0)} ${unit}</em></div>`).join("");
   }
 
-  /* ---------------- Units, fees ---------------- */
+  /* ================= Units, owner ================= */
   function syncUnits() {
     $$(".unit-a").forEach((u) => (u.textContent = S.asset));
     $("#seed").value = S.seed[S.asset];
     $("#seed-min").textContent = S.asset === "BNB" ? `min ${(100 / BNB_USD).toFixed(3)} BNB (100 USDT)` : "min 100 USDT";
-  }
-  const capSuggest = () => {
-    let usd = 25e6;
-    if (on("spot")) usd = Math.min(usd, S.stocks ? 1.5e6 : 5e6);
-    if (on("loop")) usd = Math.min(usd, 3e6);
-    return S.asset === "BNB" ? Math.round(usd / BNB_USD) : usd;
-  };
-  function feeNumbers() {
-    const pf = num($("#pf").value), mf = num($("#mf").value), plat = platform();
-    return { pf, mf, plat, total: pf + plat, keep: pf * 0.85, platTotal: plat + pf * 0.15 };
-  }
-  const fmtPct = (n) => (isFinite(n) ? (Math.round(n * 100) / 100) + "%" : "—");
-
-  /* ---------------- Plain-language rules & AI summary ---------------- */
-  function canParts() {
-    const parts = [];
-    if (on("stable")) {
-      const a = STABLES.filter((x) => S.stables.has(x)), v = [];
-      if (opOn("supply-stable")) v.push("Venus");
-      if (opOn("vault-stable")) v.push("Lista");
-      if (v.length) parts.push(`lend ${join(a)} on ${join(v)}${opOn("swap-stable") ? " and swap between them" : ""}`);
-    }
-    if (on("spot")) {
-      const m = majorsIn(), st = stocksIn(), what = [...m];
-      if (st.length) what.push(`${st.length} bStocks`);
-      if (what.length) parts.push(`buy and sell ${join(what)} against USDT${st.length ? ` (new bStock listings included${S.excluded.size ? `, ${S.excluded.size} excluded` : ""})` : ""}`);
-    }
-    if (on("work") && on("spot")) {
-      const w = OPS.filter((o) => o.block === "work" && opOn(o.id)).map((o) => o.phrase);
-      if (w.length) parts.push(`then ${join(w)}`);
-    }
-    if (on("borrow")) parts.push(`borrow up to ${S.p.borrowLtv}% LTV against its holdings`);
-    if (on("loop")) {
-      const ps = pairsIn(), k = Object.keys(KINDS).map((x) => [KINDS[x].toLowerCase(), ps.filter((p) => p.kind === x).length]).filter(([, n]) => n);
-      if (ps.length) parts.push(`run loops on ${ps.length} pairs (${k.map(([n, c]) => `${c} ${n}`).join(", ")}), each under its own cap and at most ${S.p.loopCeil}% LTV`);
-    }
-    return parts;
-  }
-  function rules() {
-    const f = feeNumbers(), dd = $("#ddon").checked ? ` Trading pauses at a ${esc($("#ddv").value)}% drawdown.` : "";
-    const parts = canParts();
-    const can = parts.length ? cap1(parts.join("; ")) + "." : "Nothing yet — switch on at least one block.";
-    const cannot = [
-      on("borrow") ? `Borrow beyond ${S.p.borrowLtv}% LTV.` : "Borrow against holdings.",
-      on("stable") ? `Hold more than ${S.p.nonUsdt}% in non-USDT stablecoins.` : "",
-      on("loop") && pairsIn().some((x) => x.kind === "long") ? "Keep a leveraged loop open past its liquidation buffer — a keeper deleverages first." : "",
-      `Keep less than ${S.p.idle}% idle, or take a position larger than its market absorbs in 24 hours.`,
-    ].filter(Boolean).join(" ") + dd + " It can never withdraw funds or call anything outside approved adapters.";
-    const exit = on("loop") || on("spot") ? "under 0.1% from idle cash; selling positions costs 0.05–1%, and loops cost leverage × the DEX discount" : "under 0.1%";
-    const pay = `${fmtPct(f.total)} of profit above the high-water mark: ${fmtPct(f.pf)} to the creator, ${fmtPct(f.plat)} to the platform.${f.mf > 0 ? ` Plus ${fmtPct(f.mf)} a year management fee.` : " No management fee."} No entry or exit fee.`;
-    const leave = `Any time after a 24-hour deposit cooldown; large exits settle within 12 hours. You pay your own slippage — ${exit}.`;
-    $("#rules").innerHTML = [["Can", can], ["Cannot", cannot], ["You pay", pay], ["Leave", leave]].map(([k, v]) => `<li><b>${k}</b><span>${v}</span></li>`).join("");
-
-    const n = S.on.size, note = $("#note").value.trim();
-    const ai = n === 0 ? "Nothing is switched on yet."
-      : `${n > 2 ? "A multi-strategy vault" : "A focused vault"} counted in ${S.asset}, judged against “${benchmark()}”. ${risk() === "Low" ? "It only lends stablecoins, so returns should sit close to lending rates." : risk() === "Medium" ? "Its loops earn the gap between collateral yield and borrow cost; that gap can turn negative." : "It can take market risk" + (on("loop") && pairsIn().some((x) => x.kind === "long") ? ", including leveraged longs that can be liquidated" : "") + (on("borrow") ? " and borrow against its holdings" : "") + ", so expect real swings."} The agent decides how capital is split between the blocks it is allowed to use.`;
-    $("#ai").innerHTML = esc(ai) + (note ? `<br><br>Creator's note: “${esc(note)}”` : "");
-
-    const unit = S.asset, P = 1000, keep = P * (1 - f.total / 100);
-    $("#split-title").textContent = `On ${fmt.n(P)} ${unit} of profit`;
-    const partsF = [["Depositors keep", keep, "rgba(255,255,255,.28)"], ["Creator", (P * f.keep) / 100, "var(--gold)"], ["Platform", (P * f.platTotal) / 100, "var(--c1)"]];
-    $("#split").innerHTML = partsF.map(([, v, c]) => `<i style="width:${Math.max(v, 0) / 10}%;background:${c}"></i>`).join("");
-    $("#split-legend").innerHTML = partsF.map(([l, v, c]) => `<div><s style="background:${c}"></s><span>${l}</span><em>${fmt.n(v, v % 1 ? 1 : 0)} ${unit}</em></div>`).join("");
-  }
-
-  /* ---------------- Agent ---------------- */
-  const agent = () => MY_AGENTS.find((a) => a.id === S.agent);
-  const operator = () => (S.opOverride ? $("#operator").value.trim() : owner() && agent() ? agent().operator : "");
-  function drawAgents() {
-    const box = $("#agents");
-    box.innerHTML = MY_AGENTS.map((a) => `<label class="mkt"><input type="radio" name="agent" value="${a.id}" ${a.id === S.agent ? "checked" : ""}><span class="logo-stack"></span><span class="t">${a.name} · ERC-8004 #${a.id}<small>${a.runtime} · operator ${short(a.operator)}, from its registration</small></span><span class="apy">${a.id === S.agent ? "Selected" : ""}</span></label>`).join("")
-      + `<button type="button" class="add-leg" id="agent-new" style="height:44px">+ Register a new agent</button>`;
-    $$("input[name=agent]").forEach((r) => r.addEventListener("change", () => { S.agent = +r.value; drawAgents(); touched(); }));
-    $("#agent-new").addEventListener("click", () => toast("Registers an ERC-8004 identity for your agent — prototype only"));
+    $("#bench").innerHTML = BENCHMARKS.map((b) => `<option ${b === benchmark() ? "selected" : ""}>${b}</option>`).join("");
   }
   function drawOwner() {
-    const o = owner(), box = $("#owner");
-    box.classList.remove("empty");
-    box.innerHTML = `<span class="mono">${o}</span><span class="tag sim">Demo owner</span>`;
+    $("#owner").innerHTML = `<span class="mono">${DEMO_OWNER}</span><span class="tag sim">Owner · trader</span>`;
   }
+  const capSuggest = () => {
+    const ms = allMarkets();
+    let usd = 25e6;
+    if (ms.some((m) => m.g === "stocks")) usd = 1.5e6; else if (risk() === "High") usd = 5e6;
+    if (ms.some((m) => m.a === "borrow")) usd = Math.min(usd, 3e6);
+    return S.asset === "BNB" ? Math.round(usd / BNB_USD) : usd;
+  };
 
-  /* ---------------- Validation ---------------- */
-  function state() {
-    const o = owner(), op = operator(), f = feeNumbers(), seed = num($("#seed").value);
-    const inB = (k) => S.p[k] >= BOUNDS[k][0] && S.p[k] <= BOUNDS[k][1];
-    const doesSomething = canParts().length > 0 && !(on("spot") && !majorsIn().length && !stocksIn().length && S.on.size === 1);
-    const ddOk = !$("#ddon").checked || (num($("#ddv").value) > 0 && num($("#ddv").value) < 100);
-    const capOk = !$("#capon").checked || num($("#capv").value) > 0;
-    const limitsOk = ["idle", ...(on("stable") ? ["nonUsdt"] : []), ...(on("borrow") ? ["borrowLtv"] : []), ...(on("loop") ? ["loopCeil"] : [])].every(inB) && ddOk && capOk;
-    const feesOk = f.pf >= 0 && f.pf <= 30 && f.mf >= 0 && f.mf <= 5;
-    const seedOk = isFinite(seed) && (S.asset === "BNB" ? seed * BNB_USD >= 100 : seed >= 100);
-    const checks = [
-      ["Demo owner loaded", !!o],
-      ["Agent selected", !!o && !!agent()],
-      ["Operator address is valid", isAddr(op)],
-      ["Operator is a separate key from the owner", !!o && isAddr(op) && op.toLowerCase() !== o.toLowerCase()],
-      ["Mandate allows at least one thing to do", doesSomething],
-      ["Limits within bounds", limitsOk],
-      ["Fees within caps (30% / 5%)", feesOk],
-      [S.asset === "BNB" ? "Seed worth at least 100 USDT" : "Seed at least 100 USDT", seedOk],
-      ["Vault name set", !!$("#name").value.trim()],
-      ["Fork dry-run passed", S.dry === "ok"],
-    ];
-    return { checks, o, op, doesSomething, limitsOk, seedOk };
+  /* ================= Validation ================= */
+  function issues() {
+    const f = feeNumbers(), seed = num($("#seed").value), out = [];
+    if (!S.legs.length) out.push(["s-1", "Add at least one rule."]);
+    if (S.draft.m.size && S.step >= 3) out.push(["s-1", S.draft.editing != null ? "Save or cancel the rule you're editing." : "Add the rule you're building, or go back to drop it."]);
+    if ($("#ddon").checked && !(num($("#ddv").value) > 0 && num($("#ddv").value) < 100)) out.push(["s-1", "Drawdown pause must be between 0% and 100%."]);
+    if ($("#capon").checked && !(num($("#capv").value) > 0)) out.push(["s-1", "Set a capacity cap above zero, or switch it off."]);
+    if (!$("#name").value.trim()) out.push(["s-2", "Name the vault."]);
+    if (!(f.pf >= 0 && f.pf <= 30) || !(f.mf >= 0 && f.mf <= 5)) out.push(["s-2", "Fees must stay within 30% performance and 5% management."]);
+    if (!(isFinite(seed) && (S.asset === "BNB" ? seed * BNB_USD >= 100 : seed >= 100))) out.push(["s-3", `Seed at least ${S.asset === "BNB" ? (100 / BNB_USD).toFixed(3) + " BNB" : "100 USDT"}.`]);
+    return out;
   }
-
   function validate() {
-    if (!S.pfEdited) $("#pf").value = isActive() ? 15 : 10;
-    const st = state(), { checks } = st;
-    const pass = checks.filter((c) => c[1]).length, all = pass === checks.length;
-    $("#checks").innerHTML = checks.map(([t, ok]) => `<li class="${ok ? "ok" : "bad"}"><i></i><span>${t}</span></li>`).join("");
-    $("#s-risk").textContent = risk();
+    const r = risk();
+    if (!S.pfEdited) $("#pf").value = r === "High" ? 15 : 10;
+    const list = issues(), ok = !list.length, bad = (sec) => list.some((x) => x[0] === sec);
+    $("#s-risk").textContent = r || "—";
     $("#s-asset").textContent = S.asset;
-    $("#s-checks").textContent = `${pass} / ${checks.length}`;
-    $("#mc-state").innerHTML = `<b>${pass} of ${checks.length} checks</b>${launchedId ? "Demo launched" : all ? "Ready to simulate" : "Needs attention"}`;
-    $("#m-state").textContent = launchedId ? "Demo launched" : all ? "Ready" : "Needs attention";
-    $("#m-state").className = all ? "tag" : "tag warn";
-    $("#deploy").disabled = !all || !!launchedId;
-    $("#deploy").textContent = launchedId ? "Demo vault launched" : all ? "Launch demo vault" : "Complete launch checks";
-    $("#dry").disabled = S.dry === "running" || checks.slice(0, 9).some((c) => !c[1]);
-    $("#dry").textContent = S.dry === "ok" ? "Dry-run passed · run again" : "Run fork dry-run";
-    const flag = (sel, bad) => $(sel).closest(".field").classList.toggle("bad", bad);
-    if (S.opOverride) flag("#operator", !isAddr(st.op) || (!!st.o && st.op.toLowerCase() === st.o.toLowerCase()));
+    $("#s-lev").textContent = levTxt(maxLev());
+    $("#platform-fee").textContent = fmtPct(platform());
+    $("#issues").innerHTML = list.map(([, t]) => `<li class="bad"><i></i><span>${t}</span></li>`).join("");
+    $("#sign").disabled = S.signing || !!S.launched;
+    $("#sign").textContent = S.launched ? "Demo vault launched" : S.signing ? "Signing…" : "Sign & launch";
+    $("#mc-state").innerHTML = S.launched ? `<b>Launched</b>Demo ledger` : ok ? `<b>${esc(vaultName())}</b>${r} risk · ready to sign` : `<b>${list.length} to fix</b>${esc(list[0][1])}`;
+    const flag = (sel, isBad) => $(sel).closest(".field").classList.toggle("bad", isBad);
     flag("#pf", !(num($("#pf").value) >= 0 && num($("#pf").value) <= 30));
     flag("#mf", !(num($("#mf").value) >= 0 && num($("#mf").value) <= 5));
-    flag("#seed", !st.seedOk);
     flag("#name", !$("#name").value.trim());
-    const secs = [true, checks[0][1] && checks[1][1] && checks[2][1] && checks[3][1], st.doesSomething && st.limitsOk, checks[6][1] && checks[8][1], st.seedOk && S.dry === "ok"];
+    flag("#seed", bad("s-3"));
+    const secs = [!bad("s-1"), !bad("s-2"), !bad("s-3") && !!S.launched];
     $$("#toc .ck").forEach((c, i) => c.classList.toggle("ok", secs[i]));
-
-    const a = S.asset, seed = num($("#seed").value);
-    $("#seed-usd").textContent = isFinite(seed) ? (a === "BNB" ? `≈ ${fmt.n(seed * BNB_USD)} USDT` : `${fmt.n(seed)} USDT`) : "—";
-    $("#cap-hint").textContent = `Stop new deposits above this size. Suggested from today's exit liquidity: ${fmt.n(capSuggest())} ${a} (simulated).`;
+    const seed = num($("#seed").value);
+    $("#seed-usd").textContent = isFinite(seed) ? (S.asset === "BNB" ? `≈ ${fmt.n(seed * BNB_USD)} USDT` : `${fmt.n(seed)} USDT`) : "—";
+    $("#cap-hint").textContent = `Stop new deposits above this size. Suggested from today's exit liquidity: ${fmt.n(capSuggest())} ${S.asset} (simulated).`;
     if ($("#capon").checked && !$("#capv").value) $("#capv").value = capSuggest();
     const name = $("#name").value.trim();
     $("#symbol").textContent = name ? "av" + name.split(/\s+/).map((w) => w.replace(/[^A-Za-z0-9]/g, "")[0] || "").join("").toUpperCase().slice(0, 5) : "—";
-    rules();
+    aside();
     $("#json").textContent = JSON.stringify(build(), null, 2);
   }
-  function touched() {
-    launchedId = null;
+  function drawAll() {
+    S.launched = null;
     $("#launch-result").innerHTML = "";
-    if (S.dry !== "idle" && S.dry !== "running") { S.dry = "idle"; $("#dryl").innerHTML = ""; }
-    validate();
+    if (!S.signing) $("#steps").innerHTML = "";
+    drawLegs(); drawBuilder(); validate();
   }
 
-  /* ---------------- Fork dry-run (simulated) ---------------- */
-  function drySteps() {
-    const steps = ["Deploy vault, mandate and adapters on a BSC fork", "Deposit seed"];
-    if (on("stable")) steps.push("Supply USDT on Venus");
-    if (on("spot")) steps.push(`Buy ${majorsIn()[0] || stocksIn()[0] || "BNB"} at test size`);
-    if (on("work")) steps.push("Supply holdings on Venus");
-    if (on("borrow")) steps.push(`Borrow USDT to ${S.p.borrowLtv}% LTV and repay`);
-    if (on("loop") && pairsIn().length) steps.push(`Flash-loan loop ${pairsIn()[0].coll} / ${pairsIn()[0].loan} and unwind`);
-    return [...steps, "Value every position through its adapter", "Redeem the seed"];
-  }
-  $("#dry").addEventListener("click", () => {
-    const steps = drySteps();
-    S.dry = "running"; validate();
-    $("#dryl").innerHTML = steps.map((s) => `<li>${esc(s)}</li>`).join("");
-    $$("#dryl li").forEach((li, i) => { setTimeout(() => (li.className = "run"), i * 380); setTimeout(() => (li.className = "ok"), i * 380 + 340); });
-    setTimeout(() => { S.dry = "ok"; validate(); toast("Fork dry-run passed (simulated)"); }, steps.length * 380 + 80);
-  });
-
-  /* ---------------- Manifest ---------------- */
+  /* ================= Manifest ================= */
   function build() {
     const f = feeNumbers(), key = S.asset === "BNB" ? "WBNB" : S.asset;
-    const blocks = {};
-    if (on("stable")) blocks.stable = { stablecoins: STABLES.filter((x) => S.stables.has(x)), operations: OPS.filter((o) => o.block === "stable" && opOn(o.id)).map((o) => o.id), nonUsdtPctMax: S.p.nonUsdt };
-    if (on("spot")) blocks.spot = { majors: majorsIn(), bStocks: S.stocks ? { rule: "any bStock with a DEX pool, including future listings", excluded: [...S.excluded] } : null };
-    if (on("work")) blocks.work = { operations: OPS.filter((o) => o.block === "work" && opOn(o.id)).map((o) => o.id) };
-    if (on("borrow")) blocks.borrow = { ltvPctMax: S.p.borrowLtv };
-    if (on("loop")) blocks.loop = { rule: "any listed loop pair, including future listings", excluded: [...S.pairsOff], ltvCeilingPct: S.p.loopCeil };
     return {
-      schema: "bnb-agent-vaults/manifest@0.3", chainId: 56,
-      identity: { name: $("#name").value.trim(), symbol: $("#symbol").textContent, note: $("#note").value.trim(), noteBinding: false, preset: S.preset },
+      schema: "bnb-agent-vaults/manifest@0.5", chainId: 56,
+      identity: { name: $("#name").value.trim(), symbol: $("#symbol").textContent, note: $("#note").value.trim(), noteBinding: false },
       denomination: { symbol: S.asset, address: ASSETS[key].address, decimals: ASSETS[key].decimals },
-      benchmark: benchmark(), risk: risk(),
-      owner: owner(),
-      operator: { address: operator(), erc8004Id: owner() ? S.agent : null, source: S.opOverride ? "override" : "erc8004-registration", type: "dedicated-key" },
-      mandate: { blocks, idlePctMin: S.p.idle, drawdownPausePct: $("#ddon").checked ? num($("#ddv").value) : null, capacityCap: $("#capon").checked ? num($("#capv").value) : null },
-      fees: { creatorPerformancePct: f.pf, creatorManagementPct: f.mf, platformPerformancePct: f.plat, platformShareOfCreatorFeesPct: 15, highWaterMark: "vault-level", entryFeePct: 0, exitFeePct: 0 },
+      owner: DEMO_OWNER,
+      manager: { type: "human", operator: DEMO_OWNER, erc8004Id: null },
+      rules: S.legs.map((l) => ({
+        asset: l.g, action: l.a,
+        markets: legMarkets(l).map((m) => (m.a === "borrow" ? { id: m.id, venue: m.venue, name: m.name, maxLeverage: +effLev(m, l.lev).toFixed(2), maxLtvPct: +((1 - 1 / effLev(m, l.lev)) * 100).toFixed(1) } : { id: m.id, venue: m.venue, name: m.name })),
+      })),
+      optional: { drawdownPausePct: $("#ddon").checked ? num($("#ddv").value) : null, capacityCap: $("#capon").checked ? num($("#capv").value) : null },
+      risk: risk(), benchmark: benchmark(),
+      fees: { managerPerformancePct: f.pf, managerManagementPct: f.mf, platformPerformancePct: f.plat, platformShareOfManagerFeesPct: 15, highWaterMark: "vault-level", entryFeePct: 0, exitFeePct: 0 },
       seed: { amount: num($("#seed").value), asset: S.asset, lockedUntilClose: true },
-      protocolFixed: { loosenTimelockHours: 24, tightenApplies: "immediately", maxRedemptionHours: 12, depositCooldownHours: 24, operatorLossBreaker: { pctOfNav: 2, windowHours: 24 }, autoPauseDepositsAtFullExitCostPct: 5, positionCap: "24h absorbable liquidity", arbitraryCalls: false, newVaultTagDays: 30 },
-      forkDryRun: S.dry === "ok" ? "passed (simulated)" : "not run",
+      protocolFixed: { marketsEnterAndExitThroughVaultAsset: true, addMarketsTimelockHours: 24, removeMarketsApplies: "immediately", minIdlePct: 5, maxRedemptionHours: 12, depositCooldownHours: 24, operatorLossBreaker: { pctOfNav: 2, windowHours: 24 }, autoPauseDepositsAtFullExitCostPct: 5, positionCap: "24h absorbable liquidity", arbitraryCalls: false, newVaultTagDays: 30 },
     };
   }
 
-  /* ---------------- Wiring ---------------- */
-  ["#name", "#note", "#mf", "#operator", "#ddv", "#capv"].forEach((sel) => $(sel).addEventListener("input", touched));
-  $("#name").addEventListener("input", () => { S.nameEdited = true; });
+  /* ================= Sign & launch (simulated) ================= */
+  $("#sign").addEventListener("click", () => {
+    const list = issues();
+    if (list.length) {
+      toast(list[0][1]);
+      $("#" + list[0][0]).scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    const steps = [
+      `Simulate every market in the rules on a BSC fork (${allMarkets().length})`,
+      "Deploy the vault with these rules",
+      `Deposit ${fmt.n(num($("#seed").value), S.asset === "BNB" ? 3 : 0)} ${S.asset} seed, locked until close`,
+      "Set your wallet as the trader",
+    ];
+    S.signing = true; validate();
+    $("#steps").innerHTML = steps.map((s) => `<li>${esc(s)}</li>`).join("");
+    $$("#steps li").forEach((li, i) => { setTimeout(() => (li.className = "run"), i * 420); setTimeout(() => (li.className = "ok"), i * 420 + 380); });
+    setTimeout(() => {
+      const manifest = build(), launched = demo.launch(manifest);
+      S.signing = false; S.launched = launched.id;
+      validate();
+      $("#launch-result").innerHTML = `<div class="state-note"><span class="dot" style="background:var(--pos)"></span><span><b>${esc(manifest.identity.name)}</b> is live in this browser's demo ledger. Reference <span class="mono">${launched.id.toUpperCase()}</span>. No transaction was sent.</span></div>`;
+      toast("Demo vault launched — no wallet or transaction used");
+    }, steps.length * 420 + 120);
+  });
+
+  /* ================= Wiring ================= */
+  const touched = () => { S.launched = null; $("#launch-result").innerHTML = ""; if (!S.signing) $("#steps").innerHTML = ""; validate(); };
+  ["#note", "#mf", "#ddv", "#capv"].forEach((sel) => $(sel).addEventListener("input", touched));
+  $("#name").addEventListener("input", () => { S.nameEdited = true; touched(); });
   $("#pf").addEventListener("input", () => { S.pfEdited = true; touched(); });
   $("#seed").addEventListener("input", () => { S.seed[S.asset] = num($("#seed").value); touched(); });
-  $$("input[name=asset]").forEach((r) => r.addEventListener("change", () => { S.asset = r.value; drawBench(); syncUnits(); drawBlocks(); touched(); }));
+  $$("input[name=asset]").forEach((r) => r.addEventListener("change", () => {
+    S.asset = r.value; S.bench = null;
+    // Holding the vault's own asset is not a rule: drop it from any "hold" rule, and drop rules left empty.
+    S.legs.forEach((l) => { const ok = new Set(marketsFor(l.g, l.a).map((m) => m.id)); l.m = new Set([...l.m].filter((id) => ok.has(id))); });
+    S.legs = S.legs.filter((l) => l.m.size);
+    if (S.draft.a) { const ok = new Set(marketsFor(S.draft.g, S.draft.a).map((m) => m.id)); S.draft.m = new Set([...S.draft.m].filter((id) => ok.has(id))); }
+    syncUnits(); drawAll();
+  }));
   $("#bench").addEventListener("change", () => { S.bench = $("#bench").value; touched(); });
   $("#ddon").addEventListener("change", () => { $("#ddv").disabled = !$("#ddon").checked; touched(); });
   $("#capon").addEventListener("change", () => { $("#capv").disabled = !$("#capon").checked; if (!$("#capon").checked) $("#capv").value = ""; touched(); });
-  $("#op-toggle").addEventListener("click", () => {
-    S.opOverride = !S.opOverride;
-    $("#op-override").classList.toggle("hide", !S.opOverride);
-    $("#op-toggle").textContent = S.opOverride ? "Use the agent's registered wallet" : "Use a different key";
-    touched();
-  });
-  $("#toggle-json").addEventListener("click", () => { $("#json").classList.toggle("hide"); $("#toggle-json").textContent = $("#json").classList.contains("hide") ? "View manifest JSON" : "Hide manifest JSON"; });
-  $("#dl").addEventListener("click", () => {
-    const m = build(), blob = new Blob([JSON.stringify(m, null, 2)], { type: "application/json" }), el = document.createElement("a");
-    el.href = URL.createObjectURL(blob);
-    el.download = (m.identity.name || "vault").toLowerCase().replace(/[^a-z0-9]+/g, "-") + ".manifest.json";
-    el.click(); URL.revokeObjectURL(el.href);
-    toast("Manifest exported");
-  });
-  $("#deploy").addEventListener("click", () => {
-    if (state().checks.some((c) => !c[1])) return;
-    const manifest = build(), launched = demo.launch(manifest);
-    launchedId = launched.id;
-    validate();
-    $("#launch-result").innerHTML = `<div class="state-note"><span class="dot" style="background:var(--pos)"></span><span><b>${esc(manifest.identity.name)}</b> launched in this browser's demo ledger. Reference <span class="mono">${launched.id.toUpperCase()}</span>. No transaction was sent.</span></div>`;
-    toast("Demo vault launched — no wallet or transaction used");
-  });
+  $("#toggle-json").addEventListener("click", () => { $("#json").classList.toggle("hide"); $("#toggle-json").textContent = $("#json").classList.contains("hide") ? "View manifest" : "Hide manifest"; });
   const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) $$("#toc a").forEach((a) => a.classList.toggle("on", a.getAttribute("href") === "#" + e.target.id)); }), { rootMargin: "-40% 0px -55% 0px" });
-  $$(".article").forEach((s) => io.observe(s));
+  $$(".article", $("#f")).forEach((s) => io.observe(s));
 
-  $("#name").value = PRESETS.fund.defaultName;
-  drawPresets(); drawBench(); drawBlocks(); syncUnits(); drawOwner(); drawAgents(); validate();
+  $("#name").value = "My Fund";
+  setWho(S.who);
+  drawOwner(); drawQuick(); syncUnits(); drawAll();
 })();
 9:X
-0:{"P":null,"c":["","create",""],"q":"","i":false,"f":[[["",{"children":["create",{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/14j5olz08x8ko.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"bodyClass":"has-mcta","html":"$5","runtimeVersion":"56fc72e39bac","script":"$6","pageKey":"create"}],["$L7"],"$L8"]}],{},null,false,null]},null,false,"$9"]},null,false,null],"$La",false]],"m":"$undefined","G":["$b",["$Lc"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"WHeYlcA39PzQYvT4IqE01"}
+0:{"P":null,"c":["","create",""],"q":"","i":false,"f":[[["",{"children":["create",{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/3nnboc6_7w6kx.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"bodyClass":"has-mcta","html":"$5","runtimeVersion":"f677ee6b844a","script":"$6","pageKey":"create"}],["$L7"],"$L8"]}],{},null,false,null]},null,false,"$9"]},null,false,null],"$La",false]],"m":"$undefined","G":["$b",["$Lc"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"UBeXQa5AfAx0sz01fMwGE"}
 d:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
 e:"$Sreact.suspense"
 10:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]
@@ -584,7 +627,7 @@ e:"$Sreact.suspense"
 7:["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js","async":true,"nonce":"$undefined"}]
 8:["$","$Ld",null,{"children":["$","$e",null,{"name":"Next.MetadataOutlet","children":"$@f"}]}]
 a:["$","$1","h",{"children":[null,["$","$L10",null,{"children":"$L11"}],["$","div",null,{"hidden":true,"children":["$","$L12",null,{"children":["$","$e",null,{"name":"Next.Metadata","children":"$L13"}]}]}],null]}]
-c:["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/14j5olz08x8ko.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]
+c:["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/3nnboc6_7w6kx.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]
 9:C
 11:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
 14:I[27201,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"IconMark"]
