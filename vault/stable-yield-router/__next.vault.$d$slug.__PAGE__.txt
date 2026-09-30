@@ -1,5 +1,5 @@
 1:"$Sreact.fragment"
-2:I[81384,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/04u3edz65h4va.js"],"PrototypePage"]
+2:I[81384,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js"],"PrototypePage"]
 3:T15b2,
 
 <section class="vhead">
@@ -345,7 +345,7 @@
 8:X
 f:X
 f:C
-0:{"buildId":"gtQlUvFE3WlrWpCIe-I3z","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"bodyClass":"has-mcta","html":"$3","script":"$4","pageKey":"vault"}],["$L5"],"$L6"]}],"isPartial":"$@7","staleTime":"$8","varyParams":null},{"rsc":"$L9","isPartial":"$@a","staleTime":"$8","varyParams":null},{"rsc":"$Lb","isPartial":"$@c","staleTime":"$8","varyParams":null},{"rsc":"$Ld","isPartial":"$@e","staleTime":"$8","varyParams":"$f"},{"rsc":"$L10","isPartial":"$@11","staleTime":"$8","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@12","rootVaryParams":null,"needsRuntimeRequest":"$@13"}
+0:{"buildId":"2wLsSHGxwEOat5koG3f8G","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"bodyClass":"has-mcta","html":"$3","runtimeVersion":"f7f11c8a9c9e","script":"$4","pageKey":"vault"}],["$L5"],"$L6"]}],"isPartial":"$@7","staleTime":"$8","varyParams":null},{"rsc":"$L9","isPartial":"$@a","staleTime":"$8","varyParams":null},{"rsc":"$Lb","isPartial":"$@c","staleTime":"$8","varyParams":null},{"rsc":"$Ld","isPartial":"$@e","staleTime":"$8","varyParams":"$f"},{"rsc":"$L10","isPartial":"$@11","staleTime":"$8","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@12","rootVaryParams":null,"needsRuntimeRequest":"$@13"}
 14:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
 15:"$Sreact.suspense"
 17:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]
@@ -354,7 +354,7 @@ f:C
 1a:I[39756,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default"]
 1b:I[37457,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default"]
 :HL["/bnb-agent-vaults-site/_next/static/chunks/14j5olz08x8ko.css","style"]
-5:["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/04u3edz65h4va.js","async":true}]
+5:["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js","async":true}]
 6:["$","$L14",null,{"children":["$","$15",null,{"name":"Next.MetadataOutlet","children":"$@16"}]}]
 9:["$","$1","h",{"children":[null,["$","$L17",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","div",null,{"hidden":true,"children":["$","$L18",null,{"children":["$","$15",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"BNB Agent Vaults — Agent-managed funds on BNB Chain"}],["$","meta","1",{"name":"description","content":"Launch and follow non-custodial, policy-bound agent vaults on BNB Chain."}],["$","meta","2",{"name":"codex-preview","content":"development"}],["$","link","3",{"rel":"shortcut icon","href":"/bnb-agent-vaults-site/favicon.svg"}],["$","link","4",{"rel":"icon","href":"/bnb-agent-vaults-site/favicon.svg"}],["$","$L19","5",{}]]}]}]}],null]}]
 b:["$","$1","c",{"children":[null,["$","$L1a",null,{"parallelRouterKey":"children","template":["$","$L1b",null,{}]}]]}]
