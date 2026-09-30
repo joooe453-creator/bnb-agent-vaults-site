@@ -5,6 +5,8 @@
   const TODAY = Date.UTC(2026, 8, 30);
   const DAY = 864e5;
   const SLOTS = ["var(--c1)", "var(--c2)", "var(--c3)", "var(--c4)"];
+  const BASE_PATH = window.__BAV_BASE_PATH__ || "";
+  const route = (target = "") => `${BASE_PATH}/${String(target).replace(/^\/+|\/+$/g, "")}${target && !String(target).includes("#") ? "/" : ""}`;
 
   /* ------------------------------------------------------------------ */
   /* Registry                                                            */
@@ -13,6 +15,7 @@
     USDT: { address: "0x55d398326f99059fF775485246999027B3197955", decimals: 18 },
     USDC: { address: "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d", decimals: 18 },
     WBNB: { address: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c", decimals: 18 },
+    BNB: { address: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c", decimals: 18 },
     BTCB: { address: "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c", decimals: 18 },
     ETH: { address: "0x2170Ed0880ac9A755fd29B2688956BD959F933F8", decimals: 18 },
     slisBNB: { address: "0xB0b84D294e0C75A6abe60171b70edEb2EFd14A1B", decimals: 18 },
@@ -20,123 +23,132 @@
   };
 
   const VENUES = [
-    {
-      id: "pancakeswap", name: "PancakeSwap", logo: "pancakeswap", kind: "DEX · Liquidity · Farms",
-      status: "Registry & interface ready — adapter in development", ready: false,
-      tracking: "Onchain — router, pool, token0/token1, fee tier, position NFT, farm PID",
-      ops: ["Exact-input swap", "Exact-output swap", "V2 / StableSwap LP add", "V2 / StableSwap LP remove", "V3 / Infinity concentrated LP mint", "V3 / Infinity increase liquidity", "V3 / Infinity decrease liquidity", "Collect LP fees", "Farm stake / unstake / harvest", "CAKE stake / unstake / claim"],
-    },
-    {
-      id: "lista", name: "Lista DAO", logo: "lista", kind: "Lending · CDP · Liquid staking",
-      status: "ERC-4626 supply adapter — prototype complete", ready: true,
-      tracking: "Onchain — market.asset(), collateral and debt positions",
-      ops: ["Lending supply / withdraw", "Collateral deposit / withdraw", "Borrow / repay", "Leverage loop / deleverage", "lisUSD CDP deposit / borrow / repay / withdraw", "Liquid stake BNB", "Request / claim unstake"],
-    },
-    {
-      id: "venus", name: "Venus", logo: "venus", kind: "Money market",
-      status: "Supply / redeem adapter — prototype complete", ready: true,
-      tracking: "Onchain — vToken.underlying(), balances, account liquidity",
-      ops: ["Enter / exit collateral market", "Supply / redeem", "Borrow / repay", "Repay on behalf", "Liquidation", "Claim rewards", "Flux lend / withdraw", "XVS stake / unstake / claim"],
-    },
-    {
-      id: "aster", name: "Aster", logo: "aster", kind: "Spot · Perpetuals · Earn (hybrid venue)",
-      status: "Registry & interface ready — execution and reconciliation layer in development", ready: false,
-      tracking: "Hybrid — onchain deposits/withdrawals reconciled with authenticated REST + user-data WebSocket ledger",
-      ops: ["Spot market / limit / cancel", "Perpetual long / short / reduce", "TP-SL / cancel", "Isolated margin adjustment", "Leverage / margin mode", "Grid strategy", "Spot / perp transfers", "Earn deposit / withdraw", "Stake / unstake"],
-    },
+    { id: "pancakeswap", name: "PancakeSwap", logo: "pancakeswap" },
+    { id: "lista", name: "Lista DAO", logo: "lista" },
+    { id: "venus", name: "Venus", logo: "venus" },
   ];
 
-  const AGENT_STACK = [
-    ["BNB Agent Studio", "Agent runtime, ERC-8004 identity, session authority"],
-    ["BNB Chain MCP", "BSC state, transaction simulation, policy-approved submission"],
-    ["Binance Agentic Wallet", "Optional MPC / session signer — never holds vault custody"],
-    ["Official protocol Skills", "Market discovery and action construction"],
-    ["Vault policy + Adapter", "Final authority over capital and execution boundaries"],
+  // The single list of operations an agent can be allowed, grouped into building blocks.
+  // A vault switches blocks on; creators can untick operations inside a block but never add new ones.
+  const BLOCKS = {
+    stable: "Stablecoin lending", spot: "Spot trading", work: "Put holdings to work", borrow: "Borrow against holdings", loop: "Loops",
+  };
+  const OPS = [
+    { id: "supply-stable", block: "stable", venues: ["venus"], group: "Earn", verb: "Supply / redeem stablecoins", scope: "USDT 3.34% · USDC 3.81% · USD1 1.90% · U 2.36%" },
+    { id: "vault-stable", block: "stable", venues: ["lista"], group: "Earn", verb: "Deposit / withdraw lending vaults", scope: "USDT 2.5–5.0% · USD1 1.09% · U 1.45%" },
+    { id: "swap-stable", block: "stable", venues: ["pancakeswap"], group: "Trade", verb: "Swap between stablecoins", scope: "USDT, USDC, USD1, U · FDUSD excluded" },
+    { id: "swap", block: "spot", venues: ["pancakeswap"], group: "Trade", verb: "Buy and sell against USDT", scope: "Majors and bStocks with a DEX pool, routed across DEXs", locked: true },
+    { id: "supply", block: "work", venues: ["venus"], group: "Earn", verb: "Supply / redeem holdings", scope: "BNB, BTCB, ETH, NVDAB, TSLAB, SPCXB, SKHYB", phrase: "supply them on Venus" },
+    { id: "collateral", block: "work", venues: ["lista"], group: "Earn", verb: "Deposit / withdraw as collateral", scope: "BNB, BTCB, ETH and bStocks markets", phrase: "post them as collateral on Lista" },
+    { id: "lp", block: "work", venues: ["pancakeswap"], group: "Earn", verb: "Add / remove liquidity, collect fees", scope: "V3 pools for majors and bStock / USDT · valued by oracle", phrase: "provide PancakeSwap liquidity" },
+    { id: "borrow", block: "borrow", venues: ["venus", "lista"], group: "Borrow", verb: "Borrow / repay against holdings", scope: "USDT, USD1, U · up to your LTV cap", locked: true },
+    { id: "stake-bnb", block: "loop", venues: ["lista"], group: "Loop", verb: "Stake BNB into slisBNB", scope: "for slisBNB pairs", locked: true },
+    { id: "loop", block: "loop", venues: ["lista", "venus"], group: "Loop", verb: "Post collateral, borrow, flash-loan lever and unwind", scope: "allowed pairs, within each pair's LTV cap", locked: true },
+    { id: "swap-unwind", block: "loop", venues: ["pancakeswap"], group: "Trade", verb: "Swap between collateral and borrowed asset", scope: "PancakeSwap and Lista DEX, capped against oracle price", locked: true },
   ];
+  const opScope = (op) => op.scope;
+
+  const TEMPLATES = {
+    fund: { name: "Fund manager", risk: "High", benchmark: "Venus USDT supply rate" },
+    stable: { name: "Stablecoin lending", risk: "Low", benchmark: "Venus USDT supply rate" },
+    loop: { name: "Looping", risk: "Medium", benchmark: "Hold slisBNB" },
+    bluechip: { name: "Blue-chip spot", risk: "High", benchmark: "Equal-weight BNB / BTCB / ETH" },
+    stocks: { name: "Tokenized stocks", risk: "High", benchmark: "Hold SPYB" },
+  };
 
   /* ------------------------------------------------------------------ */
   /* Vaults (simulated)                                                  */
   /* ------------------------------------------------------------------ */
   const VAULTS = [
     {
-      slug: "delta-neutral-bnb", name: "Delta Neutral BNB", manager: "Hedgeframe", agentId: 1187, symbol: "avDNB", asset: "USDT",
-      strategy: "Market-neutral BNB carry with automated hedge rebalancing across approved venues.",
-      runtimeDays: 184, returns: { "7D": 0.92, "30D": 3.84, "90D": 10.26, ALL: 18.4 }, maxDrawdown: { "7D": -0.48, "30D": -1.36, "90D": -3.82, ALL: -5.14 },
-      tvl: 3420000, followers: 1248, risk: "Guarded", status: "Live", dataQuality: 99.8, lastSettled: "2h ago", settledEpochs: 184, sharePrice: 1.184,
-      fees: { mgmt: 1.5, perf: 15, hurdle: 0, cryst: "Quarterly" }, lockup: "None", notice: "24 hours", minSub: 100, maxTvl: 10000000, benchmark: "BNB funding carry",
-      cycle: { id: 14, state: "Live", day: 6, duration: 14, maxCapital: 3200000, against: 1.1 },
-      allocation: [["Lista lending", 42], ["Perp hedge", 34], ["Cash buffer", 24]],
-      legs: [
-        { p: "Lista DAO", op: "Collateral deposit / borrow", loc: "slisBNB / USDT market", min: 30, tgt: 42, max: 50, lim: "Borrow LTV ≤ 60%", slip: 0.3, pos: "Debt position · HF 1.82" },
-        { p: "Aster", op: "Perpetual short", loc: "BNBUSDT perp · subaccount #3", min: 25, tgt: 34, max: 40, lim: "Leverage ≤ 2.0×", slip: 0.2, pos: "Short 5,480 BNB · reconciled" },
-        { p: "Venus", op: "Supply / redeem", loc: "vUSDT", min: 10, tgt: 24, max: 40, lim: "—", slip: 0.1, pos: "Accruing" },
+      slug: "northstar-multi", name: "Northstar Multi-Strategy", manager: "Northstar", agentId: 1611, agentVaults: 2, symbol: "avNMS", asset: "USDT", template: "fund",
+      ops: ["supply-stable", "vault-stable", "swap", "supply", "lp", "stake-bnb", "loop", "swap-unwind"],
+      strategy: "Keeps a stablecoin core on Venus, runs a slisBNB loop, and rotates a sleeve of majors and bStocks.",
+      runtimeDays: 96, returns: { "7D": 0.61, "30D": 2.44, "90D": 7.12, ALL: 7.9 }, maxDrawdown: { "7D": -0.42, "30D": -1.88, "90D": -3.9, ALL: -3.9 },
+      tvl: 3050000, followers: 1102, status: "Live", sharePrice: 1.079, fees: { perf: 15, mgmt: 0, platform: 5 }, cap: null, exitCost: "0.1–0.9% by position",
+      limits: { nonUsdt: 50, idle: 8, loopCeil: 80 }, venues: ["venus", "lista", "pancakeswap"],
+      allocation: [["Stablecoin lending", 44], ["slisBNB loop", 24], ["Majors + bStocks", 24], ["Idle USDT", 8]],
+      positions: [
+        { p: "Venus", loc: "vUSDT", w: 30, by: "vToken × exchange rate", st: "Supplying · 3.34%" },
+        { p: "Lista DAO", loc: "USDT lending vault", w: 14, by: "Vault shares", st: "Supplying · 2.84%" },
+        { p: "Lista DAO", loc: "slisBNB / BNB · fixed-term", w: 24, by: "Staking rate × BNB − debt", st: "LTV 76.0% · 4.2×" },
+        { p: "PancakeSwap", loc: "BTCB · NVDAB · SPYB", w: 24, by: "Oracle · Atlas / APRO", st: "Held" },
+        { p: "Idle", loc: "USDT in vault", w: 8, by: "Balance", st: "Instant exits" },
       ],
     },
     {
-      slug: "stable-yield-router", name: "Stable Yield Router", manager: "Orbit Agent", agentId: 942, symbol: "avSYR", asset: "USDT",
-      strategy: "Routes USDT and USDC between audited BNB Chain lending pools as rates change.",
+      slug: "stable-yield-router", ops: ["swap-stable", "supply-stable", "vault-stable"], name: "Stable Yield Router", manager: "Orbit Agent", agentId: 942, agentVaults: 1, symbol: "avSYR", asset: "USDT", template: "stable",
+      strategy: "Moves USDT and USDC between Venus and Lista lending as rates change.",
       runtimeDays: 128, returns: { "7D": 0.24, "30D": 1.02, "90D": 3.31, ALL: 4.76 }, maxDrawdown: { "7D": -0.03, "30D": -0.12, "90D": -0.38, ALL: -0.62 },
-      tvl: 2860000, followers: 984, risk: "Guarded", status: "Live", dataQuality: 100, lastSettled: "42m ago", settledEpochs: 128, sharePrice: 1.0476,
-      fees: { mgmt: 0.5, perf: 10, hurdle: 3, cryst: "Quarterly" }, lockup: "None", notice: "None", minSub: 50, maxTvl: 25000000, benchmark: "Venus USDT supply rate",
-      cycle: { id: 9, state: "Veto window", closesIn: "31h", maxCapital: 2430000, against: 1.8 },
-      allocation: [["USDT market", 48], ["USDC market", 37], ["Cash buffer", 15]],
-      legs: [
-        { p: "Venus", op: "Supply / redeem", loc: "vUSDT", min: 30, tgt: 48, max: 70, lim: "—", slip: 0.05, pos: "Accruing" },
-        { p: "Lista DAO", op: "Lending supply / withdraw", loc: "USDC lending vault", min: 20, tgt: 37, max: 60, lim: "—", slip: 0.05, pos: "Accruing" },
-        { p: "PancakeSwap", op: "Exact-input swap", loc: "USDT / USDC StableSwap", min: 0, tgt: 0, max: 60, lim: "Routing only", slip: 0.1, pos: "Policy bound" },
+      tvl: 2860000, followers: 984, status: "Live", sharePrice: 1.0476, fees: { perf: 10, mgmt: 0, platform: 3 }, cap: null, exitCost: "< 0.1%",
+      limits: { nonUsdt: 50, idle: 5 }, venues: ["venus", "lista", "pancakeswap"],
+      allocation: [["Venus · USDT", 48], ["Venus · USDC", 37], ["Idle USDT", 15]],
+      positions: [
+        { p: "Venus", loc: "vUSDT", w: 48, by: "vToken × exchange rate", st: "Supplying · 3.34%" },
+        { p: "Venus", loc: "vUSDC", w: 37, by: "vToken × exchange rate", st: "Supplying · 3.81%" },
+        { p: "Idle", loc: "USDT in vault", w: 15, by: "Balance", st: "Instant exits" },
       ],
     },
     {
-      slug: "bnb-bluechip-momentum", name: "Bluechip Momentum", manager: "Sable Quant", agentId: 1306, symbol: "avBCM", asset: "USDT",
+      slug: "bnb-bluechip-momentum", ops: ["swap", "supply", "collateral", "lp"], name: "Bluechip Momentum", manager: "Sable Quant", agentId: 1306, agentVaults: 3, symbol: "avBCM", asset: "USDT", template: "bluechip",
       strategy: "Trend-following exposure across BNB, BTCB and ETH with volatility-aware position sizing.",
       runtimeDays: 73, returns: { "7D": 2.16, "30D": 6.42, "90D": null, ALL: 13.88 }, maxDrawdown: { "7D": -1.92, "30D": -4.74, "90D": null, ALL: -8.16 },
-      tvl: 2170000, followers: 803, risk: "Balanced", status: "Live", dataQuality: 98.9, lastSettled: "3h ago", settledEpochs: 72, sharePrice: 1.1388,
-      fees: { mgmt: 2, perf: 20, hurdle: 0, cryst: "Monthly" }, lockup: "7 days", notice: "24 hours", minSub: 250, maxTvl: 8000000, benchmark: "33/33/33 BNB · BTCB · ETH",
-      cycle: { id: 22, state: "Live", day: 4, duration: 7, maxCapital: 2100000, against: 0.4 },
+      tvl: 2170000, followers: 803, status: "Live", sharePrice: 1.1388, fees: { perf: 15, mgmt: 0, platform: 5 }, cap: 5000000, exitCost: "< 0.5% at $100K",
+      pendingChange: { what: "Performance fee 15% → 20%", hours: 18 }, venues: ["pancakeswap", "venus"],
       allocation: [["BNB", 46], ["BTCB", 31], ["ETH", 23]],
-      legs: [
-        { p: "PancakeSwap", op: "Exact-input swap", loc: "WBNB / USDT · V3 0.05%", min: 0, tgt: 46, max: 60, lim: "—", slip: 0.5, pos: "Spot WBNB · policy bound" },
-        { p: "PancakeSwap", op: "Exact-input swap", loc: "BTCB / USDT · V3 0.05%", min: 0, tgt: 31, max: 45, lim: "—", slip: 0.5, pos: "Spot BTCB · policy bound" },
-        { p: "PancakeSwap", op: "Exact-input swap", loc: "ETH / USDT · V3 0.05%", min: 0, tgt: 23, max: 40, lim: "—", slip: 0.5, pos: "Spot ETH · policy bound" },
+      positions: [
+        { p: "PancakeSwap", loc: "WBNB", w: 46, by: "Oracle · Chainlink / Atlas", st: "Held" },
+        { p: "PancakeSwap", loc: "BTCB", w: 31, by: "Oracle · Chainlink / Atlas", st: "Held" },
+        { p: "Venus", loc: "vETH", w: 23, by: "vToken × oracle", st: "Supplying · 1.36%" },
       ],
     },
     {
-      slug: "liquid-staking-loop", name: "Liquid Staking Loop", manager: "Kepler AI", agentId: 1422, symbol: "avLSL", asset: "WBNB",
-      strategy: "Conservative slisBNB leverage loop with health-factor guardrails and automated unwind.",
-      runtimeDays: 41, returns: { "7D": 0.37, "30D": 1.86, "90D": null, ALL: 2.42 }, maxDrawdown: { "7D": -0.24, "30D": -1.08, "90D": null, ALL: -1.34 },
-      tvl: 1940000, followers: 677, risk: "Balanced", status: "Live", dataQuality: 99.4, lastSettled: "1h ago", settledEpochs: 41, sharePrice: 1.0242,
-      fees: { mgmt: 1, perf: 15, hurdle: 0, cryst: "Quarterly" }, lockup: "None", notice: "48 hours", minSub: 0.5, maxTvl: 6000000, benchmark: "slisBNB staking yield",
-      cycle: { id: 5, state: "Live", day: 9, duration: 30, maxCapital: 2900, against: 0.2 },
-      allocation: [["slisBNB", 69], ["Borrowed BNB", 21], ["Buffer", 10]],
-      legs: [
-        { p: "Lista DAO", op: "Liquid stake BNB", loc: "slisBNB staking manager", min: 60, tgt: 69, max: 80, lim: "—", slip: 0.2, pos: "Accruing" },
-        { p: "Lista DAO", op: "Leverage loop / deleverage", loc: "slisBNB / WBNB market", min: 0, tgt: 21, max: 30, lim: "Borrow LTV ≤ 55%", slip: 0.3, pos: "HF 1.91" },
+      slug: "liquid-staking-loop", ops: ["stake-bnb", "loop", "swap-unwind"], name: "Liquid Staking Loop", manager: "Kepler AI", agentId: 1422, agentVaults: 1, symbol: "avLSL", asset: "BNB", template: "loop",
+      strategy: "slisBNB loop on Lista at about 4.6× with the idle buffer kept at 10%.",
+      runtimeDays: 41, returns: { "7D": 0.04, "30D": 0.18, "90D": null, ALL: 0.24 }, maxDrawdown: { "7D": -0.02, "30D": -0.05, "90D": null, ALL: -0.06 },
+      tvl: 1940000, followers: 677, status: "Live", sharePrice: 1.0024, fees: { perf: 10, mgmt: 0, platform: 3 }, cap: null, exitCost: "≈ 0.8% on 10 BNB",
+      limits: { ltv: 80, idle: 10 }, venues: ["lista"],
+      allocation: [["slisBNB loop (net)", 90], ["Idle BNB", 10]],
+      positions: [
+        { p: "Lista DAO", loc: "slisBNB / BNB · fixed-term", w: 90, by: "Staking rate × BNB − debt", st: "LTV 78.4% · 4.6×" },
+        { p: "Idle", loc: "BNB in vault", w: 10, by: "Balance", st: "Instant exits" },
       ],
     },
     {
-      slug: "pancake-lp-allocator", name: "Pancake LP Allocator", manager: "Gamma Scout", agentId: 1580, symbol: "avPLA", asset: "USDT",
-      strategy: "Adaptive concentrated liquidity across high-volume PancakeSwap pools with fee harvesting.",
-      runtimeDays: 18, returns: { "7D": 1.28, "30D": null, "90D": null, ALL: 2.91 }, maxDrawdown: { "7D": -2.18, "30D": null, "90D": null, ALL: -3.76 },
-      tvl: 1530000, followers: 351, risk: "Aggressive", status: "Live", dataQuality: 97.6, lastSettled: "6h ago", settledEpochs: 18, sharePrice: 1.0291,
-      fees: { mgmt: 2, perf: 20, hurdle: 0, cryst: "Monthly" }, lockup: "None", notice: "24 hours", minSub: 100, maxTvl: 4000000, benchmark: "50/50 WBNB · USDT hold",
-      cycle: { id: 3, state: "Execution delay", closesIn: "9h", maxCapital: 1220000, against: 2.6 },
-      allocation: [["BNB/USDT", 51], ["CAKE/BNB", 29], ["Idle", 20]],
-      legs: [
-        { p: "PancakeSwap", op: "V3 / Infinity concentrated LP mint", loc: "WBNB / USDT · 0.05% · NFT #78421", min: 30, tgt: 51, max: 60, lim: "Range ±6%", slip: 0.5, pos: "In range" },
-        { p: "PancakeSwap", op: "V3 / Infinity concentrated LP mint", loc: "CAKE / WBNB · 0.25% · NFT #78455", min: 10, tgt: 29, max: 35, lim: "Range ±12%", slip: 0.8, pos: "In range" },
+      slug: "mag7-rotation", ops: ["swap", "supply", "lp"], name: "Mag 7 Rotation", manager: "Tickerline", agentId: 1702, agentVaults: 2, symbol: "avM7R", asset: "USDT", template: "stocks",
+      strategy: "Rotates between the largest US tech names in bStocks, holding USDT when momentum fades.",
+      runtimeDays: 52, returns: { "7D": 1.42, "30D": 4.91, "90D": null, ALL: 7.84 }, maxDrawdown: { "7D": -1.18, "30D": -3.96, "90D": null, ALL: -5.72 },
+      tvl: 1210000, followers: 512, status: "Live", sharePrice: 1.0784, fees: { perf: 15, mgmt: 0, platform: 5 }, cap: 1500000, exitCost: "0.2–0.7% at $100K", venues: ["pancakeswap"],
+      allocation: [["NVDAB", 28], ["GOOGLB", 22], ["AAPLB", 18], ["USDT", 32]],
+      positions: [
+        { p: "PancakeSwap", loc: "NVDAB", w: 28, by: "Atlas · APRO · TWAP", st: "Held" },
+        { p: "PancakeSwap", loc: "GOOGLB", w: 22, by: "Atlas · TWAP", st: "Held" },
+        { p: "PancakeSwap", loc: "AAPLB", w: 18, by: "Atlas · TWAP", st: "Held" },
+        { p: "Idle", loc: "USDT in vault", w: 32, by: "Balance", st: "Instant exits" },
       ],
     },
     {
-      slug: "venus-carry-agent", name: "Venus Carry Agent", manager: "Northstar", agentId: 1611, symbol: "avVCA", asset: "USDT",
-      strategy: "Autonomous supply and borrow loops on Venus with strict caps and timelocked policy updates.",
-      runtimeDays: 11, returns: { "7D": -0.31, "30D": null, "90D": null, ALL: 0.64 }, maxDrawdown: { "7D": -0.84, "30D": null, "90D": null, ALL: -0.84 },
-      tvl: 920000, followers: 143, risk: "Guarded", status: "Paused", dataQuality: 94.2, lastSettled: "19h ago", settledEpochs: 10, sharePrice: 1.0064,
-      fees: { mgmt: 1, perf: 10, hurdle: 0, cryst: "Quarterly" }, lockup: "None", notice: "24 hours", minSub: 100, maxTvl: 3000000, benchmark: "Venus USDT supply rate",
-      cycle: { id: 2, state: "Paused", maxCapital: 850000, against: 0 },
-      allocation: [["Supply", 74], ["Borrow", 18], ["Cash", 8]],
-      legs: [
-        { p: "Venus", op: "Supply / redeem", loc: "vUSDT", min: 60, tgt: 74, max: 90, lim: "—", slip: 0.05, pos: "Accruing" },
-        { p: "Venus", op: "Borrow / repay", loc: "vUSDC", min: 0, tgt: 18, max: 25, lim: "Borrow LTV ≤ 50%", slip: 0.1, pos: "HF 2.04" },
+      slug: "nvda-dca", ops: ["swap"], name: "NVDA Weekly DCA", manager: "Drip Agent", agentId: 1755, agentVaults: 1, symbol: "avNDC", asset: "USDT", template: "stocks",
+      strategy: "Buys NVDAB every Monday with a fixed share of idle USDT. Nothing else.",
+      runtimeDays: 9, returns: { "7D": 2.08, "30D": null, "90D": null, ALL: 3.41 }, maxDrawdown: { "7D": -2.64, "30D": null, "90D": null, ALL: -2.64 },
+      tvl: 184000, followers: 96, status: "Live", sharePrice: 1.0341, fees: { perf: 10, mgmt: 0, platform: 5 }, cap: null, exitCost: "≈ 0.4% at $100K", venues: ["pancakeswap"],
+      allocation: [["NVDAB", 64], ["USDT", 36]],
+      positions: [
+        { p: "PancakeSwap", loc: "NVDAB", w: 64, by: "Atlas · APRO · TWAP", st: "Held" },
+        { p: "Idle", loc: "USDT in vault", w: 36, by: "Balance", st: "Next buy Monday" },
+      ],
+    },
+    {
+      slug: "lista-rate-hopper", ops: ["supply-stable", "vault-stable"], name: "Lista Rate Hopper", manager: "Mirror Labs", agentId: 1790, agentVaults: 4, symbol: "avLRH", asset: "USDT", template: "stable",
+      strategy: "Low-fee USDT lending across Venus and Lista.",
+      runtimeDays: 11, returns: { "7D": 0.21, "30D": null, "90D": null, ALL: 0.33 }, maxDrawdown: { "7D": -0.02, "30D": null, "90D": null, ALL: -0.02 },
+      tvl: 420000, followers: 61, status: "Live", sharePrice: 1.0033, fees: { perf: 5, mgmt: 0, platform: 3 }, cap: null, exitCost: "< 0.1%",
+      copyOf: { slug: "stable-yield-router", lag: "14 min" }, limits: { nonUsdt: 50, idle: 5 }, venues: ["venus", "lista"],
+      allocation: [["Venus · USDT", 47], ["Venus · USDC", 38], ["Idle USDT", 15]],
+      positions: [
+        { p: "Venus", loc: "vUSDT", w: 47, by: "vToken × exchange rate", st: "Supplying · 3.34%" },
+        { p: "Venus", loc: "vUSDC", w: 38, by: "vToken × exchange rate", st: "Supplying · 3.81%" },
+        { p: "Idle", loc: "USDT in vault", w: 15, by: "Balance", st: "Instant exits" },
       ],
     },
   ];
@@ -176,7 +188,7 @@
     return null;
   }
   function riskMeter(r) {
-    const lvl = r === "Guarded" ? 1 : r === "Balanced" ? 2 : 3;
+    const lvl = r === "Low" ? 1 : r === "Medium" ? 2 : 3;
     return `<span class="risk"><i>${[1, 2, 3].map((i) => `<b class="${i <= lvl ? "on" : ""}"></b>`).join("")}</i>${r}</span>`;
   }
   function statusTag(v) {
@@ -201,7 +213,7 @@
   function hexAddr(seed) { const r = rng(seed); let s = "0x"; for (let i = 0; i < 40; i++) s += "0123456789abcdef"[Math.floor(r() * 16)]; return s; }
   const short = (a) => a.slice(0, 6) + "…" + a.slice(-4);
 
-  // Settled NAV/share series, anchored so period returns match the published figures.
+  // NAV/share series, anchored so period returns match the published figures.
   const seriesCache = {};
   function navSeries(v) {
     if (seriesCache[v.slug]) return seriesCache[v.slug];
@@ -235,7 +247,7 @@
     const v = VENUES.find((x) => x.id === key || x.name === key);
     const file = v ? v.logo : key === "bnb" ? "bnbchain" : null;
     if (!file) return "";
-    return `<img class="logo ${cls}" src="assets/logos/${file}.jpg" alt="${esc(v ? v.name : "BNB Chain")}">`;
+    return `<img class="logo ${cls}" src="${BASE_PATH}/logos/${file}.jpg" alt="${esc(v ? v.name : "BNB Chain")}">`;
   }
 
   // Agent portfolio-manager bust, in 240 × 290 units. Rendered live as a scan-line figure.
@@ -457,16 +469,16 @@
   /* Shell: notice strip, masthead, footer                               */
   /* ------------------------------------------------------------------ */
   function shell(active) {
-    const nav = [["vaults.html", "Vaults"], ["portfolio.html", "Portfolio"], ["create.html", "Launch a Vault"], ["venues.html", "Venues"]];
+    const nav = [["vaults.html", "Vaults"], ["portfolio.html", "Portfolio"], ["create.html", "Launch a Vault"]];
     const top = document.createElement("div");
     top.innerHTML = `
-      <div class="notice"><span><b>Prototype</b></span><span>Simulated performance</span><span>Contracts unaudited</span><span>No mainnet deployment</span></div>
-      <header class="masthead">
+      <div class="notice" data-bav-shell><span><b>Prototype</b></span><span>Simulated performance</span><span>Contracts unaudited</span><span>No mainnet deployment</span></div>
+      <header class="masthead" data-bav-shell>
         <div class="wrap">
-          <a class="brand" href="index.html">${SEAL}<span class="brand-name">BNB Agent Vaults</span></a>
-          <nav class="nav">${nav.map(([h, l]) => `<a href="${h}" class="${active === h ? "active" : ""}">${l}</a>`).join("")}</nav>
+          <a class="brand" href="${route()}">${SEAL}<span class="brand-name">BNB Agent Vaults</span></a>
+          <nav class="nav">${nav.map(([h, l]) => `<a href="${route(h.replace(".html", ""))}" class="${active === h ? "active" : ""}">${l}</a>`).join("")}</nav>
           <div class="head-right">
-            <span class="chain"><img class="logo" src="assets/logos/bnbchain.jpg" alt="">BNB Smart Chain · 56</span>
+            <span class="chain"><img class="logo" src="${BASE_PATH}/logos/bnbchain.jpg" alt="">BNB Smart Chain · 56</span>
             <button class="btn sm" data-wallet><span class="full">Connect Wallet</span><span class="short">Connect</span></button>
             <button class="menu-btn" aria-label="Menu"><span></span></button>
           </div>
@@ -480,19 +492,19 @@
   }
 
   function footerHTML() {
-    return `<footer class="footer"><div class="wrap">
+    return `<footer class="footer" data-bav-shell><div class="wrap">
       <div class="foot-grid">
-        <div><a class="brand" href="index.html">${SEAL}<span class="brand-name">BNB Agent Vaults</span></a>
+        <div><a class="brand" href="${route()}">${SEAL}<span class="brand-name">BNB Agent Vaults</span></a>
           <p>Non-custodial ERC-4626 vaults on BNB Chain, operated by AI agents inside a pre-committed mandate.</p></div>
-        <div><h5>Product</h5><a href="vaults.html">Vault directory</a><a href="create.html">Launch a vault</a><a href="portfolio.html">Portfolio</a><a href="venues.html">Approved venues</a></div>
-        <div><h5>Developers</h5><a href="create.html">Vault Manifest</a><a href="venues.html">Agent stack</a><a href="#">MCP validation endpoint</a><a href="#">Contracts (pending audit)</a></div>
-        <div><h5>Governance</h5><a href="index.html#terms">Fee caps</a><a href="index.html#how">Execution cycles</a><a href="index.html#terms">Risk council</a><a href="#">Security model</a></div>
+        <div><h5>Product</h5><a href="${route("vaults")}">Vault directory</a><a href="${route("create")}">Launch a vault</a><a href="${route("portfolio")}">Portfolio</a></div>
+        <div><h5>Developers</h5><a href="${route("create")}">Vault Manifest</a><a href="${route("#terms")}">MCP + skills</a><a href="${route("#terms")}">Contracts (pending audit)</a></div>
+        <div><h5>Protocol</h5><a href="${route("#terms")}">Fee caps</a><a href="${route("#terms")}">Timelocks</a><a href="${route("#terms")}">Risk council</a><a href="${route("#terms")}">Security model</a></div>
       </div>
       <div class="disclosure">
         <div class="label">Important information</div>
         <div>
           <p>BNB Agent Vaults is a prototype. Smart contracts have not been audited and are not deployed to BNB Smart Chain mainnet. All vaults, managers, balances and performance figures shown are simulated for design purposes and do not represent real assets or results.</p>
-          <p>Mandate limits reduce, but do not eliminate, risk. Depositors remain exposed to market, liquidation, oracle, smart-contract, bridge, counterparty and liquidity risk, and may lose some or all of their capital. Annualized figures are a mathematical restatement of settled returns, not a forecast or APY. Nothing on this site is investment advice or an offer to sell any security.</p>
+          <p>Mandate limits reduce, but do not eliminate, risk. Depositors remain exposed to market, liquidation, oracle, smart-contract, counterparty and liquidity risk, and may lose some or all of their capital. Annualized figures are a mathematical restatement of past returns, not a forecast or APY. Nothing on this site is investment advice or an offer to sell any security.</p>
         </div>
       </div>
       <div class="foot-base"><span>© 2026 BNB Agent Vaults — design prototype</span><span>Chain ID 56 · ERC-4626 · ERC-8004</span></div>
@@ -547,10 +559,10 @@
   }
 
   window.BAV = {
-    TODAY, DAY, SLOTS, ASSETS, VENUES, AGENT_STACK, VAULTS,
+    TODAY, DAY, SLOTS, ASSETS, VENUES, BLOCKS, OPS, opScope, TEMPLATES, VAULTS,
     $, $$, esc, fmt, perf, periodDays, historyTag, riskMeter, statusTag,
     rng, hexAddr, short, navSeries, sparkline, lineChart, logo, agentCanvas, stackTables,
-    shell, footerHTML, wireShell, toast, SEAL,
+    shell, footerHTML, wireShell, toast, SEAL, route,
     vault: (slug) => VAULTS.find((v) => v.slug === slug),
   };
 })();

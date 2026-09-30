@@ -1,20 +1,363 @@
 1:"$Sreact.fragment"
 2:I[39756,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default"]
 3:I[37457,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default"]
-4:I[47257,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ClientPageRoot"]
-5:I[81428,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/0bmwx_eo7wzn9.js"],"default"]
-8:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
-9:"$Sreact.suspense"
-c:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]
-e:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"MetadataBoundary"]
-10:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default",1]
-:HL["/bnb-agent-vaults-site/_next/static/chunks/1j7a84_zyqycm.css","style"]
-b:X
-0:{"P":null,"c":["","vault","stable-yield-router",""],"q":"","i":false,"f":[[["",{"children":["vault",{"children":[["slug","stable-yield-router","d",[]],{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/1j7a84_zyqycm.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"Component":"$5","serverProvidedParams":{"searchParams":{},"params":{"slug":"stable-yield-router"},"promises":["$@6","$@7"]}}],[["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/0bmwx_eo7wzn9.js","async":true,"nonce":"$undefined"}]],["$","$L8",null,{"children":["$","$9",null,{"name":"Next.MetadataOutlet","children":"$@a"}]}]]}],{},null,false,null]},null,false,null]},null,false,"$b"]},null,false,null],["$","$1","h",{"children":[null,["$","$Lc",null,{"children":"$Ld"}],["$","div",null,{"hidden":true,"children":["$","$Le",null,{"children":["$","$9",null,{"name":"Next.Metadata","children":"$Lf"}]}]}],null]}],false]],"m":"$undefined","G":["$10",[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/1j7a84_zyqycm.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"2wDZVvwObqie66R0tZuLQ"}
-b:C
-6:{}
-7:"$0:f:0:1:1:children:1:children:1:children:0:props:children:0:props:serverProvidedParams:params"
-d:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
-11:I[27201,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"IconMark"]
-a:null
-f:[["$","title","0",{"children":"BNB Agent Vaults — Agent-managed funds on BNB Chain"}],["$","meta","1",{"name":"description","content":"Launch and follow non-custodial, policy-bound agent vaults on BNB Chain."}],["$","meta","2",{"name":"codex-preview","content":"development"}],["$","link","3",{"rel":"shortcut icon","href":"/bnb-agent-vaults-site/favicon.svg"}],["$","link","4",{"rel":"icon","href":"/bnb-agent-vaults-site/favicon.svg"}],["$","$L11","5",{}]]
+4:I[81384,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/04u3edz65h4va.js"],"PrototypePage"]
+b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default",1]
+:HL["/bnb-agent-vaults-site/_next/static/chunks/14j5olz08x8ko.css","style"]
+5:T15b2,
+
+<section class="vhead">
+  <div class="wrap">
+    <div class="crumbs"><a href="/bnb-agent-vaults-site/vaults/">Vault directory</a><span>/</span><span id="c-name"></span></div>
+    <div class="row">
+      <div>
+        <h1 id="v-name"></h1>
+        <p class="strat" id="v-strat"></p>
+        <div class="tags" id="v-tags"></div>
+      </div>
+      <div class="vh-actions" style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn ghost" id="factsheet">Factsheet PDF</button>
+        <a class="btn" href="#ticket">Deposit <span class="arr">→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="keyfig" id="keyfig"></div>
+
+  <div class="vgrid">
+    <div class="main">
+
+      <!-- Performance -->
+      <div class="panel">
+        <div class="panel-h">
+          <h3>Net asset value per share</h3>
+          <div class="seg" id="p-period"><button data-v="7D">7D</button><button class="on" data-v="30D">30D</button><button data-v="90D">90D</button><button data-v="ALL">All</button></div>
+        </div>
+        <div class="chart-meta">
+          <div><div class="big" id="p-big"></div><div class="sub" id="p-sub"></div></div>
+          <span class="tag sim">Simulated</span>
+        </div>
+        <div class="chart" id="chart"></div>
+        <div class="chart-foot"><span id="p-range"></span><span id="p-src"></span></div>
+        <div class="panel-b" style="border-top:1px solid var(--line-2)">
+          <div class="tbl-scroll"><table class="tbl stack cols-3" id="perf-tbl">
+            <thead><tr><th>Period</th><th class="r">Net return</th><th class="r">Annualized</th><th class="r">Max drawdown</th><th class="r">Start NAV</th><th class="r">End NAV</th></tr></thead>
+            <tbody></tbody>
+          </table></div>
+          <p class="fine" style="margin-top:14px">Net return = NAV/share(t₁) ÷ NAV/share(t₀) − 1, from on-chain NAV after fees. If an oracle goes stale, deposits and redemptions pause and the gap is marked — never interpolated or replaced with an advertised APR.</p>
+        </div>
+      </div>
+
+      <!-- Mandate -->
+      <div class="panel">
+        <div class="panel-h"><h3>Mandate</h3><span class="tag">Binding</span></div>
+        <div class="panel-b">
+          <ul class="rules" id="rules"></ul>
+          <div style="margin-top:18px"><div class="label" style="margin-bottom:10px">Allowed operations</div><div class="chips" id="v-ops"></div></div>
+          <div class="ai-sum"><span class="tag sim">AI summary · not binding</span><div id="ai"></div></div>
+        </div>
+      </div>
+
+      <!-- Allocation + rule changes -->
+      <div class="two">
+        <div class="panel">
+          <div class="panel-h"><h3>Current allocation</h3><span class="label">By market value</span></div>
+          <div class="panel-b">
+            <div class="alloc-bar" id="alloc-bar" role="img"></div>
+            <table class="tbl" id="alloc-tbl"><thead><tr><th>Sleeve</th><th class="r">Weight</th><th class="r">Value</th></tr></thead><tbody></tbody></table>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h3>Rule changes</h3><span id="rc-tag"></span></div>
+          <div class="panel-b" id="rc"></div>
+        </div>
+      </div>
+
+      <!-- Positions -->
+      <div class="panel">
+        <div class="panel-h"><h3>Positions</h3></div>
+        <div class="panel-b tbl-scroll">
+          <table class="tbl stack" id="positions"><thead><tr><th>Venue</th><th>Position</th><th class="r">Value</th><th>Valued by</th><th class="r">Status</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Side -->
+    <aside class="side">
+      <div class="panel ticket" id="ticket">
+        <div class="tabs"><button class="on" data-t="sub">Deposit</button><button data-t="red">Redeem</button></div>
+        <div class="panel-b" id="ticket-body"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><h3>Creator</h3></div>
+        <div class="panel-b" style="padding-top:8px;padding-bottom:10px" id="creator"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><h3>Fund terms</h3></div>
+        <div class="panel-b" style="padding-top:8px;padding-bottom:10px"><dl class="kv" id="terms"></dl></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h"><h3>Contracts</h3><span class="tag sim">Not deployed</span></div>
+        <div class="panel-b" style="padding-top:6px;padding-bottom:8px" id="contracts"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="mobile-cta"><button class="btn ghost" data-go="red">Redeem</button><button class="btn" data-go="sub">Deposit</button></div>
+
+<div class="modal-bg" id="edit">
+  <div class="modal">
+    <div class="panel-h"><h3>Edit mandate</h3><button class="x" id="e-x" aria-label="Close">×</button></div>
+    <div class="panel-b">
+      <p class="fine">Only the owner wallet can submit. Tightening applies at once. Loosening waits 24 hours and holders are notified, so anyone who disagrees can leave first.</p>
+      <div id="e-ops"></div>
+      <label class="field" style="margin-top:18px"><span>Minimum idle</span><div class="suffix"><input id="e-idle" inputmode="decimal"><b>%</b></div></label>
+      <ul class="rules" id="e-diff" style="margin-top:16px"></ul>
+      <div style="display:flex;gap:10px;margin-top:16px"><button class="btn ghost" id="e-cancel" style="flex:1">Cancel</button><button class="btn" id="e-submit" style="flex:1">Sign change</button></div>
+    </div>
+  </div>
+</div>
+
+
+
+6:T459d,
+(function () {
+  const { $, $$, fmt, perf, riskMeter, statusTag, historyTag, navSeries, lineChart, hexAddr, short, ASSETS, SLOTS, toast, TEMPLATES, OPS, VENUES } = BAV;
+  BAV.shell("vaults.html");
+
+  const slug = location.pathname.split("/").filter(Boolean).pop() || "stable-yield-router";
+  const v = BAV.vault(slug) || BAV.VAULTS[0];
+  const T = TEMPLATES[v.template];
+  const copy = v.copyOf ? BAV.vault(v.copyOf.slug) : null;
+  document.title = v.name + " — BNB Agent Vaults";
+  const A = v.asset;
+  const money = (n) => fmt.n(n, A === "BNB" ? 4 : 2) + " " + A;
+
+  /* Header */
+  $("#c-name").textContent = v.name;
+  $("#v-name").textContent = v.name;
+  $("#v-strat").textContent = v.strategy;
+  const ht = historyTag(v);
+  $("#v-tags").innerHTML = `${statusTag(v)}<span class="tag">${T.name}</span><span class="tag">${riskMeter(T.risk)}</span><span class="tag">${v.manager} · ERC-8004 #${v.agentId}</span><span class="tag">${A} · ${v.symbol}</span>${ht ? `<span class="tag">${ht}</span>` : ""}${copy ? `<span class="tag warn">Follows ${copy.name}</span>` : ""}<span class="tag sim">Simulated</span>`;
+
+  /* Key figures */
+  $("#keyfig").innerHTML = `
+    <div><div class="label">NAV / share</div><div class="v">${v.sharePrice.toFixed(4)}</div><div class="s">On-chain, live</div></div>
+    <div><div class="label">Assets under mgmt.</div><div class="v">${fmt.usd(v.tvl)}</div><div class="s">${v.cap ? "Capacity " + fmt.usd(v.cap, 0) : "No capacity cap"}</div></div>
+    <div><div class="label">Since inception</div><div class="v ${fmt.cls(v.returns.ALL)}">${fmt.pct(v.returns.ALL)}</div><div class="s">Net of fees, in ${A}</div></div>
+    <div><div class="label">Max drawdown</div><div class="v">${fmt.pct(v.maxDrawdown.ALL)}</div><div class="s">Since inception</div></div>
+    <div><div class="label">Track record</div><div class="v">${v.runtimeDays}<span style="font-size:15px;color:var(--muted)"> days</span></div><div class="s">${ht || "Since launch"}</div></div>
+    <div><div class="label">Exit cost today</div><div class="v" style="font-size:22px">${v.exitCost}</div><div class="s">Paid by the redeemer</div></div>`;
+
+  /* Performance */
+  const S = navSeries(v);
+  const periods = ["7D", "30D", "90D", "ALL"];
+  const sliceFor = (p) => (p === "ALL" ? S : S.slice(-Math.min(S.length, (p === "7D" ? 7 : p === "30D" ? 30 : 90) + 1)));
+  let period = v.returns["30D"] == null ? "ALL" : "30D";
+  const drawPerf = () => {
+    $$("#p-period button").forEach((b) => b.classList.toggle("on", b.dataset.v === period));
+    const s = sliceFor(period), r = v.returns[period], label = period === "ALL" ? "since inception" : period;
+    const complete = r != null;
+    $("#p-big").innerHTML = complete ? `<span class="${fmt.cls(r)}">${fmt.pct(r)}</span>` : `<span class="muted" style="font-size:22px">Not enough history yet</span>`;
+    $("#p-sub").textContent = complete ? `Net return, ${label}` : `A complete ${period} window does not exist yet — showing available data.`;
+    $("#p-range").textContent = `${fmt.date(s[0].t)} → ${fmt.date(s[s.length - 1].t)}`;
+    $("#p-src").textContent = `Source: on-chain NAV per share · benchmark ${T.benchmark}`;
+    lineChart($("#chart"), s, { height: window.innerWidth < 720 ? 230 : 300, label: `${v.name} NAV per share, ${label}` });
+  };
+  $$("#p-period button").forEach((b) => b.addEventListener("click", () => { period = b.dataset.v; drawPerf(); }));
+  drawPerf();
+
+  $("#perf-tbl tbody").innerHTML = periods.map((p) => {
+    const r = v.returns[p], a = perf(v, p, "annualized"), s = sliceFor(p), ok = r != null;
+    return `<tr><td>${p === "ALL" ? "Since inception" : p}</td>
+      <td class="r ${fmt.cls(r)}">${ok ? fmt.pct(r) : '<span class="na">Not enough history</span>'}</td>
+      <td class="r">${ok && a != null ? fmt.pct(a) : '<span class="na">—</span>'}</td>
+      <td class="r">${ok ? fmt.pct(v.maxDrawdown[p]) : '<span class="na">—</span>'}</td>
+      <td class="r">${ok ? s[0].v.toFixed(4) : "—"}</td>
+      <td class="r">${ok ? v.sharePrice.toFixed(4) : "—"}</td></tr>`;
+  }).join("");
+
+  /* Mandate — the same four rules the creator saw at launch */
+  const L = v.limits || {}, lev = L.ltv ? 1 / (1 - L.ltv / 100) : 1;
+  const vOps = v.ops.map((id) => OPS.find((o) => o.id === id));
+  const work = vOps.filter((o) => o.phrase && o.id !== "borrow").map((o) => o.phrase);
+  const then = work.length ? `, then ${work.length < 2 ? work[0] : work.slice(0, -1).join(", ") + " and " + work[work.length - 1]}` : "";
+  const RULES = {
+    stable: ["Lend USDT, USDC, USD1 and U on Venus and Lista, and swap between them on PancakeSwap.",
+      `Borrow or hold volatile assets. Non-USDT stablecoins stay at or below ${L.nonUsdt}%; at least ${L.idle}% stays idle.`],
+    loop: [`Stake BNB into slisBNB and borrow BNB against it on Lista, up to ${L.ltv}% LTV (${lev.toFixed(1)}×).`,
+      `Go above ${L.ltv}% LTV — a keeper deleverages if it drifts. At least ${L.idle}% stays in BNB. Results are counted in BNB.`],
+    bluechip: [`Buy and sell BNB, BTCB and ETH against USDT on PancakeSwap${then}.`,
+      "Borrow against holdings. No position larger than its market can absorb in 24 hours."],
+    fund: [`Lend stablecoins on Venus and Lista; buy and sell majors and bStocks against USDT${then}; run slisBNB loops within each pair's LTV cap (ceiling ${L.loopCeil}%).`,
+      `Borrow against holdings. Hold more than ${L.nonUsdt}% in non-USDT stablecoins, or keep less than ${L.idle}% idle. No position larger than its market can absorb in 24 hours.`],
+    stocks: [`Buy and sell bStocks that have a DEX pool against USDT${then}.`,
+      "Borrow against holdings. No position larger than its market can absorb in 24 hours. Leveraged and inverse ETFs are allowed."],
+  }[v.template];
+  const f = v.fees;
+  $("#rules").innerHTML = [
+    ["Can", RULES[0]],
+    ["Cannot", RULES[1] + " It can never withdraw funds or call anything outside approved adapters."],
+    ["You pay", `${f.perf + f.platform}% of profit above the high-water mark: ${f.perf}% to the creator, ${f.platform}% to the platform. No management fee. No entry or exit fee.`],
+    ["Leave", `Any time after a 24-hour deposit cooldown; large exits settle within 12 hours. You pay your own slippage — about ${v.exitCost} today.`],
+  ].map(([k, t]) => `<li><b>${k}</b><span>${t}</span></li>`).join("");
+  const vName = (id) => VENUES.find((x) => x.id === id).name;
+  $("#v-ops").innerHTML = vOps.map((o) => `<span class="chip" style="display:inline-flex;align-items:center;cursor:default">${o.verb} · ${o.venues.map(vName).join(" / ")}</span>`).join("");
+  $("#ai").textContent = {
+    stable: "A low-volatility USDT vault. The agent moves money between lending markets as rates change, so returns should sit close to lending rates. The main risks are a stablecoin depeg and a pool running short of withdrawable cash.",
+    loop: `A BNB-counted vault looping slisBNB at up to ${lev.toFixed(1)}×. It earns the gap between BNB staking yield and borrow cost, times leverage. It loses if borrowing gets more expensive than staking pays, and leaving costs more because slisBNB is sold on DEXs.`,
+    bluechip: "An actively traded vault of BNB, BTCB and ETH. Whether it works depends on the agent's timing versus holding the three coins in equal weight. Expect crypto-level swings.",
+    stocks: "An actively traded tokenized-stock vault, judged against holding SPYB. On-chain prices move on weekends, so Monday opens can gap.",
+    fund: "A multi-strategy vault: a stablecoin lending core, a slisBNB loop and a sleeve of majors and bStocks. The agent moves capital between them; expect swings from the trading sleeve.",
+  }[v.template] + ` Creator's note: “${v.strategy}”`;
+
+  /* Allocation */
+  $("#alloc-bar").innerHTML = v.allocation.map(([n, w], i) => `<i style="width:${w}%;background:${SLOTS[i]}" title="${n} ${w}%"></i>`).join("");
+  $("#alloc-bar").setAttribute("aria-label", v.allocation.map(([n, w]) => `${n} ${w}%`).join(", "));
+  $("#alloc-tbl tbody").innerHTML = v.allocation.map(([n, w], i) => `<tr><td><span class="sw" style="background:${SLOTS[i]}"></span>${n}</td><td class="r">${w.toFixed(1)}%</td><td class="r">${fmt.usd((v.tvl * w) / 100)}</td></tr>`).join("");
+
+  /* Rule changes */
+  const pc = v.pendingChange;
+  $("#rc-tag").innerHTML = pc ? `<span class="tag warn">Pending</span>` : `<span class="tag">None pending</span>`;
+  $("#rc").innerHTML = pc
+    ? `<div class="h4">${pc.what}</div>
+       <div class="state-note"><span class="dot" style="background:var(--warn)"></span><span>Takes effect in <b>${pc.hours} hours</b>. If you disagree, redeem before then — exits settle within 12 hours.</span></div>
+       <button class="btn sm ghost block" id="rc-red">Redeem before it applies</button>
+       <p class="fine" style="margin-top:12px">Holders are alerted on Telegram when a change is announced.</p>`
+    : `<p style="font-size:14px;color:var(--ink-2)">Any change to this mandate is announced here and waits 24 hours before it applies. Tightening a limit or cutting a fee applies at once.</p>
+       <p class="fine" style="margin-top:12px">Holders are alerted on Telegram when a change is announced.</p>`;
+  $("#rc").insertAdjacentHTML("beforeend", `<button class="btn sm ghost block" id="edit-open" style="margin-top:14px">Edit mandate · owner</button>`);
+
+  /* Positions */
+  $("#positions tbody").innerHTML = v.positions.map((x) => `<tr><td class="strong" style="font-size:16px">${x.p === "Idle" ? "Vault" : `<span class="with-logo">${BAV.logo(x.p)}${x.p}</span>`}</td><td class="mono" style="font-size:12px">${x.loc}</td><td class="r">${fmt.usd((v.tvl * x.w) / 100)}</td><td class="muted">${x.by}</td><td class="r">${x.st}</td></tr>`).join("");
+
+  /* Creator */
+  $("#creator").innerHTML = `<dl class="kv">
+      <dt>Agent</dt><dd>${v.manager} · #${v.agentId}</dd>
+      <dt>Vaults opened by this agent</dt><dd>${v.agentVaults}${v.agentVaults > 1 ? " (incl. closed)" : ""}</dd>
+      <dt>Owner stake</dt><dd>Locked until close</dd>
+    </dl>${copy ? `<div class="state-note"><span class="dot" style="background:var(--warn)"></span><span>Trades closely follow <a href="${BAV.route("vault/" + copy.slug)}" style="text-decoration:underline">${copy.name}</a>, on average ${v.copyOf.lag} later.</span></div>` : ""}`;
+
+  /* Ticket */
+  let tab = "sub";
+  const bal = A === "BNB" ? 18.42 : 24850;
+  const myShares = A === "BNB" ? 12.5 : 8445.95;
+  function drawTicket() {
+    $$(".ticket .tabs button").forEach((b) => b.classList.toggle("on", b.dataset.t === tab));
+    if (tab === "sub") {
+      const note = pc ? ["var(--warn)", `A rule change takes effect in ${pc.hours} hours: ${pc.what}. Read it before you deposit.`]
+        : ["var(--pos)", "Shares are issued at live NAV. Deposits pause automatically if an oracle goes stale."];
+      $("#ticket-body").innerHTML = `
+        <div style="display:flex;justify-content:space-between"><span class="label">Amount</span><span class="fine">Balance ${fmt.n(bal, 2)} ${A}</span></div>
+        <div class="amount"><input id="amt" inputmode="decimal" placeholder="0.00"><span class="unit">${A}</span></div>
+        <div class="quick"><button data-q=".25">25%</button><button data-q=".5">50%</button><button data-q="1">Max</button></div>
+        <dl class="kv">
+          <dt>NAV / share</dt><dd>${v.sharePrice.toFixed(4)}</dd>
+          <dt>Estimated shares</dt><dd id="est">—</dd>
+          <dt>Entry fee</dt><dd>0.00%</dd>
+          <dt>Redeemable after</dt><dd>24 hours</dd>
+        </dl>
+        <div class="state-note"><span class="dot" style="background:${note[0]}"></span><span>${note[1]}</span></div>
+        <button class="btn block" id="go">Approve &amp; deposit</button>`;
+      const inp = $("#amt");
+      const upd = () => { const x = parseFloat(inp.value); $("#est").textContent = x > 0 ? fmt.n(x / v.sharePrice, 2) + " " + v.symbol : "—"; };
+      inp.addEventListener("input", upd);
+      $$(".quick button").forEach((b) => b.addEventListener("click", () => { inp.value = (bal * +b.dataset.q).toFixed(2); upd(); }));
+    } else {
+      $("#ticket-body").innerHTML = `
+        <div style="display:flex;justify-content:space-between"><span class="label">Shares</span><span class="fine">Held ${fmt.n(myShares, 2)} ${v.symbol}</span></div>
+        <div class="amount"><input id="amt" inputmode="decimal" placeholder="0.00"><span class="unit">${v.symbol}</span></div>
+        <div class="quick"><button data-q=".25">25%</button><button data-q=".5">50%</button><button data-q="1">Max</button></div>
+        <dl class="kv">
+          <dt>Indicative value</dt><dd id="est">—</dd>
+          <dt>Exit cost today</dt><dd>${v.exitCost}</dd>
+          <dt>Your max slippage</dt><dd><input id="slip" value="0.5" inputmode="decimal" style="width:56px;height:30px;padding:0 8px;border:1px solid var(--line);border-radius:8px;background:var(--field);color:var(--ink);text-align:right"> %</dd>
+          <dt>Settles</dt><dd>Instant from idle · ≤ 12 h otherwise</dd>
+        </dl>
+        <div class="state-note"><span class="dot" style="background:var(--pos)"></span><span>You pay your own slippage, so the people who stay don't. If the market can't fill within your limit, the request waits.</span></div>
+        <button class="btn block" id="go">Redeem</button>`;
+      const inp = $("#amt");
+      const upd = () => { const x = parseFloat(inp.value); $("#est").textContent = x > 0 ? "≈ " + money(x * v.sharePrice) : "—"; };
+      inp.addEventListener("input", upd);
+      $$(".quick button").forEach((b) => b.addEventListener("click", () => { inp.value = (myShares * +b.dataset.q).toFixed(2); upd(); }));
+    }
+    $("#go").addEventListener("click", () => toast("Prototype — contracts are not deployed, no transaction was sent"));
+  }
+  const openTab = (t) => { tab = t; drawTicket(); $("#ticket").scrollIntoView({ behavior: "smooth", block: "start" }); };
+  $$(".ticket .tabs button").forEach((b) => b.addEventListener("click", () => { tab = b.dataset.t; drawTicket(); }));
+  $$(".mobile-cta [data-go]").forEach((b) => b.addEventListener("click", () => openTab(b.dataset.go)));
+  if ($("#rc-red")) $("#rc-red").addEventListener("click", () => openTab("red"));
+  drawTicket();
+
+  /* Terms + contracts */
+  $("#terms").innerHTML = `
+    <dt>Counted in</dt><dd>${A} <span class="mono muted">${short(ASSETS[A].address)}</span></dd>
+    <dt>Share token</dt><dd>${v.symbol}</dd>
+    <dt>Template</dt><dd>${T.name}</dd>
+    <dt>Benchmark</dt><dd>${T.benchmark}</dd>
+    <dt>Creator performance fee</dt><dd>${f.perf.toFixed(2)}%</dd>
+    <dt>Platform fee</dt><dd>${f.platform}% + 15% of creator's</dd>
+    <dt>Management fee</dt><dd>${f.mgmt.toFixed(2)}%</dd>
+    <dt>High-water mark</dt><dd>Vault-level</dd>
+    <dt>Rule-change timelock</dt><dd>24 hours</dd>
+    <dt>Longest redemption</dt><dd>12 hours</dd>
+    <dt>Deposit cooldown</dt><dd>24 hours</dd>
+    <dt>Entry / exit fee</dt><dd>None</dd>`;
+  const addrs = [["Vault (ERC-4626)", hexAddr(v.slug + "vault")], ["Mandate", hexAddr(v.slug + "mandate")], ["Agent operator", hexAddr(v.slug + "agent")], ["Owner", hexAddr(v.slug + "owner")]];
+  $("#contracts").innerHTML = addrs.map(([n, a]) => `<div class="addr"><span class="muted">${n}</span><button data-a="${a}" title="Copy address">${short(a)}</button></div>`).join("");
+  $$("#contracts button").forEach((b) => b.addEventListener("click", () => { navigator.clipboard && navigator.clipboard.writeText(b.dataset.a); toast("Placeholder address copied"); }));
+
+  $("#factsheet").addEventListener("click", () => toast("Factsheet export is part of the production build"));
+
+  /* Edit mandate (owner): tightening applies now, loosening waits 24 hours */
+  const idle0 = (v.limits && v.limits.idle) || 10;
+  const drawEdit = () => {
+    $("#e-ops").innerHTML = Object.entries(BAV.BLOCKS).map(([b, name]) => `<div class="label" style="margin:14px 0 8px">${name}</div>` + OPS.filter((o) => o.block === b).map((o) =>
+      `<label class="mkt op"><input type="checkbox" data-eop="${o.id}" ${v.ops.includes(o.id) ? "checked" : ""}><span class="logo-stack">${o.venues.map((x) => BAV.logo(x, "md")).join("")}</span><span class="t">${o.verb}<small>${o.scope}</small></span><span class="apy">${v.ops.includes(o.id) ? "Allowed" : ""}</span></label>`).join("")).join("");
+    $("#e-idle").value = idle0;
+    $$("[data-eop]").forEach((c) => c.addEventListener("change", diff));
+    diff();
+  };
+  const diff = () => {
+    const now = [], later = [];
+    $$("[data-eop]").forEach((c) => {
+      const op = OPS.find((o) => o.id === c.dataset.eop), was = v.ops.includes(op.id);
+      if (was && !c.checked) now.push(`Stop: ${op.verb.toLowerCase()}`);
+      if (!was && c.checked) later.push(`Allow: ${op.verb.toLowerCase()}`);
+    });
+    const idle = parseFloat($("#e-idle").value);
+    if (idle > idle0) now.push(`Raise minimum idle to ${idle}%`);
+    if (idle < idle0) later.push(`Lower minimum idle to ${idle}%`);
+    $("#e-diff").innerHTML = [...now.map((t) => `<li><b>Now</b><span>${t}</span></li>`), ...later.map((t) => `<li><b>In 24 h</b><span>${t} — announced to holders, who can leave first</span></li>`)].join("")
+      || `<li><b>—</b><span>No changes yet.</span></li>`;
+    $("#e-submit").disabled = !now.length && !later.length;
+  };
+  $("#e-idle").addEventListener("input", diff);
+  const closeEdit = () => $("#edit").classList.remove("on");
+  $("#edit-open").addEventListener("click", () => { drawEdit(); $("#edit").classList.add("on"); });
+  $("#e-x").addEventListener("click", closeEdit);
+  $("#e-cancel").addEventListener("click", closeEdit);
+  $("#edit").addEventListener("click", (e) => { if (e.target.id === "edit") closeEdit(); });
+  $("#e-submit").addEventListener("click", () => { closeEdit(); toast("Prototype — change signed by the owner; loosening goes live in 24 hours"); });
+})();
+9:X
+0:{"P":null,"c":["","vault","stable-yield-router",""],"q":"","i":false,"f":[[["",{"children":["vault",{"children":[["slug","stable-yield-router","d",[]],{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/14j5olz08x8ko.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"bodyClass":"has-mcta","html":"$5","script":"$6","pageKey":"vault"}],["$L7"],"$L8"]}],{},null,false,null]},null,false,null]},null,false,"$9"]},null,false,null],"$La",false]],"m":"$undefined","G":["$b",["$Lc"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"gtQlUvFE3WlrWpCIe-I3z"}
+d:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
+e:"$Sreact.suspense"
+10:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]
+12:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"MetadataBoundary"]
+7:["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/04u3edz65h4va.js","async":true,"nonce":"$undefined"}]
+8:["$","$Ld",null,{"children":["$","$e",null,{"name":"Next.MetadataOutlet","children":"$@f"}]}]
+a:["$","$1","h",{"children":[null,["$","$L10",null,{"children":"$L11"}],["$","div",null,{"hidden":true,"children":["$","$L12",null,{"children":["$","$e",null,{"name":"Next.Metadata","children":"$L13"}]}]}],null]}]
+c:["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/14j5olz08x8ko.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]
+9:C
+11:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
+14:I[27201,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"IconMark"]
+f:null
+13:[["$","title","0",{"children":"BNB Agent Vaults — Agent-managed funds on BNB Chain"}],["$","meta","1",{"name":"description","content":"Launch and follow non-custodial, policy-bound agent vaults on BNB Chain."}],["$","meta","2",{"name":"codex-preview","content":"development"}],["$","link","3",{"rel":"shortcut icon","href":"/bnb-agent-vaults-site/favicon.svg"}],["$","link","4",{"rel":"icon","href":"/bnb-agent-vaults-site/favicon.svg"}],["$","$L14","5",{}]]

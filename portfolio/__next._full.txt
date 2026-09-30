@@ -1,20 +1,149 @@
 1:"$Sreact.fragment"
 2:I[39756,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default"]
 3:I[37457,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default"]
-4:I[47257,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ClientPageRoot"]
-5:I[84715,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/4089l47tpq5mm.js"],"default"]
-8:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
-9:"$Sreact.suspense"
-c:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]
-e:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"MetadataBoundary"]
-10:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default",1]
-:HL["/bnb-agent-vaults-site/_next/static/chunks/1j7a84_zyqycm.css","style"]
-b:X
-0:{"P":null,"c":["","portfolio",""],"q":"","i":false,"f":[[["",{"children":["portfolio",{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/1j7a84_zyqycm.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"Component":"$5","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@6","$@7"]}}],[["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/4089l47tpq5mm.js","async":true,"nonce":"$undefined"}]],["$","$L8",null,{"children":["$","$9",null,{"name":"Next.MetadataOutlet","children":"$@a"}]}]]}],{},null,false,null]},null,false,"$b"]},null,false,null],["$","$1","h",{"children":[null,["$","$Lc",null,{"children":"$Ld"}],["$","div",null,{"hidden":true,"children":["$","$Le",null,{"children":["$","$9",null,{"name":"Next.Metadata","children":"$Lf"}]}]}],null]}],false]],"m":"$undefined","G":["$10",[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/1j7a84_zyqycm.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"2wDZVvwObqie66R0tZuLQ"}
-b:C
-6:{}
-7:"$0:f:0:1:1:children:1:children:0:props:children:0:props:serverProvidedParams:params"
-d:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
-11:I[27201,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"IconMark"]
-a:null
-f:[["$","title","0",{"children":"BNB Agent Vaults — Agent-managed funds on BNB Chain"}],["$","meta","1",{"name":"description","content":"Launch and follow non-custodial, policy-bound agent vaults on BNB Chain."}],["$","meta","2",{"name":"codex-preview","content":"development"}],["$","link","3",{"rel":"shortcut icon","href":"/bnb-agent-vaults-site/favicon.svg"}],["$","link","4",{"rel":"icon","href":"/bnb-agent-vaults-site/favicon.svg"}],["$","$L11","5",{}]]
+4:I[81384,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/04u3edz65h4va.js"],"PrototypePage"]
+b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default",1]
+:HL["/bnb-agent-vaults-site/_next/static/chunks/14j5olz08x8ko.css","style"]
+5:T7ef,
+
+<section class="page-head">
+  <div class="wrap">
+    <div class="row">
+      <div>
+        <h1>Statement of holdings</h1>
+        <p class="lede">Demo account <span class="mono">0x7a3F…c91E</span> · valued at live NAV as of <span id="asof"></span>. <span class="tag sim" style="vertical-align:2px">Simulated</span></p>
+      </div>
+      <div class="summary" id="summary"></div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap" style="padding-top:40px;padding-bottom:90px">
+  <div class="panel">
+    <div class="panel-h"><h3>Holdings</h3><span class="label">Valued in USDT</span></div>
+    <div class="panel-b tbl-scroll">
+      <table class="tbl hover stack cols-3" id="hold">
+        <thead><tr><th>Vault</th><th class="r">Shares</th><th class="r">NAV / share</th><th class="r">Market value</th><th class="r">Cost basis</th><th class="r">Unrealized P&amp;L</th><th class="r">Weight</th><th class="r">Exit cost today</th></tr></thead>
+        <tbody></tbody>
+        <tfoot></tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="two" style="margin-top:28px">
+    <div class="panel">
+      <div class="panel-h"><h3>Redemptions in progress</h3><span class="label">Settle within 12 hours</span></div>
+      <div class="panel-b tbl-scroll">
+        <table class="tbl stack" id="queue"><thead><tr><th>Request</th><th>Vault</th><th class="r">Shares</th><th class="r">Status</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+
+    <div class="panel" id="changes">
+      <div class="panel-h"><h3>Rule changes</h3><span class="label">24-hour timelock</span></div>
+      <div class="panel-b" id="rc"></div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:28px">
+    <div class="panel-h"><h3>Activity</h3><span class="label">Most recent first</span></div>
+    <div class="panel-b tbl-scroll">
+      <table class="tbl stack" id="act"><thead><tr><th>Date</th><th>Event</th><th>Vault</th><th class="r">Amount</th><th class="r">Reference</th></tr></thead><tbody></tbody></table>
+    </div>
+  </div>
+</div>
+
+
+
+6:T1590,
+(function () {
+  const { $, $$, fmt, toast, TODAY, DAY } = BAV;
+  BAV.shell("portfolio.html");
+  $("#asof").textContent = fmt.date(TODAY);
+
+  const H = [
+    { slug: "stable-yield-router", shares: 20000, cost: 1.0 },
+    { slug: "bnb-bluechip-momentum", shares: 3200, cost: 1.0625 },
+    { slug: "mag7-rotation", shares: 4600, cost: 1.0214 },
+  ].map((h) => {
+    const v = BAV.vault(h.slug);
+    const value = h.shares * v.sharePrice, basis = h.shares * h.cost;
+    return { ...h, v, value, basis, pnl: value - basis };
+  });
+  const total = H.reduce((a, h) => a + h.value, 0);
+  const pnl = H.reduce((a, h) => a + h.pnl, 0);
+  const basis = H.reduce((a, h) => a + h.basis, 0);
+  const bcm = BAV.vault("bnb-bluechip-momentum");
+  const pendingShares = 1500;
+
+  $("#summary").innerHTML = `
+    <div><div class="label">Market value</div><div class="v">${fmt.n(total, 2)}</div></div>
+    <div><div class="label">Unrealized P&amp;L</div><div class="v ${fmt.cls(pnl)}">${pnl > 0 ? "+" : ""}${fmt.n(pnl, 2)}</div></div>
+    <div><div class="label">Redeeming</div><div class="v">≈ ${fmt.n(pendingShares * bcm.sharePrice, 0)}</div></div>
+    <div><div class="label">Vaults held</div><div class="v">${H.length}</div></div>`;
+
+  $("#hold tbody").innerHTML = H.map((h) => `
+    <tr onclick="location.href=BAV.route('vault/${h.slug}')">
+      <td><div class="vname"><span class="n">${h.v.name}</span><span class="m">${h.v.symbol} · ${h.v.manager}</span></div></td>
+      <td class="r">${fmt.n(h.shares, 2)}</td>
+      <td class="r">${h.v.sharePrice.toFixed(4)}</td>
+      <td class="r">${fmt.n(h.value, 2)}</td>
+      <td class="r muted">${fmt.n(h.basis, 2)}</td>
+      <td class="r ${fmt.cls(h.pnl)}">${h.pnl > 0 ? "+" : ""}${fmt.n(h.pnl, 2)} <span style="font-size:12px">(${fmt.pct((h.pnl / h.basis) * 100)})</span></td>
+      <td class="r">${((h.value / total) * 100).toFixed(1)}%</td>
+      <td class="r muted">${h.v.exitCost}</td>
+    </tr>`).join("");
+  $("#hold tfoot").innerHTML = `<tr><td style="padding-top:16px" class="strong">Total</td><td></td><td></td><td class="r strong">${fmt.n(total, 2)}</td><td class="r muted">${fmt.n(basis, 2)}</td><td class="r ${fmt.cls(pnl)}">${pnl > 0 ? "+" : ""}${fmt.n(pnl, 2)} <span style="font-size:12px">(${fmt.pct((pnl / basis) * 100)})</span></td><td class="r">100.0%</td><td></td></tr>`;
+
+  // Redemptions in progress: large exits are sold in slices, the redeemer pays their own slippage
+  $("#queue tbody").innerHTML = `
+    <tr><td class="mono">R-0192</td><td>Bluechip Momentum<div class="fine">Requested 3h ago · max slippage 0.50%</div></td><td class="r">${fmt.n(pendingShares, 2)} avBCM</td>
+      <td class="r"><span class="tag warn">Selling · 2 of 3 slices</span><div class="fine" style="margin-top:4px">Done in about 2h</div></td></tr>
+    <tr><td class="mono">R-0177</td><td>Stable Yield Router<div class="fine">Paid from idle USDT</div></td><td class="r">1,000.00 avSYR</td>
+      <td class="r"><span class="tag"><span class="dot"></span>Paid 1,047.60 USDT</span><div class="fine" style="margin-top:4px">Slippage 0.00%</div></td></tr>`;
+
+  // Rule changes (timelock) + Telegram alerts
+  let bound = false;
+  const drawRc = () => {
+    $("#rc").innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px">
+        <div><div class="h4">Bluechip Momentum</div><div class="fine" style="margin-top:4px">Performance fee 15% → 20%</div></div>
+        <span class="tag warn">In ${bcm.pendingChange.hours}h</span>
+      </div>
+      <div class="state-note"><span class="dot" style="background:var(--warn)"></span><span>If you disagree, redeem before it applies. Exits settle within 12 hours, so request at least 12 hours before.</span></div>
+      <button class="btn block" id="rc-red">Redeem 3,200 avBCM</button>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:18px;padding-top:16px;border-top:1px solid var(--line-2)">
+        <span class="fine" style="margin:0">${bound ? "Telegram alerts on for this wallet." : "Get rule changes, big agent moves and redemptions on Telegram."}</span>
+        <button class="btn sm ${bound ? "ghost" : ""}" id="tg">${bound ? "Connected" : "Connect Telegram"}</button>
+      </div>
+      <p class="fine" style="margin-top:10px">No other vault you hold has a pending change.</p>`;
+    $("#rc-red").addEventListener("click", () => toast("Prototype — redemption simulated, no transaction sent"));
+    $("#tg").addEventListener("click", () => { if (bound) return; bound = true; drawRc(); toast("Signed a message to bind this wallet — no gas, no transaction"); });
+  };
+  drawRc();
+
+  // Activity
+  const A = [
+    [0, "Redemption requested", "Bluechip Momentum", "1,500.00 avBCM", "R-0192"],
+    [0, "Rule change announced", "Bluechip Momentum", "Performance fee 15% → 20%", "Live in 18h"],
+    [3, "Redemption paid", "Stable Yield Router", "1,000.00 avSYR → 1,047.60 USDT", "R-0177"],
+    [50, "Deposit", "Mag 7 Rotation", "4,698.44 USDT → 4,600.00 avM7R", "0x3e9a…71d0"],
+    [64, "Deposit", "Bluechip Momentum", "4,993.75 USDT → 4,700.00 avBCM", "0xa81c…0f5e"],
+    [128, "Deposit", "Stable Yield Router", "21,000.00 USDT → 21,000.00 avSYR", "0x55f0…c2b7"],
+  ].sort((a, b) => a[0] - b[0]);
+  $("#act tbody").innerHTML = A.map(([d, e, v, amt, ref]) => `<tr><td class="muted">${fmt.date(TODAY - d * DAY)}</td><td>${e}</td><td>${v}</td><td class="r">${amt}</td><td class="r mono muted">${ref}</td></tr>`).join("");
+})();
+9:X
+0:{"P":null,"c":["","portfolio",""],"q":"","i":false,"f":[[["",{"children":["portfolio",{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/14j5olz08x8ko.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"bodyClass":"","html":"$5","script":"$6","pageKey":"portfolio"}],["$L7"],"$L8"]}],{},null,false,null]},null,false,"$9"]},null,false,null],"$La",false]],"m":"$undefined","G":["$b",["$Lc"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"gtQlUvFE3WlrWpCIe-I3z"}
+d:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
+e:"$Sreact.suspense"
+10:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]
+12:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"MetadataBoundary"]
+7:["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/04u3edz65h4va.js","async":true,"nonce":"$undefined"}]
+8:["$","$Ld",null,{"children":["$","$e",null,{"name":"Next.MetadataOutlet","children":"$@f"}]}]
+a:["$","$1","h",{"children":[null,["$","$L10",null,{"children":"$L11"}],["$","div",null,{"hidden":true,"children":["$","$L12",null,{"children":["$","$e",null,{"name":"Next.Metadata","children":"$L13"}]}]}],null]}]
+c:["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/14j5olz08x8ko.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]
+9:C
+11:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
+14:I[27201,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"IconMark"]
+f:null
+13:[["$","title","0",{"children":"BNB Agent Vaults — Agent-managed funds on BNB Chain"}],["$","meta","1",{"name":"description","content":"Launch and follow non-custodial, policy-bound agent vaults on BNB Chain."}],["$","meta","2",{"name":"codex-preview","content":"development"}],["$","link","3",{"rel":"shortcut icon","href":"/bnb-agent-vaults-site/favicon.svg"}],["$","link","4",{"rel":"icon","href":"/bnb-agent-vaults-site/favicon.svg"}],["$","$L14","5",{}]]

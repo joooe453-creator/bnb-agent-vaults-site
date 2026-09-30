@@ -1,12 +1,26 @@
 1:"$Sreact.fragment"
 2:I[39756,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default"]
 3:I[37457,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default"]
-4:I[48026,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/0dqv24fd5h9qb.js"],"AppShell"]
+4:I[81384,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/04u3edz65h4va.js"],"PrototypePage"]
 a:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default",1]
-:HL["/bnb-agent-vaults-site/_next/static/chunks/1j7a84_zyqycm.css","style"]
-5:T6c9a,
+:HL["/bnb-agent-vaults-site/_next/static/chunks/14j5olz08x8ko.css","style"]
+5:T67d8,
 
-
+<header class="masthead float" id="mh">
+  <div class="wrap">
+    <a class="brand" href="/bnb-agent-vaults-site/" id="brand"></a>
+    <nav class="nav">
+      <a href="#product">Product</a>
+      <a href="#how">How it works</a>
+      <a href="#economics">Economics</a>
+      <a href="/bnb-agent-vaults-site/vaults/">Vaults</a>
+    </nav>
+    <div class="head-right">
+      <a class="btn sm" href="/bnb-agent-vaults-site/vaults/">Launch App <span class="arr">→</span></a>
+      <button class="menu-btn" aria-label="Menu"><span></span></button>
+    </div>
+  </div>
+</header>
 
 <!-- ============================== HERO ============================== -->
 <section class="hero">
@@ -25,7 +39,7 @@ a:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
   <div class="hero-content">
     <div class="wrap">
       <h1 class="display">Your agent can run a fund. <span>And earn like one.</span></h1>
-      <p class="lede">Non-custodial vaults where AI agents manage capital inside a mandate depositors can read and veto — and collect management and performance fees onchain.</p>
+      <p class="lede">Non-custodial vaults where AI agents manage capital inside a mandate anyone can read — depositors can leave at any time, and agents collect performance fees onchain.</p>
       <div class="hero-cta">
         <a class="btn" href="/bnb-agent-vaults-site/create/">Launch an agent vault <span class="arr">→</span></a>
         <a class="btn ghost" href="/bnb-agent-vaults-site/vaults/">Explore vaults</a>
@@ -38,10 +52,9 @@ a:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
 <!-- ============================== INTEGRATIONS ============================== -->
 <section class="venues-row">
   <div class="wrap">
-    <a class="v-item" href="/bnb-agent-vaults-site/integrations/#pancakeswap"><img class="logo lg" src="/bnb-agent-vaults-site/logos/pancakeswap.jpg" alt=""><span>PancakeSwap<small>Swaps · Liquidity</small></span></a>
-    <a class="v-item" href="/bnb-agent-vaults-site/integrations/#lista"><img class="logo lg" src="/bnb-agent-vaults-site/logos/lista.jpg" alt=""><span>Lista DAO<small>Lending · Staking</small></span></a>
-    <a class="v-item" href="/bnb-agent-vaults-site/integrations/#venus"><img class="logo lg" src="/bnb-agent-vaults-site/logos/venus.jpg" alt=""><span>Venus<small>Money market</small></span></a>
-    <a class="v-item" href="/bnb-agent-vaults-site/integrations/#aster"><img class="logo lg" src="/bnb-agent-vaults-site/logos/aster.jpg" alt=""><span>Aster<small>Spot · Perps</small></span></a>
+    <span class="v-item"><img class="logo lg" src="/bnb-agent-vaults-site/logos/pancakeswap.jpg" alt=""><span>PancakeSwap<small>Swaps · Liquidity</small></span></span>
+    <span class="v-item"><img class="logo lg" src="/bnb-agent-vaults-site/logos/lista.jpg" alt=""><span>Lista DAO<small>Lending · Staking · Loops</small></span></span>
+    <span class="v-item"><img class="logo lg" src="/bnb-agent-vaults-site/logos/venus.jpg" alt=""><span>Venus<small>Money market</small></span></span>
     <span class="built v-item" style="opacity:1"><img class="logo lg" src="/bnb-agent-vaults-site/logos/bnbchain.jpg" alt=""><span>BNB Chain<small>Agent infrastructure</small></span></span>
   </div>
 </section>
@@ -56,9 +69,9 @@ a:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
       <p class="lede">Agents already trade around the clock. BNB Agent Vaults gives them what a fund manager needs — outside capital, a binding mandate and a way to get paid — without ever handing them the keys.</p>
     </div>
     <div class="stmt"><span class="n">01</span><h3>Raise capital.</h3><p>Open a vault under an ERC-8004 identity, publish the mandate, and accept deposits from anyone on BNB Chain.</p></div>
-    <div class="stmt"><span class="n">02</span><h3>Trade within a mandate.</h3><p>Venues, operations, allocations and risk limits are fixed before capital moves. Custody never leaves the vault.</p></div>
-    <div class="stmt"><span class="n">03</span><h3>Get paid for performance.</h3><p>Management fees and high-water-mark performance fees accrue onchain to the agent's fee recipient.</p></div>
-    <div class="stmt"><span class="n">04</span><h3>Compound a track record.</h3><p>Every cycle settles to a verifiable NAV per share. The record becomes the agent's reputation.</p></div>
+    <div class="stmt"><span class="n">02</span><h3>Trade within a mandate.</h3><p>Markets and limits are fixed before capital moves. Inside them, the agent acts whenever it wants. Custody never leaves the vault.</p></div>
+    <div class="stmt"><span class="n">03</span><h3>Get paid for performance.</h3><p>High-water-mark performance fees accrue onchain to the vault owner.</p></div>
+    <div class="stmt"><span class="n">04</span><h3>Compound a track record.</h3><p>NAV per share is on-chain and live. The record becomes the agent's reputation.</p></div>
   </div>
 </section>
 
@@ -74,21 +87,18 @@ a:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
         <div class="step on">
           <div>
             <div class="big-n">01</div>
-            <h3>Draft the mandate</h3>
-            <p>The agent's operator fills in seven articles — terms, capital, strategy book, fees, risk limits, permissions and reporting. They compile into a machine-readable Vault Manifest.</p>
-            <ul><li>Assets pinned by contract address, not symbol</li><li>Every leg names an exact market and position</li><li>Arbitrary contract calls cannot be granted</li></ul>
+            <h3>Build the mandate</h3>
+            <p>Start from a preset — or switch on stablecoin lending, spot trading, loops and borrowing yourself. What is switched on is all the agent may ever do.</p>
+            <ul><li>Markets pinned by contract address, not symbol</li><li>Tightening applies at once; loosening waits 24 hours</li><li>Arbitrary contract calls cannot be granted</li></ul>
           </div>
           <div class="ui-card">
-            <div class="ui-h"><b>Vault Manifest</b><span class="tag">Chain ID 56</span></div>
-            <div class="leg-row head"><span>Venue</span><span>Operation</span><span class="alloc">Min / Tgt / Max</span></div>
-            <div class="leg-row"><span class="with-logo"><img class="logo" src="/bnb-agent-vaults-site/logos/lista.jpg" alt="">Lista DAO</span><span>Collateral · borrow</span><span class="alloc">30 / 42 / 50%</span></div>
-            <div class="leg-row"><span class="with-logo"><img class="logo" src="/bnb-agent-vaults-site/logos/aster.jpg" alt="">Aster</span><span>Perpetual short</span><span class="alloc">25 / 34 / 40%</span></div>
-            <div class="leg-row"><span class="with-logo"><img class="logo" src="/bnb-agent-vaults-site/logos/venus.jpg" alt="">Venus</span><span>Supply / redeem</span><span class="alloc">10 / 24 / 40%</span></div>
-            <dl class="kv" style="margin-top:6px">
-              <dt>Max borrow LTV</dt><dd>60.00%</dd>
-              <dt>Global max slippage</dt><dd>0.50%</dd>
-              <dt>Arbitrary calls</dt><dd><span class="prohibit">false</span></dd>
-              <dt>Validation</dt><dd class="ok">9 of 9 checks passed</dd>
+            <div class="ui-h"><b>Mandate · Mag 7 Rotation</b><span class="tag">Binding</span></div>
+            <dl class="kv">
+              <dt>Can</dt><dd>Trade 33 bStocks, supply on Venus, LP on PancakeSwap</dd>
+              <dt>Cannot</dt><dd>Borrow · exceed 24h market depth</dd>
+              <dt>You pay</dt><dd>20% of profit above HWM</dd>
+              <dt>Leave</dt><dd>Any time · ≤ 12 h · own slippage</dd>
+              <dt>Launch checks</dt><dd class="ok">10 of 10 passed</dd>
             </dl>
           </div>
         </div>
@@ -96,19 +106,18 @@ a:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
         <div class="step">
           <div>
             <div class="big-n">02</div>
-            <h3>Deploy the vault</h3>
-            <p>One factory call creates the ERC-4626 vault and its governor, then clones only the strategy adapters protocol governance has approved. The agent seeds it and opens the doors.</p>
-            <ul><li>Non-upgradeable contracts</li><li>Adapters bound to a single vault</li><li>Fee caps enforced by the factory</li></ul>
+            <h3>Dry-run, deploy, seed</h3>
+            <p>The whole vault is rehearsed on a BSC fork first. Then one factory call deploys the vault, its mandate and the approved adapters, and the owner seeds at least 100 USDT.</p>
+            <ul><li>Non-upgradeable adapters</li><li>Fees fixed at launch</li><li>Owner wallet and agent key are always separate</li></ul>
           </div>
           <div class="ui-card">
             <div class="ui-h"><b>createVault()</b><span class="tag"><span class="dot"></span>Confirmed</span></div>
             <dl class="kv">
               <dt>ERC-4626 Vault</dt><dd class="mono">0x2F8a…71C4</dd>
-              <dt>Vault Governor</dt><dd class="mono">0x9b1E…0D2a</dd>
-              <dt>Adapter · Lista collateral</dt><dd class="mono">0x44c7…aE19</dd>
-              <dt>Adapter · Aster perp</dt><dd class="mono">0xE03d…5b88</dd>
+              <dt>Mandate</dt><dd class="mono">0x9b1E…0D2a</dd>
+              <dt>Adapter · PancakeSwap swap + LP</dt><dd class="mono">0x44c7…aE19</dd>
               <dt>Adapter · Venus supply</dt><dd class="mono">0x1a6F…c7B3</dd>
-              <dt>Seed capital</dt><dd>25,000.00 USDT</dd>
+              <dt>Owner seed</dt><dd>100.00 USDT · locked until close</dd>
               <dt>Status</dt><dd class="ok">Open to depositors</dd>
             </dl>
           </div>
@@ -117,18 +126,19 @@ a:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
         <div class="step">
           <div>
             <div class="big-n">03</div>
-            <h3>Depositors subscribe</h3>
-            <p>Depositors deposit the accounting asset and receive vault shares at the settled NAV. Shares self-delegate, so voting weight is live from the first block.</p>
-            <ul><li>Ownership — a pro-rata claim on vault assets</li><li>Redemption — instant when idle, queued in a live cycle</li><li>Veto — weight against any proposed cycle</li></ul>
+            <h3>Depositors join</h3>
+            <p>Deposit and receive shares at live NAV. Redeem any time after a 24-hour cooldown: most exits are instant, large ones settle within 12 hours, and you pay only your own slippage.</p>
+            <ul><li>Pro-rata claim on vault assets</li><li>Live NAV from on-chain valuations</li><li>Exit cost shown before you commit</li></ul>
           </div>
           <div class="ui-card">
-            <div class="ui-h"><b>Subscription</b><span class="tag sim">Simulated</span></div>
+            <div class="ui-h"><b>Deposit</b><span class="tag sim">Simulated</span></div>
             <dl class="kv">
               <dt>Deposited</dt><dd>10,000.00 USDT</dd>
-              <dt>Settled NAV / share</dt><dd>1.1840</dd>
-              <dt>Shares issued</dt><dd>8,445.95 avDNB</dd>
+              <dt>NAV / share</dt><dd>1.0784</dd>
+              <dt>Shares issued</dt><dd>9,272.99 avM7R</dd>
               <dt>Entry fee</dt><dd>0.00%</dd>
-              <dt>Voting weight</dt><dd>Self-delegated</dd>
+              <dt>Redeemable after</dt><dd>24 hours</dd>
+              <dt>Exit cost today</dt><dd>0.2–0.7% at $100K</dd>
             </dl>
           </div>
         </div>
@@ -136,39 +146,37 @@ a:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
         <div class="step">
           <div>
             <div class="big-n">04</div>
-            <h3>The agent proposes a cycle</h3>
-            <p>One fixed plan: which adapter, how much capital at most, for how long, and the exact entry and exit. Nothing in it can change after submission. Holders can veto or simply leave.</p>
-            <ul><li>Entry and exit calldata committed before the vote</li><li>Veto by snapshot shares, the manager or the risk council</li><li>One active cycle per vault</li></ul>
+            <h3>The agent trades inside the mandate</h3>
+            <p>No votes, no waiting. The agent acts whenever it wants and every action is checked against the mandate before it executes. Changing the rules takes a public 24-hour timelock — long enough for anyone to leave first.</p>
+            <ul><li>Out-of-mandate actions revert</li><li>Slippage capped against the oracle price</li><li>Rule changes announced on Telegram</li></ul>
           </div>
           <div class="ui-card">
-            <div class="ui-h"><b>Execution cycle #14</b><span class="tag">Veto window</span></div>
-            <div class="timeline"><div class="done">Proposed</div><div class="now">Veto window<br>31h left</div><div>Execution delay</div><div>Live</div><div>Settled</div></div>
+            <div class="ui-h"><b>Agent activity</b><span class="tag"><span class="dot"></span>Live</span></div>
             <dl class="kv">
-              <dt>Max capital</dt><dd>3,200,000 USDT</dd>
-              <dt>Duration</dt><dd>14 days</dd>
-              <dt>Enter / exit calldata</dt><dd class="mono">0x9f3c…e1a0 · 0x77b2…04dd</dd>
+              <dt>14:02 · Buy NVDAB</dt><dd class="ok">42,000 USDT · slippage 0.08%</dd>
+              <dt>14:05 · Supply NVDAB on Venus</dt><dd class="ok">Executed</dd>
+              <dt>14:09 · Buy ARMB</dt><dd class="neg">Reverted · no DEX pool</dd>
+              <dt>14:30 · Rule change queued</dt><dd>Fee 15% → 20% · in 24h</dd>
             </dl>
-            <div style="display:flex;justify-content:space-between;margin-top:14px;font-size:13px"><span class="muted">Votes against</span><span>1.1% · veto at 10.0%</span></div>
-            <div class="meter"><i style="width:11%"></i><span class="thr" style="left:calc(100% - 2px)"></span></div>
           </div>
         </div>
 
         <div class="step">
           <div>
             <div class="big-n">05</div>
-            <h3>Execute, settle, get paid</h3>
-            <p>The adapter receives an allowance up to the cap, which returns to zero after entry. At maturity anyone can trigger settlement through the committed exit — and the agent's fees crystallize.</p>
-            <ul><li>Performance fee only above the high-water mark</li><li>Queued redemptions clear at realized post-fee NAV</li><li>Failed fee transfers escrow, never block exits</li></ul>
+            <h3>Get paid on new profit</h3>
+            <p>Performance fees accrue only above the high-water mark. The creator keeps 85% of the fee they set; the platform adds its own 3–5% and takes 15% of the creator's.</p>
+            <ul><li>No management fee by default</li><li>Fee terms fixed at launch</li><li>The agent never holds depositor funds</li></ul>
           </div>
           <div class="ui-card">
-            <div class="ui-h"><b>Settlement · cycle #13</b><span class="tag"><span class="dot"></span>Final</span></div>
+            <div class="ui-h"><b>Fees · last 30 days</b><span class="tag"><span class="dot"></span>Accrued</span></div>
             <dl class="kv">
-              <dt>Opening NAV / share</dt><dd>1.1702</dd>
-              <dt>Realized P&amp;L</dt><dd class="pos">+46,210.40 USDT</dd>
-              <dt>Closing NAV / share</dt><dd>1.1840</dd>
-              <dt>Management fee → agent</dt><dd class="gold">1,008.14 USDT</dd>
-              <dt>Performance fee → agent</dt><dd class="gold">5,832.81 USDT</dd>
-              <dt>Adapter allowance</dt><dd class="ok">0</dd>
+              <dt>Profit above HWM</dt><dd class="pos">+46,210.40 USDT</dd>
+              <dt>Creator fee · 15%</dt><dd>6,931.56 USDT</dd>
+              <dt>→ to the creator (85%)</dt><dd class="gold">5,891.83 USDT</dd>
+              <dt>→ to the platform (15%)</dt><dd>1,039.73 USDT</dd>
+              <dt>Platform fee · 5%</dt><dd>2,310.52 USDT</dd>
+              <dt>Depositors keep</dt><dd>36,968.32 USDT</dd>
             </dl>
           </div>
         </div>
@@ -183,10 +191,10 @@ a:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
   <div class="wrap">
     <div class="stmt-head" style="margin-bottom:0">
       <div><h2 class="h2">Three parties. One contract boundary.</h2></div>
-      <p class="lede">Depositors provide capital, the agent proposes how to use it, and the vault decides what is allowed. Only components inside the boundary ever touch funds.</p>
+      <p class="lede">Depositors provide capital, the agent decides how to use it, and the mandate decides what is allowed. Only components inside the boundary ever touch funds.</p>
     </div>
     <div class="diagram">
-      <svg viewBox="0 0 1160 430" role="img" aria-label="Architecture: depositors, vault, governor, adapters, venues and indexer">
+      <svg viewBox="0 0 1160 430" role="img" aria-label="Architecture: depositors, vault, mandate, adapters, venues and oracles">
         <defs>
           <clipPath id="lc" clipPathUnits="objectBoundingBox"><circle cx=".5" cy=".5" r=".5"/></clipPath>
           <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#F0B90B"/></marker>
@@ -204,55 +212,52 @@ a:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
         <rect x="290" y="98" width="540" height="318" rx="14" fill="rgba(240,185,11,.02)" stroke="#F0B90B" stroke-dasharray="4 5" stroke-width="1"/>
         <text x="310" y="124" class="ll">MANDATE BOUNDARY — ENFORCED ONCHAIN</text>
 
-        <rect class="bx" x="590" y="8" width="200" height="58" rx="10"/><text class="tt" x="690" y="33">Agent Runtime</text><text class="ss" x="690" y="52">ERC-8004 identity · session key</text>
-        <rect class="bx" x="900" y="8" width="240" height="58" rx="10"/><text class="tt" x="1020" y="33">Indexer + Oracle</text><text class="ss" x="1020" y="52">Finalized NAV per share</text>
-        <rect class="bx" x="20" y="208" width="190" height="104" rx="10"/><text class="tt" x="115" y="244">Depositors</text><text class="ss" x="115" y="265">Hold vault shares</text><text class="ss" x="115" y="283">ownership · redemption · veto</text>
-        <rect class="bx k" x="320" y="208" width="210" height="104" rx="10"/><text class="tt" x="425" y="244">ERC-4626 Vault</text><text class="ss" x="425" y="265">Custody · share accounting</text><text class="ss" x="425" y="283">Fees · redemption queue</text>
-        <rect class="bx k" x="590" y="140" width="200" height="86" rx="10"/><text class="tt" x="690" y="175">Vault Governor</text><text class="ss" x="690" y="195">Execution cycles · veto</text><text class="ss" x="690" y="212">Settlement</text>
-        <rect class="bx k" x="590" y="300" width="200" height="86" rx="10"/><text class="tt" x="690" y="335">Strategy Adapters</text><text class="ss" x="690" y="355">Vault-bound clones</text><text class="ss" x="690" y="372">Allowance capped, then zeroed</text>
+        <rect class="bx" x="590" y="8" width="200" height="58" rx="10"/><text class="tt" x="690" y="33">Agent Runtime</text><text class="ss" x="690" y="52">ERC-8004 identity · operator key</text>
+        <rect class="bx" x="900" y="8" width="240" height="58" rx="10"/><text class="tt" x="1020" y="33">Oracles + Keeper</text><text class="ss" x="1020" y="52">Live NAV · deleverage · alerts</text>
+        <rect class="bx" x="20" y="208" width="190" height="104" rx="10"/><text class="tt" x="115" y="244">Depositors</text><text class="ss" x="115" y="265">Hold vault shares</text><text class="ss" x="115" y="283">ownership · exit any time</text>
+        <rect class="bx k" x="320" y="208" width="210" height="104" rx="10"/><text class="tt" x="425" y="244">ERC-4626 Vault</text><text class="ss" x="425" y="265">Custody · share accounting</text><text class="ss" x="425" y="283">Fees · redemptions ≤ 12 h</text>
+        <rect class="bx k" x="590" y="140" width="200" height="86" rx="10"/><text class="tt" x="690" y="175">Mandate</text><text class="ss" x="690" y="195">Checks every action</text><text class="ss" x="690" y="212">24 h timelock on changes</text>
+        <rect class="bx k" x="590" y="300" width="200" height="86" rx="10"/><text class="tt" x="690" y="335">Strategy Adapters</text><text class="ss" x="690" y="355">Non-upgradeable</text><text class="ss" x="690" y="372">Oracle-bound slippage</text>
 
-        <rect class="bx" x="900" y="150" width="240" height="44" rx="10"/><image href="/bnb-agent-vaults-site/logos/pancakeswap.jpg" x="914" y="160" width="24" height="24" clip-path="url(#lc)"/><text class="tv" x="950" y="177">PancakeSwap</text>
-        <rect class="bx" x="900" y="206" width="240" height="44" rx="10"/><image href="/bnb-agent-vaults-site/logos/lista.jpg" x="914" y="216" width="24" height="24" clip-path="url(#lc)"/><text class="tv" x="950" y="233">Lista DAO</text>
-        <rect class="bx" x="900" y="262" width="240" height="44" rx="10"/><image href="/bnb-agent-vaults-site/logos/venus.jpg" x="914" y="272" width="24" height="24" clip-path="url(#lc)"/><text class="tv" x="950" y="289">Venus</text>
-        <rect class="bx" x="900" y="318" width="240" height="44" rx="10"/><image href="/bnb-agent-vaults-site/logos/aster.jpg" x="914" y="328" width="24" height="24" clip-path="url(#lc)"/><text class="tv" x="950" y="345">Aster <tspan style="font:400 11px 'Archivo';fill:#7C818B">hybrid</tspan></text>
+        <rect class="bx" x="900" y="150" width="240" height="44" rx="10"/><image href="assets/logos/pancakeswap.jpg" x="914" y="160" width="24" height="24" clip-path="url(#lc)"/><text class="tv" x="950" y="177">PancakeSwap</text>
+        <rect class="bx" x="900" y="206" width="240" height="44" rx="10"/><image href="assets/logos/lista.jpg" x="914" y="216" width="24" height="24" clip-path="url(#lc)"/><text class="tv" x="950" y="233">Lista DAO</text>
+        <rect class="bx" x="900" y="262" width="240" height="44" rx="10"/><image href="assets/logos/venus.jpg" x="914" y="272" width="24" height="24" clip-path="url(#lc)"/><text class="tv" x="950" y="289">Venus</text>
 
         <path class="cn" d="M210 246 H318" marker-end="url(#ar)"/><text class="lb" x="236" y="238">deposit</text>
         <path class="cn" d="M320 284 H212" marker-end="url(#ar)"/><text class="lb" x="238" y="302">shares</text>
-        <path class="cn" d="M115 208 V168 H588" marker-end="url(#ar)"/><text class="lb" x="330" y="160">veto, weighted by shares</text>
-        <path class="cn" d="M690 66 V138" marker-end="url(#ar)"/><text class="lb" x="700" y="90">fixed execution plan</text>
-        <path class="cn" d="M690 226 V298" marker-end="url(#ar)"/><text class="lb" x="700" y="266">authorize ≤ cap</text>
+        <path class="cn" d="M115 208 V168 H588" marker-end="url(#ar)"/><text class="lb" x="330" y="160">read the rules · alerts on changes</text>
+        <path class="cn" d="M690 66 V138" marker-end="url(#ar)"/><text class="lb" x="700" y="90">typed actions via MCP</text>
+        <path class="cn" d="M690 226 V298" marker-end="url(#ar)"/><text class="lb" x="700" y="266">only if allowed</text>
         <path class="cn" d="M530 290 H556 V343 H588" marker-end="url(#ar)"/><text class="lb" x="480" y="336">assets</text>
         <path class="cn" d="M790 343 C845 343 845 172 898 172" marker-end="url(#ar)"/>
         <path class="cn" d="M790 343 C845 343 845 228 898 228" marker-end="url(#ar)"/>
         <path class="cn" d="M790 343 C845 343 845 284 898 284" marker-end="url(#ar)"/>
-        <path class="cn" d="M790 343 H898" marker-end="url(#ar)"/>
-        <path class="cn" d="M1020 150 V68" marker-end="url(#ar)"/><text class="lb" x="1030" y="112">positions · fills</text>
+        <path class="cn" d="M1020 150 V68" marker-end="url(#ar)"/><text class="lb" x="1030" y="112">prices · positions</text>
       </svg>
-      <div class="cap"><span>Gold components can touch capital. None accept instructions outside the committed plan.</span><span>Fig. 1 — Vault architecture</span></div>
+      <div class="cap"><span>Gold components can touch capital. None accept an action outside the mandate.</span><span>Fig. 1 — Vault architecture</span></div>
     </div>
     <div class="mdiagram">
       <div class="md-row">
         <div class="md-node">Depositors<small>Hold vault shares</small></div>
         <div class="md-node">Agent Runtime<small>ERC-8004 identity</small></div>
       </div>
-      <div class="md-arrow">deposits in · fixed execution plan</div>
+      <div class="md-arrow">deposits in · typed actions via MCP</div>
       <div class="md-boundary">
         <span class="md-label">Mandate boundary — enforced onchain</span>
-        <div class="md-node k">ERC-4626 Vault<small>Custody · share accounting · fees · redemption queue</small></div>
-        <div class="md-arrow">capital, only within the plan</div>
-        <div class="md-node k">Vault Governor<small>Execution cycles · veto · settlement</small></div>
-        <div class="md-arrow">authorize ≤ cap</div>
-        <div class="md-node k">Strategy Adapters<small>Vault-bound clones · allowance capped, then zeroed</small></div>
+        <div class="md-node k">ERC-4626 Vault<small>Custody · share accounting · fees · redemptions ≤ 12 h</small></div>
+        <div class="md-arrow">capital, only within the mandate</div>
+        <div class="md-node k">Mandate<small>Checks every action · 24 h timelock on changes</small></div>
+        <div class="md-arrow">only if allowed</div>
+        <div class="md-node k">Strategy Adapters<small>Non-upgradeable · oracle-bound slippage</small></div>
       </div>
       <div class="md-arrow">executes on</div>
       <div class="md-venues">
         <span><img class="logo" src="/bnb-agent-vaults-site/logos/pancakeswap.jpg" alt="">PancakeSwap</span>
         <span><img class="logo" src="/bnb-agent-vaults-site/logos/lista.jpg" alt="">Lista DAO</span>
         <span><img class="logo" src="/bnb-agent-vaults-site/logos/venus.jpg" alt="">Venus</span>
-        <span><img class="logo" src="/bnb-agent-vaults-site/logos/aster.jpg" alt="">Aster</span>
       </div>
-      <div class="md-arrow">positions · fills</div>
-      <div class="md-node">Indexer + Oracle<small>Finalized NAV per share</small></div>
+      <div class="md-arrow">prices · positions</div>
+      <div class="md-node">Oracles + Keeper<small>Live NAV · deleverage · alerts</small></div>
     </div>
   </div>
 </section>
@@ -262,12 +267,12 @@ a:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
   <div class="wrap">
     <div class="stmt-head">
       <div><h2 class="h2">Pays the agent. Protects the depositor.</h2></div>
-      <p class="lede">An agent earns the way a fund manager does — a management fee on assets and a performance fee on new profits. The factory caps both, and the agent never holds the money it manages.</p>
+      <p class="lede">An agent earns the way a fund manager does — a performance fee on new profit. The factory caps it, fee terms are fixed at launch, and the agent never holds the money it manages.</p>
     </div>
     <div class="stats">
-      <div><div class="v">5<small>%</small></div><div class="k">Maximum annual management fee an agent may set.</div></div>
       <div><div class="v">30<small>%</small></div><div class="k">Maximum performance fee, earned only above the high-water mark.</div></div>
-      <div><div class="v">90<small>%</small></div><div class="k">Of manager fees paid to the agent by default. The protocol keeps 10%.</div></div>
+      <div><div class="v">85<small>%</small></div><div class="k">Of the fee the creator sets goes to the creator. The platform keeps 15%.</div></div>
+      <div><div class="v">3–5<small>%</small></div><div class="k">Platform's own performance fee, by template. Fixed at launch.</div></div>
       <div><div class="v">0</div><div class="k">Withdrawal rights the agent holds over depositor capital.</div></div>
     </div>
   </div>
@@ -296,10 +301,10 @@ a:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
         <div class="col after">
           <h4>An agent with a mandate</h4>
           <ol>
-            <li data-t="02:14">The 8% / 24h loss circuit breaker trips. New entries halt automatically.</li>
-            <li data-t="02:15">The agent can reach only venues in its mandate. The risk council can force settlement — through the committed exit only.</li>
-            <li data-t="02:40">Redemption requests queue and clear at realized post-fee NAV.</li>
-            <li data-t="09:00">Settlement publishes a finalized snapshot: block, positions, fees, oracle readings.</li>
+            <li data-t="02:14">A keeper sees LTV drift and deleverages before liquidation. No agent needed.</li>
+            <li data-t="02:15">The agent can only trade markets in its mandate, at prices bound to the oracle. If its trades lose 2% of NAV in a day, its key pauses itself.</li>
+            <li data-t="02:40">Redeemers leave at live NAV and pay their own slippage. Nobody's exit costs the people who stay.</li>
+            <li data-t="09:00">Every action and its reason is already on the vault's timeline — and on holders' Telegram.</li>
           </ol>
         </div>
       </div>
@@ -312,11 +317,11 @@ a:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     <table class="ba" data-ba-panel="mgr">
       <thead><tr><th></th><th>Before</th><th class="after">With BNB Agent Vaults</th></tr></thead>
       <tbody>
-        <tr><td>Launching a fund</td><td class="before">Write, test and audit bespoke fund contracts.</td><td class="after">Fill in a seven-part mandate. The factory deploys vault, governor and adapters.</td></tr>
+        <tr><td>Launching a fund</td><td class="before">Write, test and audit bespoke fund contracts.</td><td class="after">Start from a preset, switch on what the agent may do, seed 100 USDT. The factory deploys vault, mandate and adapters.</td></tr>
         <tr><td>Earning trust</td><td class="before">Ask depositors to trust your key management.</td><td class="after">Show a mandate the contract enforces, not one you promise to follow.</td></tr>
-        <tr><td>Track record</td><td class="before">Screenshots and self-reported PnL.</td><td class="after">A settled, verifiable NAV history — 7D, 30D, 90D and since inception.</td></tr>
-        <tr><td>Getting paid</td><td class="before">Manual invoicing and disputes over marks.</td><td class="after">Management and high-water-mark fees accrue onchain; failed transfers escrow.</td></tr>
-        <tr><td>Execution</td><td class="before">Glue code across SDKs, signers and protocol quirks.</td><td class="after">BNB Agent Studio, BNB Chain MCP and protocol Skills compile intent into checked actions.</td></tr>
+        <tr><td>Track record</td><td class="before">Screenshots and self-reported PnL.</td><td class="after">A live, verifiable on-chain NAV history — 7D, 30D, 90D and since inception.</td></tr>
+        <tr><td>Getting paid</td><td class="before">Manual invoicing and disputes over marks.</td><td class="after">High-water-mark fees accrue onchain on terms fixed at launch.</td></tr>
+        <tr><td>Execution</td><td class="before">Glue code across SDKs, signers and protocol quirks.</td><td class="after">One MCP for Codex, Claude Code or OpenClaw turns intent into checked actions.</td></tr>
       </tbody>
     </table>
     <table class="ba hide" data-ba-panel="dep">
@@ -324,9 +329,9 @@ a:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
       <tbody>
         <tr><td>Custody</td><td class="before">Funds sit in a wallet or sub-account the operator controls.</td><td class="after">Funds stay in an ERC-4626 contract. The agent cannot move them out.</td></tr>
         <tr><td>Permissions</td><td class="before">Anything the key can sign — any contract, any token.</td><td class="after">Only allowlisted venues, operations and markets named in the mandate.</td></tr>
-        <tr><td>Strategy changes</td><td class="before">Made silently. You find out afterwards.</td><td class="after">Committed in advance, open to a shareholder veto.</td></tr>
-        <tr><td>Performance</td><td class="before">Headline APR, emissions and marked-to-model gains.</td><td class="after">Settled NAV per share after fees. Stale data is flagged, never interpolated.</td></tr>
-        <tr><td>Exiting mid-strategy</td><td class="before">First out takes the estimate; losses fall on whoever remains.</td><td class="after">Requests queue and clear at realized post-fee NAV.</td></tr>
+        <tr><td>Rule changes</td><td class="before">Made silently. You find out afterwards.</td><td class="after">Announced 24 hours ahead. Leave first if you disagree.</td></tr>
+        <tr><td>Performance</td><td class="before">Headline APR, emissions and marked-to-model gains.</td><td class="after">Live on-chain NAV per share after fees. A stale oracle pauses deposits and exits.</td></tr>
+        <tr><td>Exiting mid-strategy</td><td class="before">First out takes the estimate; losses fall on whoever remains.</td><td class="after">Exit any time at live NAV; you pay only your own slippage, shown up front.</td></tr>
       </tbody>
     </table>
   </div>
@@ -337,29 +342,29 @@ a:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
   <div class="wrap">
     <div class="stmt-head" style="margin-bottom:0">
       <div><h2 class="h2">Every vault, in full view.</h2></div>
-      <div><p class="lede">Mandate, positions, settled NAV and the fees the agent earns — on one page, for anyone to check.</p><a class="link" href="/bnb-agent-vaults-site/vaults/" style="margin-top:24px">Explore the directory</a></div>
+      <div><p class="lede">Mandate, positions, live NAV and the fees the agent earns — on one page, for anyone to check.</p><a class="link" href="/bnb-agent-vaults-site/vaults/" style="margin-top:24px">Explore the directory</a></div>
     </div>
     <div class="showcase">
       <div class="shot">
-        <div class="shot-bar"><i></i><i></i><i></i><span>vaults / delta-neutral-bnb</span></div>
+        <div class="shot-bar"><i></i><i></i><i></i><span>vaults / bnb-bluechip-momentum</span></div>
         <div class="shot-body">
           <div class="shot-main">
-            <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="tag"><span class="dot"></span>Live</span><span class="tag">Hedgeframe · #1187</span><span class="tag sim">Simulated</span></div>
-            <h4>Delta Neutral BNB</h4>
-            <div style="display:flex;align-items:baseline;gap:16px;margin:14px 0 4px;flex-wrap:wrap"><span style="font-size:44px;font-weight:600;font-stretch:80%;letter-spacing:-.035em" class="pos">+18.40%</span><span class="muted" style="font-size:13px">Net return since inception · NAV 1.1840</span></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="tag"><span class="dot"></span>Live</span><span class="tag">Sable Quant · #1306</span><span class="tag sim">Simulated</span></div>
+            <h4>Bluechip Momentum</h4>
+            <div style="display:flex;align-items:baseline;gap:16px;margin:14px 0 4px;flex-wrap:wrap"><span style="font-size:44px;font-weight:600;font-stretch:80%;letter-spacing:-.035em" class="pos">+13.88%</span><span class="muted" style="font-size:13px">Net return since inception · NAV 1.1388</span></div>
             <div class="chart" id="shot-chart"></div>
           </div>
           <div class="shot-side">
             <div class="label">Allocation</div>
-            <div class="alloc-bar" style="margin-top:12px"><i style="width:42%;background:var(--c1)"></i><i style="width:34%;background:var(--c2)"></i><i style="width:24%;background:var(--c3)"></i></div>
+            <div class="alloc-bar" style="margin-top:12px"><i style="width:46%;background:var(--c1)"></i><i style="width:31%;background:var(--c2)"></i><i style="width:23%;background:var(--c3)"></i></div>
             <dl class="kv">
-              <dt><span class="sw" style="background:var(--c1)"></span>Lista lending</dt><dd>42%</dd>
-              <dt><span class="sw" style="background:var(--c2)"></span>Perp hedge</dt><dd>34%</dd>
-              <dt><span class="sw" style="background:var(--c3)"></span>Cash buffer</dt><dd>24%</dd>
+              <dt><span class="sw" style="background:var(--c1)"></span>BNB</dt><dd>46%</dd>
+              <dt><span class="sw" style="background:var(--c2)"></span>BTCB</dt><dd>31%</dd>
+              <dt><span class="sw" style="background:var(--c3)"></span>ETH · on Venus</dt><dd>23%</dd>
             </dl>
             <div class="label" style="margin-top:22px">Fees earned by the agent</div>
             <div style="font-size:36px;font-weight:600;font-stretch:82%;letter-spacing:-.03em;color:var(--gold);margin-top:6px">$78,120</div>
-            <div class="fine">1.50% management · 15% performance above HWM · net of 10% protocol share</div>
+            <div class="fine">15% performance above HWM · creator keeps 85%</div>
           </div>
         </div>
       </div>
@@ -375,14 +380,14 @@ a:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
       <p class="lede" style="margin-top:24px">Agents choose parameters inside these limits — never outside them. The factory enforces them in code.</p>
     </div>
     <dl class="spec">
-      <div><dt>Vault standard</dt><dd><b>ERC-4626</b><br>Non-upgradeable · one active cycle per vault</dd></div>
+      <div><dt>Vault standard</dt><dd><b>ERC-4626</b><br>Non-upgradeable adapters, added only by the protocol</dd></div>
       <div><dt>Custody</dt><dd>Held by the vault contract. Agents hold no withdrawal rights.</dd></div>
-      <div><dt>Management fee</dt><dd><b>≤ 5.00%</b> per annum</dd></div>
+      <div><dt>Management fee</dt><dd><b>≤ 5.00%</b> per annum · 0 by default</dd></div>
       <div><dt>Performance fee</dt><dd><b>≤ 30.00%</b> above the post-fee high-water mark</dd></div>
-      <div><dt>Protocol share</dt><dd>10% of manager fees by default · capped at 30%</dd></div>
-      <div><dt>Redemptions</dt><dd>Instant when idle · queued at realized post-fee NAV during a live cycle</dd></div>
-      <div><dt>Oversight</dt><dd>Depositor veto · manager veto · risk-council pause via the committed exit only</dd></div>
-      <div><dt>Reporting</dt><dd>Settled NAV per share · 7D / 30D / 90D / since inception</dd></div>
+      <div><dt>Platform fee</dt><dd>3–5% of profit by template + 15% of the creator's fee · fixed at launch</dd></div>
+      <div><dt>Redemptions</dt><dd>Instant from idle · ≤ 12 hours otherwise · you pay your own slippage</dd></div>
+      <div><dt>Oversight</dt><dd>24-hour timelock on rule changes · owner can pause the agent at once · risk council can pause, never move funds</dd></div>
+      <div><dt>Reporting</dt><dd>Live on-chain NAV per share · every agent action with its reason</dd></div>
     </dl>
   </div>
 </section>
@@ -391,7 +396,7 @@ a:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
 <section class="cta">
   <div class="wrap">
     <h2>Give your agent a mandate.</h2>
-    <p class="lede">Draft it in minutes. Validate it against the registry. Launch on BNB Chain when mainnet opens.</p>
+    <p class="lede">Pick a template, dry-run it on a fork, launch on BNB Chain when mainnet opens.</p>
     <div class="btns">
       <a class="btn" href="/bnb-agent-vaults-site/create/">Launch an agent vault <span class="arr">→</span></a>
       <a class="btn ghost" href="/bnb-agent-vaults-site/vaults/">Explore vaults</a>
@@ -399,18 +404,81 @@ a:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
   </div>
 </section>
 
-0:{"P":null,"c":["",""],"q":"","i":false,"f":[[["",{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/1j7a84_zyqycm.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"landing":true,"children":[["$","main",null,{"id":"landing-experience","dangerouslySetInnerHTML":{"__html":"$5"}}],"$L6"]}],["$L7"],"$L8"]}],{},null,false,null]},null,false,null],"$L9",false]],"m":"$undefined","G":["$a",["$Lb"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"2wDZVvwObqie66R0tZuLQ"}
-c:I[80379,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/0dqv24fd5h9qb.js"],"LandingRuntime"]
-d:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
-e:"$Sreact.suspense"
-10:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]
-12:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"MetadataBoundary"]
-6:["$","$Lc",null,{}]
-7:["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/0dqv24fd5h9qb.js","async":true,"nonce":"$undefined"}]
-8:["$","$Ld",null,{"children":["$","$e",null,{"name":"Next.MetadataOutlet","children":"$@f"}]}]
-9:["$","$1","h",{"children":[null,["$","$L10",null,{"children":"$L11"}],["$","div",null,{"hidden":true,"children":["$","$L12",null,{"children":["$","$e",null,{"name":"Next.Metadata","children":"$L13"}]}]}],null]}]
-b:["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/1j7a84_zyqycm.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]
-11:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
-14:I[27201,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"IconMark"]
-f:null
-13:[["$","title","0",{"children":"BNB Agent Vaults — Agent-managed funds on BNB Chain"}],["$","meta","1",{"name":"description","content":"Launch and follow non-custodial, policy-bound agent vaults on BNB Chain."}],["$","meta","2",{"name":"codex-preview","content":"development"}],["$","link","3",{"rel":"shortcut icon","href":"/bnb-agent-vaults-site/favicon.svg"}],["$","link","4",{"rel":"icon","href":"/bnb-agent-vaults-site/favicon.svg"}],["$","$L14","5",{}]]
+<div id="footer"></div>
+
+
+
+6:Tb79,
+(function () {
+  const { $, $$, fmt, SEAL } = BAV;
+
+  $("#brand").innerHTML = SEAL + '<span class="brand-name">BNB Agent Vaults</span>';
+  $("#footer").outerHTML = BAV.footerHTML();
+  BAV.wireShell();
+  $$(".nav a").forEach((a) => a.addEventListener("click", () => $(".masthead").classList.remove("open")));
+
+  // Masthead turns solid once the hero is behind us
+  const mh = $("#mh");
+  const onScroll = () => mh.classList.toggle("solid", window.scrollY > 40);
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+
+  // Hero: live agent figure + fee counter
+  BAV.agentCanvas($("#agent"));
+  const feeEl = $("#fees"), target = 78120, t0 = performance.now();
+  const count = (now) => {
+    const k = Math.min(1, (now - t0) / 1800), e = 1 - Math.pow(1 - k, 3);
+    feeEl.textContent = "$" + fmt.n(Math.round(target * e));
+    if (k < 1) requestAnimationFrame(count);
+  };
+  requestAnimationFrame(count);
+
+  // Statements light up as they reach the middle of the screen
+  const io = new IntersectionObserver((es) => es.forEach((e) => e.target.classList.toggle("on", e.isIntersecting)), { rootMargin: "-30% 0px -30% 0px" });
+  $$(".stmt").forEach((el) => io.observe(el));
+
+  // How it works: the section is pinned; scroll progress drives the active step
+  const how = $("#how"), steps = $$(".step", how), bars = $$(".how-prog b", how);
+  const pinned = () => window.matchMedia("(min-width: 961px)").matches;
+  const track = $(".how-steps", how);
+  const onSwipe = () => {
+    const w = steps[0].getBoundingClientRect().width + 14;
+    const idx = Math.min(steps.length - 1, Math.round(track.scrollLeft / w));
+    bars.forEach((b, i) => (b.style.transform = `scaleX(${i <= idx ? 1 : 0})`));
+  };
+  track.addEventListener("scroll", () => { if (!pinned()) onSwipe(); }, { passive: true });
+  const onHow = () => {
+    if (!pinned()) { steps.forEach((s) => s.classList.add("on")); onSwipe(); return; }
+    const r = how.getBoundingClientRect(), span = how.offsetHeight - window.innerHeight;
+    const p = Math.min(0.9999, Math.max(0, -r.top / span));
+    const idx = Math.floor(p * steps.length), local = p * steps.length - idx;
+    steps.forEach((s, i) => s.classList.toggle("on", i === idx));
+    bars.forEach((b, i) => (b.style.transform = `scaleX(${i < idx ? 1 : i === idx ? local : 0})`));
+  };
+  window.addEventListener("scroll", onHow, { passive: true });
+  window.addEventListener("resize", onHow);
+  onHow();
+
+  // Before / after tabs
+  $$("[data-ba]").forEach((b) => b.addEventListener("click", () => {
+    $$("[data-ba]").forEach((x) => x.classList.toggle("on", x === b));
+    $$("[data-ba-panel]").forEach((p) => p.classList.toggle("hide", p.dataset.baPanel !== b.dataset.ba));
+  }));
+
+  // Product showcase chart
+  const v = BAV.vault("bnb-bluechip-momentum");
+  BAV.lineChart($("#shot-chart"), BAV.navSeries(v), { height: 280, left: 0, label: "Bluechip Momentum NAV per share since inception" });
+})();
+0:{"P":null,"c":["",""],"q":"","i":false,"f":[[["",{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/14j5olz08x8ko.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"bodyClass":"","html":"$5","script":"$6","pageKey":"landing"}],["$L7"],"$L8"]}],{},null,false,null]},null,false,null],"$L9",false]],"m":"$undefined","G":["$a",["$Lb"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"gtQlUvFE3WlrWpCIe-I3z"}
+c:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
+d:"$Sreact.suspense"
+f:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]
+11:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"MetadataBoundary"]
+7:["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/04u3edz65h4va.js","async":true,"nonce":"$undefined"}]
+8:["$","$Lc",null,{"children":["$","$d",null,{"name":"Next.MetadataOutlet","children":"$@e"}]}]
+9:["$","$1","h",{"children":[null,["$","$Lf",null,{"children":"$L10"}],["$","div",null,{"hidden":true,"children":["$","$L11",null,{"children":["$","$d",null,{"name":"Next.Metadata","children":"$L12"}]}]}],null]}]
+b:["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/14j5olz08x8ko.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]
+10:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
+13:I[27201,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"IconMark"]
+e:null
+12:[["$","title","0",{"children":"BNB Agent Vaults — Agent-managed funds on BNB Chain"}],["$","meta","1",{"name":"description","content":"Launch and follow non-custodial, policy-bound agent vaults on BNB Chain."}],["$","meta","2",{"name":"codex-preview","content":"development"}],["$","link","3",{"rel":"shortcut icon","href":"/bnb-agent-vaults-site/favicon.svg"}],["$","link","4",{"rel":"icon","href":"/bnb-agent-vaults-site/favicon.svg"}],["$","$L13","5",{}]]
