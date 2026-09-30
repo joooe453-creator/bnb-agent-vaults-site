@@ -1,6 +1,6 @@
 1:"$Sreact.fragment"
 2:I[81384,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js"],"PrototypePage"]
-3:T7ef,
+3:T86e,
 
 <section class="page-head">
   <div class="wrap">
@@ -16,7 +16,7 @@
 
 <div class="wrap" style="padding-top:40px;padding-bottom:90px">
   <div class="panel">
-    <div class="panel-h"><h3>Holdings</h3><span class="label">Valued in USDT</span></div>
+    <div class="panel-h"><h3>Holdings</h3><div style="display:flex;align-items:center;gap:10px"><span class="label">Local demo ledger</span><button class="btn sm ghost" id="reset-demo">Reset demo</button></div></div>
     <div class="panel-b tbl-scroll">
       <table class="tbl hover stack cols-3" id="hold">
         <thead><tr><th>Vault</th><th class="r">Shares</th><th class="r">NAV / share</th><th class="r">Market value</th><th class="r">Cost basis</th><th class="r">Unrealized P&amp;L</th><th class="r">Weight</th><th class="r">Exit cost today</th></tr></thead>
@@ -50,21 +50,19 @@
 
 
 
-4:T1590,
+4:T1716,
 (function () {
-  const { $, $$, fmt, toast, TODAY, DAY } = BAV;
+  const { $, $$, esc, fmt, toast, TODAY, DAY, demo } = BAV;
   BAV.shell("portfolio.html");
   $("#asof").textContent = fmt.date(TODAY);
 
-  const H = [
-    { slug: "stable-yield-router", shares: 20000, cost: 1.0 },
-    { slug: "bnb-bluechip-momentum", shares: 3200, cost: 1.0625 },
-    { slug: "mag7-rotation", shares: 4600, cost: 1.0214 },
-  ].map((h) => {
-    const v = BAV.vault(h.slug);
+  const demoState = demo.state();
+  const H = Object.entries(demoState.holdings).map(([slug, holding]) => {
+    const h = { slug, ...holding }, v = BAV.vault(slug);
+    if (!v) return null;
     const value = h.shares * v.sharePrice, basis = h.shares * h.cost;
     return { ...h, v, value, basis, pnl: value - basis };
-  });
+  }).filter(Boolean);
   const total = H.reduce((a, h) => a + h.value, 0);
   const pnl = H.reduce((a, h) => a + h.pnl, 0);
   const basis = H.reduce((a, h) => a + h.basis, 0);
@@ -74,7 +72,7 @@
   $("#summary").innerHTML = `
     <div><div class="label">Market value</div><div class="v">${fmt.n(total, 2)}</div></div>
     <div><div class="label">Unrealized P&amp;L</div><div class="v ${fmt.cls(pnl)}">${pnl > 0 ? "+" : ""}${fmt.n(pnl, 2)}</div></div>
-    <div><div class="label">Redeeming</div><div class="v">≈ ${fmt.n(pendingShares * bcm.sharePrice, 0)}</div></div>
+    <div><div class="label">Demo cash</div><div class="v">${fmt.n(demoState.balances.USDT, 2)}</div><div class="s">USDT available</div></div>
     <div><div class="label">Vaults held</div><div class="v">${H.length}</div></div>`;
 
   $("#hold tbody").innerHTML = H.map((h) => `
@@ -85,10 +83,11 @@
       <td class="r">${fmt.n(h.value, 2)}</td>
       <td class="r muted">${fmt.n(h.basis, 2)}</td>
       <td class="r ${fmt.cls(h.pnl)}">${h.pnl > 0 ? "+" : ""}${fmt.n(h.pnl, 2)} <span style="font-size:12px">(${fmt.pct((h.pnl / h.basis) * 100)})</span></td>
-      <td class="r">${((h.value / total) * 100).toFixed(1)}%</td>
+      <td class="r">${total ? ((h.value / total) * 100).toFixed(1) : "0.0"}%</td>
       <td class="r muted">${h.v.exitCost}</td>
     </tr>`).join("");
-  $("#hold tfoot").innerHTML = `<tr><td style="padding-top:16px" class="strong">Total</td><td></td><td></td><td class="r strong">${fmt.n(total, 2)}</td><td class="r muted">${fmt.n(basis, 2)}</td><td class="r ${fmt.cls(pnl)}">${pnl > 0 ? "+" : ""}${fmt.n(pnl, 2)} <span style="font-size:12px">(${fmt.pct((pnl / basis) * 100)})</span></td><td class="r">100.0%</td><td></td></tr>`;
+  $("#hold tfoot").innerHTML = `<tr><td style="padding-top:16px" class="strong">Total</td><td></td><td></td><td class="r strong">${fmt.n(total, 2)}</td><td class="r muted">${fmt.n(basis, 2)}</td><td class="r ${fmt.cls(pnl)}">${pnl > 0 ? "+" : ""}${fmt.n(pnl, 2)} <span style="font-size:12px">(${basis ? fmt.pct((pnl / basis) * 100) : "—"})</span></td><td class="r">${total ? "100.0%" : "—"}</td><td></td></tr>`;
+  $("#reset-demo").addEventListener("click", () => { demo.reset(); location.reload(); });
 
   // Redemptions in progress: large exits are sold in slices, the redeemer pays their own slippage
   $("#queue tbody").innerHTML = `
@@ -126,12 +125,13 @@
     [64, "Deposit", "Bluechip Momentum", "4,993.75 USDT → 4,700.00 avBCM", "0xa81c…0f5e"],
     [128, "Deposit", "Stable Yield Router", "21,000.00 USDT → 21,000.00 avSYR", "0x55f0…c2b7"],
   ].sort((a, b) => a[0] - b[0]);
-  $("#act tbody").innerHTML = A.map(([d, e, v, amt, ref]) => `<tr><td class="muted">${fmt.date(TODAY - d * DAY)}</td><td>${e}</td><td>${v}</td><td class="r">${amt}</td><td class="r mono muted">${ref}</td></tr>`).join("");
+  const demoActivity = demoState.activities.map((a) => `<tr><td class="muted">${fmt.date(a.at)}</td><td>${esc(a.event)}</td><td>${esc(a.vault)}</td><td class="r">${esc(a.amount)}</td><td class="r mono muted">${esc(a.ref)}</td></tr>`).join("");
+  $("#act tbody").innerHTML = demoActivity + A.map(([d, e, v, amt, ref]) => `<tr><td class="muted">${fmt.date(TODAY - d * DAY)}</td><td>${e}</td><td>${v}</td><td class="r">${amt}</td><td class="r mono muted">${ref}</td></tr>`).join("");
 })();
 8:X
 d:X
 d:C
-0:{"buildId":"2wLsSHGxwEOat5koG3f8G","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"bodyClass":"","html":"$3","runtimeVersion":"f7f11c8a9c9e","script":"$4","pageKey":"portfolio"}],["$L5"],"$L6"]}],"isPartial":"$@7","staleTime":"$8","varyParams":null},{"rsc":"$L9","isPartial":"$@a","staleTime":"$8","varyParams":null},{"rsc":"$Lb","isPartial":"$@c","staleTime":"$8","varyParams":"$d"},{"rsc":"$Le","isPartial":"$@f","staleTime":"$8","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@10","rootVaryParams":null,"needsRuntimeRequest":"$@11"}
+0:{"buildId":"WHeYlcA39PzQYvT4IqE01","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"bodyClass":"","html":"$3","runtimeVersion":"56fc72e39bac","script":"$4","pageKey":"portfolio"}],["$L5"],"$L6"]}],"isPartial":"$@7","staleTime":"$8","varyParams":null},{"rsc":"$L9","isPartial":"$@a","staleTime":"$8","varyParams":null},{"rsc":"$Lb","isPartial":"$@c","staleTime":"$8","varyParams":"$d"},{"rsc":"$Le","isPartial":"$@f","staleTime":"$8","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@10","rootVaryParams":null,"needsRuntimeRequest":"$@11"}
 12:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
 13:"$Sreact.suspense"
 15:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]

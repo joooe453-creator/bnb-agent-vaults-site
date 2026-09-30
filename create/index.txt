@@ -4,7 +4,7 @@
 4:I[81384,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js"],"PrototypePage"]
 b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default",1]
 :HL["/bnb-agent-vaults-site/_next/static/chunks/14j5olz08x8ko.css","style"]
-5:T253d,
+5:T2549,
 
 <section class="page-head">
   <div class="wrap wide">
@@ -48,8 +48,8 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
       <section class="article" id="s-2">
         <header><span class="rn">02</span><h2>Agent</h2><p>Your wallet owns the vault. The agent trades with its own key, inside the mandate.</p></header>
         <div class="body fields">
-          <div class="field full"><span>Owner wallet <em>any wallet via WalletConnect</em></span><div class="owner-box" id="owner"></div></div>
-          <div class="field full"><span>Agent <em>ERC-8004 agents owned by this wallet</em></span><div class="mkt-list" id="agents"></div></div>
+          <div class="field full"><span>Demo owner <em>local simulation · no wallet required</em></span><div class="owner-box" id="owner"></div></div>
+          <div class="field full"><span>Agent <em>simulated ERC-8004 agents available to this owner</em></span><div class="mkt-list" id="agents"></div></div>
           <div class="field full hide" id="op-override"><span>Operator address <em>replaces the agent's registered wallet</em></span><input id="operator" class="mono" placeholder="0x…">
             <div class="cli" style="margin-top:8px"><b>$</b> npx bnb-agent-vaults operator new &nbsp;→ creates a key in your system keychain and prints its address</div></div>
           <p class="fine" style="grid-column:1/-1">The operator is the agent's own wallet from its ERC-8004 registration. It can only call <span class="mono">execute</span> inside this mandate and can never withdraw. You can pause it instantly; switching to a new key waits 24 hours. If its trades lose more than 2% of NAV against oracle prices within 24 hours, it pauses itself until you resume it. <button type="button" class="link" id="op-toggle" style="margin-left:6px">Use a different key</button></p>
@@ -115,8 +115,9 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
             <div>
               <button type="button" class="btn ghost block" id="dry">Run fork dry-run</button>
               <ul class="dry" id="dryl"></ul>
-              <button type="button" class="btn block" id="deploy" style="margin-top:14px" disabled>Deploy to BSC</button>
-              <p class="fine" style="margin-top:12px">Prototype: the dry-run is simulated and deploy is disabled. Agents can submit the same manifest through the MCP tool <span class="mono">create_vault</span>; the owner still signs.</p>
+              <button type="button" class="btn block" id="deploy" style="margin-top:14px" disabled>Complete launch checks</button>
+              <p class="fine" style="margin-top:12px">Demo mode: the dry-run and launch are simulated locally. No wallet signature or blockchain transaction is requested.</p>
+              <div id="launch-result"></div>
               <button type="button" class="link" id="toggle-json" style="margin-top:16px">View manifest JSON</button>
               <div class="json hide" id="json" style="margin-top:12px"></div>
               <button type="button" class="btn ghost block" id="dl" style="margin-top:12px">Download manifest (.json)</button>
@@ -145,14 +146,13 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
 
 
 
-6:Tae0c,
+6:Taecf,
 (function () {
-  const { $, $$, esc, ASSETS, OPS, fmt, toast, logo, short } = BAV;
+  const { $, $$, esc, ASSETS, OPS, fmt, toast, logo, short, demo, DEMO_OWNER } = BAV;
   BAV.shell("create.html");
 
   /* ---------------- Data (snapshot 2026-09-30, simulated where noted) ---------------- */
   const BNB_USD = 758.28;
-  const DEMO_OWNER = "0x7a3F5b2E9d41C8a06f3B7e2D19c4A8b5E0d2c91E";
   const MY_AGENTS = [ // ERC-8004 agents the demo wallet owns (simulated registry lookup)
     { id: 942, name: "Orbit Agent", runtime: "Claude Code", operator: "0x4f2A9c81D07b3E5a6C91e0B2d7F84a13C5e9b7D0" },
     { id: 1790, name: "Mirror Labs", runtime: "BNB Agent Studio", operator: "0x9C07e3B15aF4d8621E0b7A9c3D5f1284B6e0aC3F" },
@@ -197,6 +197,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     agent: 942, opOverride: false, pfEdited: false, nameEdited: false,
     seed: { USDT: 100, BNB: 0.14 }, dry: "idle",
   };
+  let launchedId = null;
   const BOUNDS = { nonUsdt: [0, 50, 50], borrowLtv: [1, 50, 50], loopCeil: [10, 90, 90], idle: [5, 100, 50] }; // min, max, slider max
   const num = (v) => parseFloat(String(v).replace(/,/g, ""));
   const isAddr = (s) => /^0x[0-9a-fA-F]{40}$/.test(s);
@@ -204,7 +205,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
   const cap1 = (t) => t.charAt(0).toUpperCase() + t.slice(1);
   const on = (b) => S.on.has(b);
   const opOn = (id) => S.ops.has(id);
-  const owner = () => ($("[data-wallet]").dataset.connected === "1" ? DEMO_OWNER : null);
+  const owner = () => DEMO_OWNER;
   const stocksIn = () => (on("spot") && S.stocks ? TRADEABLE.filter((s) => !S.excluded.has(s)) : []);
   const majorsIn = () => (on("spot") && S.majors ? MAJORS.filter((m) => S.majorSet.has(m)) : []);
   const pairsIn = () => (on("loop") ? PAIRS.filter((x) => !S.pairsOff.has(x.id)) : []);
@@ -419,7 +420,6 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
   const operator = () => (S.opOverride ? $("#operator").value.trim() : owner() && agent() ? agent().operator : "");
   function drawAgents() {
     const box = $("#agents");
-    if (!owner()) { box.innerHTML = `<div class="owner-box empty">Connect a wallet to load the agents it owns.</div>`; return; }
     box.innerHTML = MY_AGENTS.map((a) => `<label class="mkt"><input type="radio" name="agent" value="${a.id}" ${a.id === S.agent ? "checked" : ""}><span class="logo-stack"></span><span class="t">${a.name} · ERC-8004 #${a.id}<small>${a.runtime} · operator ${short(a.operator)}, from its registration</small></span><span class="apy">${a.id === S.agent ? "Selected" : ""}</span></label>`).join("")
       + `<button type="button" class="add-leg" id="agent-new" style="height:44px">+ Register a new agent</button>`;
     $$("input[name=agent]").forEach((r) => r.addEventListener("change", () => { S.agent = +r.value; drawAgents(); touched(); }));
@@ -427,11 +427,8 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
   }
   function drawOwner() {
     const o = owner(), box = $("#owner");
-    box.classList.toggle("empty", !o);
-    box.innerHTML = o ? `<span class="mono">${o}</span><span class="tag">Connected</span>`
-      : `<span>Connect Binance Wallet, MetaMask, OKX, Trust or any WalletConnect wallet</span><button type="button" class="btn sm" id="owner-connect">Connect</button>`;
-    const b = $("#owner-connect");
-    if (b) b.addEventListener("click", () => $("[data-wallet]").click());
+    box.classList.remove("empty");
+    box.innerHTML = `<span class="mono">${o}</span><span class="tag sim">Demo owner</span>`;
   }
 
   /* ---------------- Validation ---------------- */
@@ -445,7 +442,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     const feesOk = f.pf >= 0 && f.pf <= 30 && f.mf >= 0 && f.mf <= 5;
     const seedOk = isFinite(seed) && (S.asset === "BNB" ? seed * BNB_USD >= 100 : seed >= 100);
     const checks = [
-      ["Owner wallet connected", !!o],
+      ["Demo owner loaded", !!o],
       ["Agent selected", !!o && !!agent()],
       ["Operator address is valid", isAddr(op)],
       ["Operator is a separate key from the owner", !!o && isAddr(op) && op.toLowerCase() !== o.toLowerCase()],
@@ -460,16 +457,18 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
   }
 
   function validate() {
+    if (!S.pfEdited) $("#pf").value = isActive() ? 15 : 10;
     const st = state(), { checks } = st;
     const pass = checks.filter((c) => c[1]).length, all = pass === checks.length;
-    if (!S.pfEdited) $("#pf").value = isActive() ? 15 : 10;
     $("#checks").innerHTML = checks.map(([t, ok]) => `<li class="${ok ? "ok" : "bad"}"><i></i><span>${t}</span></li>`).join("");
     $("#s-risk").textContent = risk();
     $("#s-asset").textContent = S.asset;
     $("#s-checks").textContent = `${pass} / ${checks.length}`;
-    $("#mc-state").innerHTML = `<b>${pass} of ${checks.length} checks</b>${all ? "Ready to deploy" : "Needs attention"}`;
-    $("#m-state").textContent = all ? "Ready" : "Needs attention";
+    $("#mc-state").innerHTML = `<b>${pass} of ${checks.length} checks</b>${launchedId ? "Demo launched" : all ? "Ready to simulate" : "Needs attention"}`;
+    $("#m-state").textContent = launchedId ? "Demo launched" : all ? "Ready" : "Needs attention";
     $("#m-state").className = all ? "tag" : "tag warn";
+    $("#deploy").disabled = !all || !!launchedId;
+    $("#deploy").textContent = launchedId ? "Demo vault launched" : all ? "Launch demo vault" : "Complete launch checks";
     $("#dry").disabled = S.dry === "running" || checks.slice(0, 9).some((c) => !c[1]);
     $("#dry").textContent = S.dry === "ok" ? "Dry-run passed · run again" : "Run fork dry-run";
     const flag = (sel, bad) => $(sel).closest(".field").classList.toggle("bad", bad);
@@ -491,6 +490,8 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     $("#json").textContent = JSON.stringify(build(), null, 2);
   }
   function touched() {
+    launchedId = null;
+    $("#launch-result").innerHTML = "";
     if (S.dry !== "idle" && S.dry !== "running") { S.dry = "idle"; $("#dryl").innerHTML = ""; }
     validate();
   }
@@ -552,7 +553,6 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     $("#op-toggle").textContent = S.opOverride ? "Use the agent's registered wallet" : "Use a different key";
     touched();
   });
-  $("[data-wallet]").addEventListener("click", () => { drawOwner(); drawAgents(); touched(); });
   $("#toggle-json").addEventListener("click", () => { $("#json").classList.toggle("hide"); $("#toggle-json").textContent = $("#json").classList.contains("hide") ? "View manifest JSON" : "Hide manifest JSON"; });
   $("#dl").addEventListener("click", () => {
     const m = build(), blob = new Blob([JSON.stringify(m, null, 2)], { type: "application/json" }), el = document.createElement("a");
@@ -561,7 +561,14 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     el.click(); URL.revokeObjectURL(el.href);
     toast("Manifest exported");
   });
-  $("#deploy").addEventListener("click", () => toast("Deploy opens after the contracts are audited"));
+  $("#deploy").addEventListener("click", () => {
+    if (state().checks.some((c) => !c[1])) return;
+    const manifest = build(), launched = demo.launch(manifest);
+    launchedId = launched.id;
+    validate();
+    $("#launch-result").innerHTML = `<div class="state-note"><span class="dot" style="background:var(--pos)"></span><span><b>${esc(manifest.identity.name)}</b> launched in this browser's demo ledger. Reference <span class="mono">${launched.id.toUpperCase()}</span>. No transaction was sent.</span></div>`;
+    toast("Demo vault launched — no wallet or transaction used");
+  });
   const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) $$("#toc a").forEach((a) => a.classList.toggle("on", a.getAttribute("href") === "#" + e.target.id)); }), { rootMargin: "-40% 0px -55% 0px" });
   $$(".article").forEach((s) => io.observe(s));
 
@@ -569,7 +576,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
   drawPresets(); drawBench(); drawBlocks(); syncUnits(); drawOwner(); drawAgents(); validate();
 })();
 9:X
-0:{"P":null,"c":["","create",""],"q":"","i":false,"f":[[["",{"children":["create",{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/14j5olz08x8ko.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"bodyClass":"has-mcta","html":"$5","runtimeVersion":"f7f11c8a9c9e","script":"$6","pageKey":"create"}],["$L7"],"$L8"]}],{},null,false,null]},null,false,"$9"]},null,false,null],"$La",false]],"m":"$undefined","G":["$b",["$Lc"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"2wLsSHGxwEOat5koG3f8G"}
+0:{"P":null,"c":["","create",""],"q":"","i":false,"f":[[["",{"children":["create",{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/14j5olz08x8ko.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"bodyClass":"has-mcta","html":"$5","runtimeVersion":"56fc72e39bac","script":"$6","pageKey":"create"}],["$L7"],"$L8"]}],{},null,false,null]},null,false,"$9"]},null,false,null],"$La",false]],"m":"$undefined","G":["$b",["$Lc"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"WHeYlcA39PzQYvT4IqE01"}
 d:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
 e:"$Sreact.suspense"
 10:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]

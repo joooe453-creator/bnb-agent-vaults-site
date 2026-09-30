@@ -1,6 +1,6 @@
 1:"$Sreact.fragment"
 2:I[81384,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js"],"PrototypePage"]
-3:T15b2,
+3:T15b0,
 
 <section class="vhead">
   <div class="wrap">
@@ -111,20 +111,20 @@
   <div class="modal">
     <div class="panel-h"><h3>Edit mandate</h3><button class="x" id="e-x" aria-label="Close">×</button></div>
     <div class="panel-b">
-      <p class="fine">Only the owner wallet can submit. Tightening applies at once. Loosening waits 24 hours and holders are notified, so anyone who disagrees can leave first.</p>
+      <p class="fine">Demo owner controls are enabled without a wallet. Tightening applies at once in the simulation; loosening waits 24 hours in the modeled timeline.</p>
       <div id="e-ops"></div>
       <label class="field" style="margin-top:18px"><span>Minimum idle</span><div class="suffix"><input id="e-idle" inputmode="decimal"><b>%</b></div></label>
       <ul class="rules" id="e-diff" style="margin-top:16px"></ul>
-      <div style="display:flex;gap:10px;margin-top:16px"><button class="btn ghost" id="e-cancel" style="flex:1">Cancel</button><button class="btn" id="e-submit" style="flex:1">Sign change</button></div>
+      <div style="display:flex;gap:10px;margin-top:16px"><button class="btn ghost" id="e-cancel" style="flex:1">Cancel</button><button class="btn" id="e-submit" style="flex:1">Apply demo change</button></div>
     </div>
   </div>
 </div>
 
 
 
-4:T459d,
+4:T46fc,
 (function () {
-  const { $, $$, fmt, perf, riskMeter, statusTag, historyTag, navSeries, lineChart, hexAddr, short, ASSETS, SLOTS, toast, TEMPLATES, OPS, VENUES } = BAV;
+  const { $, $$, fmt, perf, riskMeter, statusTag, historyTag, navSeries, lineChart, hexAddr, short, ASSETS, SLOTS, toast, TEMPLATES, OPS, VENUES, demo } = BAV;
   BAV.shell("vaults.html");
 
   const slug = location.pathname.split("/").filter(Boolean).pop() || "stable-yield-router";
@@ -242,15 +242,15 @@
 
   /* Ticket */
   let tab = "sub";
-  const bal = A === "BNB" ? 18.42 : 24850;
-  const myShares = A === "BNB" ? 12.5 : 8445.95;
+  const bal = () => demo.balance(A);
+  const myShares = () => demo.shares(v.slug);
   function drawTicket() {
     $$(".ticket .tabs button").forEach((b) => b.classList.toggle("on", b.dataset.t === tab));
     if (tab === "sub") {
       const note = pc ? ["var(--warn)", `A rule change takes effect in ${pc.hours} hours: ${pc.what}. Read it before you deposit.`]
         : ["var(--pos)", "Shares are issued at live NAV. Deposits pause automatically if an oracle goes stale."];
       $("#ticket-body").innerHTML = `
-        <div style="display:flex;justify-content:space-between"><span class="label">Amount</span><span class="fine">Balance ${fmt.n(bal, 2)} ${A}</span></div>
+        <div style="display:flex;justify-content:space-between"><span class="label">Amount</span><span class="fine">Demo balance ${fmt.n(bal(), 2)} ${A}</span></div>
         <div class="amount"><input id="amt" inputmode="decimal" placeholder="0.00"><span class="unit">${A}</span></div>
         <div class="quick"><button data-q=".25">25%</button><button data-q=".5">50%</button><button data-q="1">Max</button></div>
         <dl class="kv">
@@ -260,14 +260,14 @@
           <dt>Redeemable after</dt><dd>24 hours</dd>
         </dl>
         <div class="state-note"><span class="dot" style="background:${note[0]}"></span><span>${note[1]}</span></div>
-        <button class="btn block" id="go">Approve &amp; deposit</button>`;
+        <button class="btn block" id="go">Simulate deposit</button>`;
       const inp = $("#amt");
       const upd = () => { const x = parseFloat(inp.value); $("#est").textContent = x > 0 ? fmt.n(x / v.sharePrice, 2) + " " + v.symbol : "—"; };
       inp.addEventListener("input", upd);
-      $$(".quick button").forEach((b) => b.addEventListener("click", () => { inp.value = (bal * +b.dataset.q).toFixed(2); upd(); }));
+      $$(".quick button").forEach((b) => b.addEventListener("click", () => { inp.value = (bal() * +b.dataset.q).toFixed(2); upd(); }));
     } else {
       $("#ticket-body").innerHTML = `
-        <div style="display:flex;justify-content:space-between"><span class="label">Shares</span><span class="fine">Held ${fmt.n(myShares, 2)} ${v.symbol}</span></div>
+        <div style="display:flex;justify-content:space-between"><span class="label">Shares</span><span class="fine">Demo held ${fmt.n(myShares(), 2)} ${v.symbol}</span></div>
         <div class="amount"><input id="amt" inputmode="decimal" placeholder="0.00"><span class="unit">${v.symbol}</span></div>
         <div class="quick"><button data-q=".25">25%</button><button data-q=".5">50%</button><button data-q="1">Max</button></div>
         <dl class="kv">
@@ -277,13 +277,19 @@
           <dt>Settles</dt><dd>Instant from idle · ≤ 12 h otherwise</dd>
         </dl>
         <div class="state-note"><span class="dot" style="background:var(--pos)"></span><span>You pay your own slippage, so the people who stay don't. If the market can't fill within your limit, the request waits.</span></div>
-        <button class="btn block" id="go">Redeem</button>`;
+        <button class="btn block" id="go">Simulate redemption</button>`;
       const inp = $("#amt");
       const upd = () => { const x = parseFloat(inp.value); $("#est").textContent = x > 0 ? "≈ " + money(x * v.sharePrice) : "—"; };
       inp.addEventListener("input", upd);
-      $$(".quick button").forEach((b) => b.addEventListener("click", () => { inp.value = (myShares * +b.dataset.q).toFixed(2); upd(); }));
+      $$(".quick button").forEach((b) => b.addEventListener("click", () => { inp.value = (myShares() * +b.dataset.q).toFixed(2); upd(); }));
     }
-    $("#go").addEventListener("click", () => toast("Prototype — contracts are not deployed, no transaction was sent"));
+    $("#go").addEventListener("click", () => {
+      const amount = parseFloat($("#amt").value);
+      const result = tab === "sub" ? demo.deposit(v.slug, amount) : demo.redeem(v.slug, amount);
+      if (!result.ok) { toast(result.error); return; }
+      toast(tab === "sub" ? `Demo deposit complete · ${fmt.n(result.shares, 2)} ${v.symbol} issued` : `Demo redemption complete · ${fmt.n(result.received, 2)} ${A} received`);
+      drawTicket();
+    });
   }
   const openTab = (t) => { tab = t; drawTicket(); $("#ticket").scrollIntoView({ behavior: "smooth", block: "start" }); };
   $$(".ticket .tabs button").forEach((b) => b.addEventListener("click", () => { tab = b.dataset.t; drawTicket(); }));
@@ -340,12 +346,12 @@
   $("#e-x").addEventListener("click", closeEdit);
   $("#e-cancel").addEventListener("click", closeEdit);
   $("#edit").addEventListener("click", (e) => { if (e.target.id === "edit") closeEdit(); });
-  $("#e-submit").addEventListener("click", () => { closeEdit(); toast("Prototype — change signed by the owner; loosening goes live in 24 hours"); });
+  $("#e-submit").addEventListener("click", () => { closeEdit(); toast("Demo mandate change applied; loosening is modeled for 24 hours later"); });
 })();
 8:X
 f:X
 f:C
-0:{"buildId":"2wLsSHGxwEOat5koG3f8G","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"bodyClass":"has-mcta","html":"$3","runtimeVersion":"f7f11c8a9c9e","script":"$4","pageKey":"vault"}],["$L5"],"$L6"]}],"isPartial":"$@7","staleTime":"$8","varyParams":null},{"rsc":"$L9","isPartial":"$@a","staleTime":"$8","varyParams":null},{"rsc":"$Lb","isPartial":"$@c","staleTime":"$8","varyParams":null},{"rsc":"$Ld","isPartial":"$@e","staleTime":"$8","varyParams":"$f"},{"rsc":"$L10","isPartial":"$@11","staleTime":"$8","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@12","rootVaryParams":null,"needsRuntimeRequest":"$@13"}
+0:{"buildId":"WHeYlcA39PzQYvT4IqE01","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"bodyClass":"has-mcta","html":"$3","runtimeVersion":"56fc72e39bac","script":"$4","pageKey":"vault"}],["$L5"],"$L6"]}],"isPartial":"$@7","staleTime":"$8","varyParams":null},{"rsc":"$L9","isPartial":"$@a","staleTime":"$8","varyParams":null},{"rsc":"$Lb","isPartial":"$@c","staleTime":"$8","varyParams":null},{"rsc":"$Ld","isPartial":"$@e","staleTime":"$8","varyParams":"$f"},{"rsc":"$L10","isPartial":"$@11","staleTime":"$8","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@12","rootVaryParams":null,"needsRuntimeRequest":"$@13"}
 14:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
 15:"$Sreact.suspense"
 17:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]

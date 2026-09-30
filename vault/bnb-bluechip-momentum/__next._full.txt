@@ -4,7 +4,7 @@
 4:I[81384,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js"],"PrototypePage"]
 b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default",1]
 :HL["/bnb-agent-vaults-site/_next/static/chunks/14j5olz08x8ko.css","style"]
-5:T15b2,
+5:T15b0,
 
 <section class="vhead">
   <div class="wrap">
@@ -115,20 +115,20 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
   <div class="modal">
     <div class="panel-h"><h3>Edit mandate</h3><button class="x" id="e-x" aria-label="Close">×</button></div>
     <div class="panel-b">
-      <p class="fine">Only the owner wallet can submit. Tightening applies at once. Loosening waits 24 hours and holders are notified, so anyone who disagrees can leave first.</p>
+      <p class="fine">Demo owner controls are enabled without a wallet. Tightening applies at once in the simulation; loosening waits 24 hours in the modeled timeline.</p>
       <div id="e-ops"></div>
       <label class="field" style="margin-top:18px"><span>Minimum idle</span><div class="suffix"><input id="e-idle" inputmode="decimal"><b>%</b></div></label>
       <ul class="rules" id="e-diff" style="margin-top:16px"></ul>
-      <div style="display:flex;gap:10px;margin-top:16px"><button class="btn ghost" id="e-cancel" style="flex:1">Cancel</button><button class="btn" id="e-submit" style="flex:1">Sign change</button></div>
+      <div style="display:flex;gap:10px;margin-top:16px"><button class="btn ghost" id="e-cancel" style="flex:1">Cancel</button><button class="btn" id="e-submit" style="flex:1">Apply demo change</button></div>
     </div>
   </div>
 </div>
 
 
 
-6:T459d,
+6:T46fc,
 (function () {
-  const { $, $$, fmt, perf, riskMeter, statusTag, historyTag, navSeries, lineChart, hexAddr, short, ASSETS, SLOTS, toast, TEMPLATES, OPS, VENUES } = BAV;
+  const { $, $$, fmt, perf, riskMeter, statusTag, historyTag, navSeries, lineChart, hexAddr, short, ASSETS, SLOTS, toast, TEMPLATES, OPS, VENUES, demo } = BAV;
   BAV.shell("vaults.html");
 
   const slug = location.pathname.split("/").filter(Boolean).pop() || "stable-yield-router";
@@ -246,15 +246,15 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
 
   /* Ticket */
   let tab = "sub";
-  const bal = A === "BNB" ? 18.42 : 24850;
-  const myShares = A === "BNB" ? 12.5 : 8445.95;
+  const bal = () => demo.balance(A);
+  const myShares = () => demo.shares(v.slug);
   function drawTicket() {
     $$(".ticket .tabs button").forEach((b) => b.classList.toggle("on", b.dataset.t === tab));
     if (tab === "sub") {
       const note = pc ? ["var(--warn)", `A rule change takes effect in ${pc.hours} hours: ${pc.what}. Read it before you deposit.`]
         : ["var(--pos)", "Shares are issued at live NAV. Deposits pause automatically if an oracle goes stale."];
       $("#ticket-body").innerHTML = `
-        <div style="display:flex;justify-content:space-between"><span class="label">Amount</span><span class="fine">Balance ${fmt.n(bal, 2)} ${A}</span></div>
+        <div style="display:flex;justify-content:space-between"><span class="label">Amount</span><span class="fine">Demo balance ${fmt.n(bal(), 2)} ${A}</span></div>
         <div class="amount"><input id="amt" inputmode="decimal" placeholder="0.00"><span class="unit">${A}</span></div>
         <div class="quick"><button data-q=".25">25%</button><button data-q=".5">50%</button><button data-q="1">Max</button></div>
         <dl class="kv">
@@ -264,14 +264,14 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
           <dt>Redeemable after</dt><dd>24 hours</dd>
         </dl>
         <div class="state-note"><span class="dot" style="background:${note[0]}"></span><span>${note[1]}</span></div>
-        <button class="btn block" id="go">Approve &amp; deposit</button>`;
+        <button class="btn block" id="go">Simulate deposit</button>`;
       const inp = $("#amt");
       const upd = () => { const x = parseFloat(inp.value); $("#est").textContent = x > 0 ? fmt.n(x / v.sharePrice, 2) + " " + v.symbol : "—"; };
       inp.addEventListener("input", upd);
-      $$(".quick button").forEach((b) => b.addEventListener("click", () => { inp.value = (bal * +b.dataset.q).toFixed(2); upd(); }));
+      $$(".quick button").forEach((b) => b.addEventListener("click", () => { inp.value = (bal() * +b.dataset.q).toFixed(2); upd(); }));
     } else {
       $("#ticket-body").innerHTML = `
-        <div style="display:flex;justify-content:space-between"><span class="label">Shares</span><span class="fine">Held ${fmt.n(myShares, 2)} ${v.symbol}</span></div>
+        <div style="display:flex;justify-content:space-between"><span class="label">Shares</span><span class="fine">Demo held ${fmt.n(myShares(), 2)} ${v.symbol}</span></div>
         <div class="amount"><input id="amt" inputmode="decimal" placeholder="0.00"><span class="unit">${v.symbol}</span></div>
         <div class="quick"><button data-q=".25">25%</button><button data-q=".5">50%</button><button data-q="1">Max</button></div>
         <dl class="kv">
@@ -281,13 +281,19 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
           <dt>Settles</dt><dd>Instant from idle · ≤ 12 h otherwise</dd>
         </dl>
         <div class="state-note"><span class="dot" style="background:var(--pos)"></span><span>You pay your own slippage, so the people who stay don't. If the market can't fill within your limit, the request waits.</span></div>
-        <button class="btn block" id="go">Redeem</button>`;
+        <button class="btn block" id="go">Simulate redemption</button>`;
       const inp = $("#amt");
       const upd = () => { const x = parseFloat(inp.value); $("#est").textContent = x > 0 ? "≈ " + money(x * v.sharePrice) : "—"; };
       inp.addEventListener("input", upd);
-      $$(".quick button").forEach((b) => b.addEventListener("click", () => { inp.value = (myShares * +b.dataset.q).toFixed(2); upd(); }));
+      $$(".quick button").forEach((b) => b.addEventListener("click", () => { inp.value = (myShares() * +b.dataset.q).toFixed(2); upd(); }));
     }
-    $("#go").addEventListener("click", () => toast("Prototype — contracts are not deployed, no transaction was sent"));
+    $("#go").addEventListener("click", () => {
+      const amount = parseFloat($("#amt").value);
+      const result = tab === "sub" ? demo.deposit(v.slug, amount) : demo.redeem(v.slug, amount);
+      if (!result.ok) { toast(result.error); return; }
+      toast(tab === "sub" ? `Demo deposit complete · ${fmt.n(result.shares, 2)} ${v.symbol} issued` : `Demo redemption complete · ${fmt.n(result.received, 2)} ${A} received`);
+      drawTicket();
+    });
   }
   const openTab = (t) => { tab = t; drawTicket(); $("#ticket").scrollIntoView({ behavior: "smooth", block: "start" }); };
   $$(".ticket .tabs button").forEach((b) => b.addEventListener("click", () => { tab = b.dataset.t; drawTicket(); }));
@@ -344,10 +350,10 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
   $("#e-x").addEventListener("click", closeEdit);
   $("#e-cancel").addEventListener("click", closeEdit);
   $("#edit").addEventListener("click", (e) => { if (e.target.id === "edit") closeEdit(); });
-  $("#e-submit").addEventListener("click", () => { closeEdit(); toast("Prototype — change signed by the owner; loosening goes live in 24 hours"); });
+  $("#e-submit").addEventListener("click", () => { closeEdit(); toast("Demo mandate change applied; loosening is modeled for 24 hours later"); });
 })();
 9:X
-0:{"P":null,"c":["","vault","bnb-bluechip-momentum",""],"q":"","i":false,"f":[[["",{"children":["vault",{"children":[["slug","bnb-bluechip-momentum","d",[]],{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/14j5olz08x8ko.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"bodyClass":"has-mcta","html":"$5","runtimeVersion":"f7f11c8a9c9e","script":"$6","pageKey":"vault"}],["$L7"],"$L8"]}],{},null,false,null]},null,false,null]},null,false,"$9"]},null,false,null],"$La",false]],"m":"$undefined","G":["$b",["$Lc"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"2wLsSHGxwEOat5koG3f8G"}
+0:{"P":null,"c":["","vault","bnb-bluechip-momentum",""],"q":"","i":false,"f":[[["",{"children":["vault",{"children":[["slug","bnb-bluechip-momentum","d",[]],{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/14j5olz08x8ko.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"bodyClass":"has-mcta","html":"$5","runtimeVersion":"56fc72e39bac","script":"$6","pageKey":"vault"}],["$L7"],"$L8"]}],{},null,false,null]},null,false,null]},null,false,"$9"]},null,false,null],"$La",false]],"m":"$undefined","G":["$b",["$Lc"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"WHeYlcA39PzQYvT4IqE01"}
 d:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
 e:"$Sreact.suspense"
 10:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]

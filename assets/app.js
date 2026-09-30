@@ -154,6 +154,76 @@
   ];
 
   /* ------------------------------------------------------------------ */
+  /* Local demo ledger — no wallet, signature or transaction required.  */
+  /* ------------------------------------------------------------------ */
+  const DEMO_OWNER = "0x7a3F5b2E9d41C8a06f3B7e2D19c4A8b5E0d2c91E";
+  const DEMO_KEY = "bnb-agent-vaults:demo-ledger:v1";
+  const freshDemoState = () => ({
+    balances: { USDT: 24850, BNB: 18.42 },
+    holdings: {
+      "stable-yield-router": { shares: 20000, cost: 1 },
+      "bnb-bluechip-momentum": { shares: 3200, cost: 1.0625 },
+      "mag7-rotation": { shares: 4600, cost: 1.0214 },
+    },
+    activities: [],
+    launchedVaults: [],
+  });
+  let memoryDemoState = freshDemoState();
+  function readDemoState() {
+    try {
+      const saved = localStorage.getItem(DEMO_KEY);
+      if (saved) memoryDemoState = { ...freshDemoState(), ...JSON.parse(saved) };
+    } catch (_) {}
+    return memoryDemoState;
+  }
+  function writeDemoState(state) {
+    memoryDemoState = state;
+    try { localStorage.setItem(DEMO_KEY, JSON.stringify(state)); } catch (_) {}
+    window.dispatchEvent(new CustomEvent("bav:demo-state", { detail: state }));
+    return state;
+  }
+  const demo = {
+    owner: DEMO_OWNER,
+    state: readDemoState,
+    balance(asset) { return Number(readDemoState().balances[asset] || 0); },
+    shares(slug) { return Number(readDemoState().holdings[slug]?.shares || 0); },
+    deposit(slug, amount) {
+      const v = VAULTS.find((x) => x.slug === slug), n = Number(amount), state = readDemoState();
+      if (!v || !isFinite(n) || n <= 0) return { ok: false, error: "Enter an amount greater than zero." };
+      if (n > Number(state.balances[v.asset] || 0)) return { ok: false, error: "Demo balance is too low for this deposit." };
+      const issued = n / v.sharePrice, old = state.holdings[slug] || { shares: 0, cost: v.sharePrice };
+      const basis = old.shares * old.cost + n;
+      state.balances[v.asset] -= n;
+      state.holdings[slug] = { shares: old.shares + issued, cost: basis / (old.shares + issued) };
+      state.activities.unshift({ at: Date.now(), event: "Demo deposit", vault: v.name, amount: `${n.toFixed(2)} ${v.asset} → ${issued.toFixed(2)} ${v.symbol}`, ref: "LOCAL" });
+      writeDemoState(state);
+      return { ok: true, shares: issued, balance: state.balances[v.asset] };
+    },
+    redeem(slug, shares) {
+      const v = VAULTS.find((x) => x.slug === slug), n = Number(shares), state = readDemoState();
+      const held = Number(state.holdings[slug]?.shares || 0);
+      if (!v || !isFinite(n) || n <= 0) return { ok: false, error: "Enter an amount greater than zero." };
+      if (n > held) return { ok: false, error: `You only hold ${held.toFixed(2)} demo shares.` };
+      const received = n * v.sharePrice;
+      state.holdings[slug].shares = held - n;
+      if (state.holdings[slug].shares < 0.000001) delete state.holdings[slug];
+      state.balances[v.asset] = Number(state.balances[v.asset] || 0) + received;
+      state.activities.unshift({ at: Date.now(), event: "Demo redemption", vault: v.name, amount: `${n.toFixed(2)} ${v.symbol} → ${received.toFixed(2)} ${v.asset}`, ref: "LOCAL" });
+      writeDemoState(state);
+      return { ok: true, received, balance: state.balances[v.asset] };
+    },
+    launch(manifest) {
+      const state = readDemoState();
+      const id = `demo-${Date.now().toString(36)}`;
+      state.launchedVaults.unshift({ id, at: Date.now(), manifest });
+      state.activities.unshift({ at: Date.now(), event: "Demo vault launched", vault: manifest.identity.name, amount: `${manifest.seed.amount} ${manifest.seed.asset} seed`, ref: id.toUpperCase() });
+      writeDemoState(state);
+      return { id };
+    },
+    reset() { return writeDemoState(freshDemoState()); },
+  };
+
+  /* ------------------------------------------------------------------ */
   /* Utilities                                                           */
   /* ------------------------------------------------------------------ */
   const $ = (s, r = document) => r.querySelector(s);
@@ -472,14 +542,14 @@
     const nav = [["vaults.html", "Vaults"], ["portfolio.html", "Portfolio"], ["create.html", "Launch a Vault"]];
     const top = document.createElement("div");
     top.innerHTML = `
-      <div class="notice" data-bav-shell><span><b>Prototype</b></span><span>Simulated performance</span><span>Contracts unaudited</span><span>No mainnet deployment</span></div>
+      <div class="notice" data-bav-shell><span><b>Demo mode</b></span><span>No wallet required</span><span>Simulated performance</span><span>No transactions</span></div>
       <header class="masthead" data-bav-shell>
         <div class="wrap">
           <a class="brand" href="${route()}">${SEAL}<span class="brand-name">BNB Agent Vaults</span></a>
           <nav class="nav">${nav.map(([h, l]) => `<a href="${route(h.replace(".html", ""))}" class="${active === h ? "active" : ""}">${l}</a>`).join("")}</nav>
           <div class="head-right">
             <span class="chain"><img class="logo" src="${BASE_PATH}/logos/bnbchain.jpg" alt="">BNB Smart Chain · 56</span>
-            <button class="btn sm" data-wallet><span class="full">Connect Wallet</span><span class="short">Connect</span></button>
+            <button class="btn sm ghost" data-demo><span class="full">Demo Mode</span><span class="short">Demo</span></button>
             <button class="menu-btn" aria-label="Menu"><span></span></button>
           </div>
         </div>
@@ -518,13 +588,7 @@
     if (mb) mb.addEventListener("click", () => setMenu(!mh.classList.contains("open")));
     $$(".nav a", mh).forEach((a) => a.addEventListener("click", () => setMenu(false)));
     window.addEventListener("resize", () => { if (window.innerWidth > 960) setMenu(false); });
-    $$("[data-wallet]").forEach((b) => b.addEventListener("click", () => {
-      const on = b.dataset.connected === "1";
-      b.dataset.connected = on ? "0" : "1";
-      b.innerHTML = on ? '<span class="full">Connect Wallet</span><span class="short">Connect</span>' : '<span class="full">0x7a3F…c91E</span><span class="short">0x7a3F…</span>';
-      b.classList.toggle("ghost", !on);
-      toast(on ? "Wallet disconnected" : "Demo wallet connected — no transactions will be sent");
-    }));
+    $$("[data-demo]").forEach((b) => b.addEventListener("click", () => toast("Demo mode is active — no wallet or transaction is required")));
     stackTables();
   }
 
@@ -562,7 +626,7 @@
     TODAY, DAY, SLOTS, ASSETS, VENUES, BLOCKS, OPS, opScope, TEMPLATES, VAULTS,
     $, $$, esc, fmt, perf, periodDays, historyTag, riskMeter, statusTag,
     rng, hexAddr, short, navSeries, sparkline, lineChart, logo, agentCanvas, stackTables,
-    shell, footerHTML, wireShell, toast, SEAL, route,
+    shell, footerHTML, wireShell, toast, SEAL, route, DEMO_OWNER, demo,
     vault: (slug) => VAULTS.find((v) => v.slug === slug),
   };
 })();

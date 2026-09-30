@@ -144,7 +144,7 @@
 8:X
 d:X
 d:C
-0:{"buildId":"2wLsSHGxwEOat5koG3f8G","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"bodyClass":"","html":"$3","runtimeVersion":"f7f11c8a9c9e","script":"$4","pageKey":"vaults"}],["$L5"],"$L6"]}],"isPartial":"$@7","staleTime":"$8","varyParams":null},{"rsc":"$L9","isPartial":"$@a","staleTime":"$8","varyParams":null},{"rsc":"$Lb","isPartial":"$@c","staleTime":"$8","varyParams":"$d"},{"rsc":"$Le","isPartial":"$@f","staleTime":"$8","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@10","rootVaryParams":null,"needsRuntimeRequest":"$@11"}
+0:{"buildId":"WHeYlcA39PzQYvT4IqE01","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"bodyClass":"","html":"$3","runtimeVersion":"56fc72e39bac","script":"$4","pageKey":"vaults"}],["$L5"],"$L6"]}],"isPartial":"$@7","staleTime":"$8","varyParams":null},{"rsc":"$L9","isPartial":"$@a","staleTime":"$8","varyParams":null},{"rsc":"$Lb","isPartial":"$@c","staleTime":"$8","varyParams":"$d"},{"rsc":"$Le","isPartial":"$@f","staleTime":"$8","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@10","rootVaryParams":null,"needsRuntimeRequest":"$@11"}
 12:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
 13:"$Sreact.suspense"
 15:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]
