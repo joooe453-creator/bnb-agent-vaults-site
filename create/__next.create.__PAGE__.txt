@@ -115,7 +115,7 @@
 
 
 
-4:T9a1f,
+4:Ta29f,
 (function () {
   "use strict";
   const { $, $$, esc, toast, DEMO_OWNER, hexAddr } = BAV;
@@ -249,10 +249,12 @@
     return { protocol: "v2", venue: "PancakeSwap V2", poolAddress, fee: 2500, liquidityUsd, spotPriceUsd };
   }
 
-  async function discoverContractTarget(address, skipKnown) {
+  async function discoverContractTarget(address, skipKnown, requestedPoolAddress) {
     const normalized = address.toLowerCase();
     const known = S.registry.targets.find((target) => target.address.toLowerCase() === normalized);
-    if (known && !skipKnown) return known;
+    const requestedPool = String(requestedPoolAddress || "").toLowerCase();
+    if (requestedPoolAddress && !ADDRESS_RE.test(requestedPool)) throw new Error("Selected pool address is invalid.");
+    if (known && !known.dynamic && !skipKnown && !requestedPool) return known;
     if (normalized === S.registry.quoteAsset.address.toLowerCase()) throw new Error("USDT is the accounting asset, not a basket target.");
     const chainId = await rpc("eth_chainId");
     if (Number(BigInt(chainId)) !== 56) throw new Error("RPC is not connected to BNB Chain.");
@@ -300,13 +302,16 @@
     const routes = inspected.filter((result) => result.status === "fulfilled").map((result) => result.value);
     if (!routes.length) throw new Error("No initialized Pancake V2/V3 pool to USDT or BNB found.");
     routes.sort((left, right) => right.liquidityUsd - left.liquidityUsd);
-    const route = routes[0];
+    const route = requestedPool
+      ? routes.find((candidate) => candidate.path[0]?.poolAddress.toLowerCase() === requestedPool)
+      : routes[0];
+    if (!route) throw new Error("Selected pool is not an executable USDT/BNB route. Choose another pool or search the CA for automatic routing.");
     return {
-      id: "crypto:custom:" + normalized,
-      category: "crypto",
+      id: known?.id || ("crypto:custom:" + normalized),
+      category: known?.category || "crypto",
       symbol,
-      displaySymbol: symbol,
-      ticker: symbol,
+      displaySymbol: known?.displaySymbol || symbol,
+      ticker: known?.ticker || symbol,
       address: normalized,
       decimals,
       dynamic: true,
@@ -318,6 +323,9 @@
         methodology: "Every route hop was checked against a Pancake factory on BNB Chain; effective TVL uses the route bottleneck and is not guaranteed execution depth.",
       },
       discovery: { source: "BSC JSON-RPC + Pancake factory", exactPair: true, customToken: true, verifiedAtBlock: Number(BigInt(blockTag)) },
+      routeSelection: requestedPool
+        ? { mode: "pinned-pool", poolAddress: route.path[0].poolAddress, protocol: route.path[0].protocol, fee: route.path[0].fee }
+        : { mode: "best-liquidity" },
     };
   }
 
@@ -410,7 +418,10 @@
     if (!S.registry) return;
     const rows = [...S.selected.entries()].map(([id, selected]) => {
       const target = S.registry.targets.find((candidate) => candidate.id === id);
-      return `<div class="launch-leg" data-selected="${esc(id)}"><div class="launch-leg-h"><b>${esc(displayName(target))}</b><span class="tag">${esc(target.category)}</span><span class="route">USDT · ${routeName(target)}</span><button type="button" class="rm" data-remove="${esc(id)}">Remove</button></div><div class="fields"><label class="field"><span>Basket weight</span><div class="suffix"><input data-weight="${esc(id)}" value="${selected.weightBps / 100}" inputmode="decimal"><b>%</b></div></label></div></div>`;
+      const routing = target.routeSelection?.mode === "pinned-pool" ? "Pinned pool" : "Best route";
+      const poolFee = target.routeSelection?.fee ?? target.swap.path?.[0]?.fee;
+      const fee = Number.isFinite(poolFee) ? `${poolFee / 10000}% fee` : "fee unavailable";
+      return `<div class="launch-leg" data-selected="${esc(id)}"><div class="launch-leg-h"><b>${esc(displayName(target))}</b><span class="tag">${esc(target.category)}</span><span class="route">${routing} · ${fee} · ${formatUsd(target.liquidity?.usd)} TVL · ${routeName(target)}</span><button type="button" class="rm" data-remove="${esc(id)}">Remove</button></div><div class="fields"><label class="field"><span>Basket weight</span><div class="suffix"><input data-weight="${esc(id)}" value="${selected.weightBps / 100}" inputmode="decimal"><b>%</b></div></label></div></div>`;
     });
     $("#selected-list").innerHTML = rows.join("") || `<div class="allocation-empty">Select at least one crypto or bStock target.</div>`;
     $$('[data-weight]').forEach((input) => input.addEventListener("input", () => {
@@ -464,6 +475,7 @@
         tokenAddress: target.address,
         weightBps: selected.weightBps,
         swap: target.swap,
+        routing: target.routeSelection || { mode: "registry-pinned" },
         discovery: target.discovery || null,
         postPurchase: market ? {
           mode: "yield-market",
@@ -663,9 +675,9 @@
       const pool = ADDRESS_RE.test(result.poolAddress) ? `${result.poolAddress.slice(0, 6)}…${result.poolAddress.slice(-4)}` : "pool";
       const fee = result.feePct ? `${result.feePct}% fee` : "fee unavailable";
       const token = `${result.address.slice(0, 6)}…${result.address.slice(-4)}`;
-      return `<button type="button" class="mkt" data-search-address="${esc(result.address)}" aria-label="Verify ${esc(result.symbol)} on-chain"><span aria-hidden="true">+</span><span class="logo-stack">◈</span><span class="t">${esc(result.symbol)}<small>${esc(result.name)} · CA ${esc(token)} · ${esc(result.version)} · ${esc(fee)} · Pool ${esc(pool)}</small></span><span class="apy"><b>${cap ? `${capLabel} ${formatUsd(cap)}` : "MC unavailable"}</b><em>Liquidity ${formatUsd(result.liquidityUsd)}</em></span></button>`;
+      return `<button type="button" class="mkt" data-search-address="${esc(result.address)}" data-search-pool="${esc(result.poolAddress)}" aria-label="Pin ${esc(result.symbol)} ${esc(result.version)} pool"><span aria-hidden="true">+</span><span class="logo-stack">◈</span><span class="t">${esc(result.symbol)}<small>${esc(result.name)} · CA ${esc(token)} · ${esc(result.version)} · ${esc(fee)} · Pool ${esc(pool)}</small></span><span class="apy"><b>${cap ? `${capLabel} ${formatUsd(cap)}` : "MC unavailable"}</b><em>Liquidity ${formatUsd(result.liquidityUsd)}</em></span></button>`;
     }).join("");
-    $$('[data-search-address]').forEach((button) => button.addEventListener("click", () => findContractPool(button.dataset.searchAddress)));
+    $$('[data-search-address]').forEach((button) => button.addEventListener("click", () => findContractPool(button.dataset.searchAddress, button.dataset.searchPool)));
   }
 
   let tokenSearchController = null;
@@ -703,7 +715,7 @@
     }
   }
 
-  async function findContractPool(addressOverride) {
+  async function findContractPool(addressOverride, requestedPoolAddress) {
     const address = typeof addressOverride === "string" ? addressOverride.trim() : $("#search").value.trim();
     if (!S.registry) return showCaStatus("Market registry is still loading.", true);
     if (!ADDRESS_RE.test(address)) return showCaStatus("Enter a valid BSC contract address.", true);
@@ -712,8 +724,10 @@
     button.textContent = "Checking…";
     showCaStatus("Checking the token and Pancake routes on BNB Chain.", false);
     try {
-      const target = await discoverContractTarget(address, false);
-      if (!S.registry.targets.some((candidate) => candidate.id === target.id)) S.registry.targets.unshift(target);
+      const target = await discoverContractTarget(address, false, requestedPoolAddress);
+      const targetIndex = S.registry.targets.findIndex((candidate) => candidate.id === target.id);
+      if (targetIndex === -1) S.registry.targets.unshift(target);
+      else if (target.dynamic) S.registry.targets.splice(targetIndex, 1, target);
       if (!S.selected.has(target.id)) {
         if (S.selected.size >= S.registry.policy.maxTargets) throw new Error(`Maximum ${S.registry.policy.maxTargets} targets.`);
         S.selected.set(target.id, { weightBps: 0, marketId: "" });
@@ -725,7 +739,8 @@
       S.forkPassed = false;
       draw();
       const warning = target.dynamic ? " Custom contracts are not security-audited." : "";
-      showCaStatus(`${displayName(target)} · ${routeName(target)} · ${formatUsd(target.liquidity.usd)} TVL.${warning}`, false);
+      const routing = target.routeSelection?.mode === "pinned-pool" ? "Pinned pool" : "Automatic route";
+      showCaStatus(`${displayName(target)} · ${routing} · ${routeName(target)} · ${formatUsd(target.liquidity.usd)} TVL.${warning}`, false);
     } catch (error) {
       showCaStatus(error?.message || "Unable to verify this contract.", true);
     } finally {
@@ -776,7 +791,11 @@
     const rows = $$("#steps li");
     try {
       const customTargets = [...S.selected.keys()].map((id) => S.registry.targets.find((target) => target.id === id)).filter((target) => target?.dynamic);
-      const fresh = await Promise.all(customTargets.map((target) => discoverContractTarget(target.address, true)));
+      const fresh = await Promise.all(customTargets.map((target) => discoverContractTarget(
+        target.address,
+        true,
+        target.routeSelection?.mode === "pinned-pool" ? target.routeSelection.poolAddress : "",
+      )));
       fresh.forEach((target, index) => {
         const pinned = customTargets[index];
         const routeChanged = target.swap.protocol !== pinned.swap.protocol
@@ -786,7 +805,13 @@
             return hop.protocol !== oldHop.protocol || hop.fee !== oldHop.fee || hop.poolAddress.toLowerCase() !== oldHop.poolAddress.toLowerCase();
           });
         if (routeChanged) {
-          throw new Error(`${displayName(pinned)} best verified route changed. Find the CA again.`);
+          throw new Error(`${displayName(pinned)} verified route changed. Select the pool again.`);
+        }
+        const selected = S.selected.get(pinned.id);
+        const deploymentBps = S.mode === "lump-sum" ? 9500 : Math.round(num($("#tranche").value) * 100);
+        const initialOrderUsd = num($("#seed").value) * deploymentBps / 10000 * selected.weightBps / 10000;
+        if (initialOrderUsd > target.liquidity.usd * 0.001) {
+          throw new Error(`${displayName(pinned)} selected pool no longer supports the initial order within the 0.1% TVL limit.`);
         }
       });
     } catch (error) {
@@ -811,7 +836,7 @@
 8:X
 d:X
 d:C
-0:{"buildId":"X9R2WnB9iElzpI3-0dq2H","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"bodyClass":"has-mcta","html":"$3","runtimeVersion":"2d0b01e4e7b6","script":"$4","pageKey":"create"}],["$L5"],"$L6"]}],"isPartial":"$@7","staleTime":"$8","varyParams":null},{"rsc":"$L9","isPartial":"$@a","staleTime":"$8","varyParams":null},{"rsc":"$Lb","isPartial":"$@c","staleTime":"$8","varyParams":"$d"},{"rsc":"$Le","isPartial":"$@f","staleTime":"$8","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@10","rootVaryParams":null,"needsRuntimeRequest":"$@11"}
+0:{"buildId":"5Ek6We0geWJZqzaJWaWwm","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"bodyClass":"has-mcta","html":"$3","runtimeVersion":"2d0b01e4e7b6","script":"$4","pageKey":"create"}],["$L5"],"$L6"]}],"isPartial":"$@7","staleTime":"$8","varyParams":null},{"rsc":"$L9","isPartial":"$@a","staleTime":"$8","varyParams":null},{"rsc":"$Lb","isPartial":"$@c","staleTime":"$8","varyParams":"$d"},{"rsc":"$Le","isPartial":"$@f","staleTime":"$8","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@10","rootVaryParams":null,"needsRuntimeRequest":"$@11"}
 12:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
 13:"$Sreact.suspense"
 15:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]
