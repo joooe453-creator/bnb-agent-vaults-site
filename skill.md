@@ -38,10 +38,14 @@ Never ask your owner for their private key, seed phrase or a signature you canno
 ```
 list_markets({ asset: "stable", action: "lend" })
 → [ { id: "lista-vault-0xb5a3", name: "RockawayX PT Yield", kind: "Vault", apy: 4.14, tvlUsd: 1770000 },
-    { id: "venus-supply-usdc", name: "Venus · USDC", kind: "Market", apy: 3.87 }, … ]
+    { id: "venus-supply-usdc", name: "Venus · USDC", kind: "Market", apy: 3.87 },
+    { id: "lista-vault-0x8a06", name: "Lista USDC Vault", kind: "Vault", apy: 0.01,
+      incentives: [{ token: "LISTA", apy: 9.24 }], tvlUsd: 930000 }, … ]
 ```
 
 `asset` is one of `stable`, `bnb`, `majors`, `stocks`. `action` is one of `lend` (Lista lending vaults, Venus supply markets, BNB staking), `trade` (hold the token), `lp` (PancakeSwap V3 pools) or `borrow` (loops). Loops also return their platform leverage cap and liquidation LTV. Lending vaults are curated baskets and often pay more than a single supply market — compare both.
+
+`apy` is the base rate. `incentives` are protocol rewards: the platform keeper claims them daily and sells them into USDT for every holder, so they reach NAV without you trading them. `points` are not distributed.
 
 ## 4. Propose the vault
 
@@ -49,11 +53,10 @@ A vault is a list of operations. Choose every exact market yourself and give it 
 
 A loop also sets `maxLeverage`. Its allocation percentage is net Vault capital before leverage; gross exposure can therefore be as high as `maxAllocationPct × effective leverage`. Each loop uses the lower of your leverage cap and its platform cap. Anything not explicitly selected is off limits.
 
-Every market is entered from the vault's own asset (`USDT` or `BNB`) and exits back to it. Any swap on the way — USDT into USDC for a USDC vault, USDT into NVDAB for an NVDAB loop — is part of the market and priced against the oracle. You do not need a separate `trade` rule to reach a market.
+Every vault accounts in USDT. Every market is entered from USDT and exits back to it. Any swap on the way — USDT into USDC for a USDC vault, USDT into NVDAB for an NVDAB loop — is part of the market and priced against the oracle. You do not need a separate `trade` rule to reach a market.
 
 ```
 create_vault({
-  asset: "USDT",
   rules: [
     { asset: "stable", action: "lend",
       markets: [
@@ -90,6 +93,16 @@ simulate_execute(vault, [
 build_execute(vault, actions)   → { to, data }
 ```
 
+```
+simulate_execute(vault, [
+  { op: "move", from: "lista-vault-0xfa27", to: "venus-supply-usd1", amount: "50000",
+    reason: "Venus USD1 1.90% vs Gauntlet USD1 1.07%" }
+])
+→ { ok: true, apyFrom: 1.07, apyTo: 1.90, costUsd: 0.3, paybackDays: 0.3 }
+```
+
+A lending position can move to another market in your rules for the same token without swapping. Whether it is worth it is your call; the platform sets no threshold.
+
 Sign `{ to, data }` locally with your operator key and send it. Every action needs a `reason`; it is shown on the vault's public timeline.
 
 If a simulation reverts, read the reason and change the plan. Do not retry the same call.
@@ -113,6 +126,6 @@ You cannot change these. Actions that break them revert.
 | `list_markets` | Every listed market for an asset and an action, with rate, size and loop caps |
 | `create_vault` | Propose exact markets and NAV caps; returns the depositor sentence, risk level and a sign link |
 | `get_vault_state` | NAV, positions, leverage, idle cash, limits, pending changes |
-| `simulate_execute` | Dry-run actions from your key; plain-language revert reasons |
+| `simulate_execute` | Dry-run actions from your key; plain-language revert reasons; for a move, the APY gain, cost and payback |
 | `build_execute` | Calldata to sign locally with your operator key |
 | `propose_settings` | Lower/remove now; raise allocation/leverage caps or add markets after 24 hours |

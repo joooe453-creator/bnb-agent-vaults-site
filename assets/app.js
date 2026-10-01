@@ -100,7 +100,7 @@
     lend({ id: "venus-supply-usd1", g: "stable", venue: "venus", kind: "Market", name: "Venus · USD1", sub: "Core pool supply", apy: 1.90, tokens: ["USD1"] });
     lend({ id: "lista-vault-0x9a17", g: "stable", venue: "lista", kind: "Vault", name: "Gauntlet x Lista DAO U Vault", sub: "U · curated by Gauntlet x Lista DAO", apy: 1.41, tvl: 49.93e6, tokens: ["U"] });
     lend({ id: "lista-vault-0xfa27", g: "stable", venue: "lista", kind: "Vault", name: "Gauntlet x Lista DAO USD1 Vault", sub: "USD1 · curated by Gauntlet x Lista DAO", apy: 1.07, tvl: 138.20e6, tokens: ["USD1"] });
-    lend({ id: "lista-vault-0x8a06", g: "stable", venue: "lista", kind: "Vault", name: "Lista USDC Vault", sub: "USDC · curated by Lista DAO", apy: 0.01, apyNote: "+9.24% LISTA, not counted", tvl: 0.93e6, tokens: ["USDC"] });
+    lend({ id: "lista-vault-0x8a06", g: "stable", venue: "lista", kind: "Vault", name: "Lista USDC Vault", sub: "USDC · curated by Lista DAO", apy: 0.01, incentives: [{ token: "LISTA", apy: 9.24 }], tvl: 0.93e6, tokens: ["USDC"] });
     // BNB
     lend({ id: "lista-vault-0xd5cf", g: "bnb", venue: "lista", kind: "Vault", name: "MEV BNB Vault", sub: "BNB · curated by MEV Capital", apy: 1.72, tvl: 0.03e6, tokens: ["BNB"] });
     lend({ id: "lista-stake-slisbnb", g: "bnb", venue: "lista", kind: "Staking", name: "Stake BNB → slisBNB", sub: "Lista liquid staking · exits via DEX, or a 7–15 day unstake", apy: 0.83, tokens: ["slisBNB"] });
@@ -140,6 +140,8 @@
       id, g: groupOf(coll), a: "borrow", venue, kind: "Loop", name: `${coll} / ${loan}`, tokens: [coll, loan],
       loop: { kind, coll, loan, lltv, cap, def, borrow, rew, liq, sub, yld, stake: !!stake, max: 1 / (1 - cap / 100), dflt: 1 / (1 - def / 100) },
     }));
+    const POINTS = { "lista-susde-usdt": "Ethena 5x points" };
+    M.forEach((m) => { if (POINTS[m.id]) m.points = POINTS[m.id]; });
     const byId = Object.fromEntries(M.map((m) => [m.id, m]));
     const denomFam = (asset) => (asset === "BNB" ? "bnb" : "stable");
     // Holding the vault's own asset is not a market.
@@ -160,6 +162,9 @@
     }
     const levTxt = (x) => (Math.round(x * 10) / 10).toFixed(1) + "×";
     const pct = (n) => (n == null ? "—" : (n >= 10 ? n.toFixed(1) : n.toFixed(2)) + "%");
+    const incentiveApy = (m) => (m.incentives || []).reduce((s, x) => s + x.apy, 0);
+    const totalApy = (m) => (m.apy || 0) + incentiveApy(m);
+    const incentiveTxt = (m) => (m.incentives || []).map((x) => `+ ${pct(x.apy)} $${x.token} incentive`).join(" ");
     const capTxt = (n) => `${Math.round((Number(n) || 0) * 10) / 10}%`;
     const usd = (n) => (n >= 1e6 ? "$" + (n / 1e6).toFixed(n >= 1e8 ? 0 : 1) + "M" : "$" + Math.round(n / 1e3) + "K");
     // Leverage x on a loop: LTV = 1 − 1/x. Liquidation comes after the collateral falls by 1 − LTV / LLTV against the loan.
@@ -205,7 +210,7 @@
       return `${name} can ${joinAnd(phrases)}. <em>Nothing else.</em>`;
     }
     const maxLeverage = (rules) => Math.max(1, ...rules.filter((r) => r.a === "borrow").flatMap((r) => ruleMarkets(r).map((m) => effLev(m, r.lev))));
-    return { label, GROUPS, ACTIONS, MARKETS: M, byId, BSTOCKS, VNAME, groupOf, familyOf, denomFam, marketsFor, ruleMarkets, allocationCap, totalAllocation, minIdleAllocation, effLev, riskOf, levTxt, pct, capTxt, usd, loopRisk, carry, pairNames, describe, maxLeverage };
+    return { label, GROUPS, ACTIONS, MARKETS: M, byId, BSTOCKS, VNAME, groupOf, familyOf, denomFam, marketsFor, ruleMarkets, allocationCap, totalAllocation, minIdleAllocation, effLev, riskOf, levTxt, pct, incentiveApy, totalApy, incentiveTxt, capTxt, usd, loopRisk, carry, pairNames, describe, maxLeverage };
   })();
 
   /* ------------------------------------------------------------------ */
@@ -253,27 +258,29 @@
       ],
     },
     {
-      slug: "liquid-staking-loop", name: "Liquid Staking Loop", manager: "Kepler AI", agentId: 1422, agentVaults: 1, symbol: "avLSL", asset: "BNB", benchmark: "Hold slisBNB", managerType: "agent",
+      slug: "liquid-staking-loop", name: "Liquid Staking Loop", manager: "Kepler AI", agentId: 1422, agentVaults: 1, symbol: "avLSL", asset: "USDT", demoUnit: "BNB", benchmark: "Hold slisBNB", managerType: "agent",
       rules: [{ g: "bnb", a: "borrow", m: ["lista-slisbnb-bnb-fixed-term"], caps: { "lista-slisbnb-bnb-fixed-term": 90 }, lev: 5 }],
-      strategy: "slisBNB loop on Lista at about 4.6× with the idle buffer kept at 10%.",
+      strategy: "Buys BNB with USDT, stakes it to slisBNB and loops on Lista at about 4.6×. In USDT it moves with BNB; in BNB it earns the staking carry.",
       runtimeDays: 41, returns: { "7D": 0.04, "30D": 0.18, "90D": null, ALL: 0.24 }, maxDrawdown: { "7D": -0.02, "30D": -0.05, "90D": null, ALL: -0.06 },
-      tvl: 1940000, followers: 677, status: "Live", sharePrice: 1.0024, fees: { perf: 10, mgmt: 0, platform: 3 }, cap: null, exitCost: "≈ 0.8% on 10 BNB",
+      tvl: 1940000, followers: 677, status: "Live", sharePrice: 1.0024, fees: { perf: 10, mgmt: 0, platform: 5 }, cap: null, exitCost: "≈ 0.8% on $7.5K",
       positions: [
         { p: "Lista DAO", loc: "slisBNB / BNB · fixed-term", w: 90, by: "Staking rate × BNB − debt", st: "LTV 78.4% · 4.6×" },
-        { p: "Idle", loc: "BNB in vault", w: 10, by: "Balance", st: "Instant exits" },
+        { p: "Idle", loc: "USDT in vault", w: 10, by: "Balance", st: "Instant exits" },
       ],
     },
     {
       slug: "mag7-rotation", name: "Mag 7 Rotation", manager: "Tickerline", agentId: null, agentVaults: 2, symbol: "avM7R", asset: "USDT", benchmark: "Hold SPYB", managerType: "human",
-      rules: [{ g: "stocks", a: "trade", m: ["pcs-hold-nvdab", "pcs-hold-googlb", "pcs-hold-aaplb"], caps: { "pcs-hold-nvdab": 30, "pcs-hold-googlb": 25, "pcs-hold-aaplb": 20 } }],
-      strategy: "Rotates between the largest US tech names in bStocks, holding USDT when momentum fades.",
+      rules: [{ g: "stocks", a: "trade", m: ["pcs-hold-nvdab", "pcs-hold-googlb", "pcs-hold-aaplb"], caps: { "pcs-hold-nvdab": 30, "pcs-hold-googlb": 25, "pcs-hold-aaplb": 20 } }, { g: "stable", a: "lend", m: ["lista-vault-0xfa27", "venus-supply-usd1"], caps: { "lista-vault-0xfa27": 10, "venus-supply-usd1": 10 } }],
+      strategy: "Rotates between the largest US tech names in bStocks and parks spare cash in USD1 lending when momentum fades.",
       runtimeDays: 52, returns: { "7D": 1.42, "30D": 4.91, "90D": null, ALL: 7.84 }, maxDrawdown: { "7D": -1.18, "30D": -3.96, "90D": null, ALL: -5.72 },
       tvl: 1210000, followers: 512, status: "Live", sharePrice: 1.0784, fees: { perf: 15, mgmt: 0, platform: 5 }, cap: 1500000, exitCost: "0.2–0.7% at $100K",
       positions: [
         { p: "PancakeSwap", loc: "NVDAB", w: 28, by: "Atlas · APRO · TWAP", st: "Held" },
         { p: "PancakeSwap", loc: "GOOGLB", w: 22, by: "Atlas · TWAP", st: "Held" },
         { p: "PancakeSwap", loc: "AAPLB", w: 18, by: "Atlas · TWAP", st: "Held" },
-        { p: "Idle", loc: "USDT in vault", w: 32, by: "Balance", st: "Instant exits" },
+        { p: "Lista DAO", loc: "Gauntlet x Lista DAO USD1 Vault", market: "lista-vault-0xfa27", w: 10, by: "Vault shares", st: "Supplying · 1.07%" },
+        { p: "Venus", loc: "vUSD1", market: "venus-supply-usd1", w: 6, by: "vToken × exchange rate", st: "Supplying · 1.90%" },
+        { p: "Idle", loc: "USDT in vault", w: 16, by: "Balance", st: "Instant exits" },
       ],
     },
     {
@@ -455,6 +462,67 @@
       }
     }
     return (seriesCache[v.slug] = out.map((p, i) => ({ t: TODAY - (N - i) * DAY, v: p })));
+  }
+
+  const BNB_USD = 758.28; // demo spot, 2026-09-30
+  let bnbCache;
+  function bnbSeries() {
+    if (bnbCache) return bnbCache;
+    const N = 200, r = rng("bnb-usd-demo"), w = [0];
+    for (let i = 1; i <= N; i++) w.push(w[i - 1] + gauss(r) * 0.025);
+    const shift = w[N];
+    return (bnbCache = w.map((x, i) => ({ t: TODAY - (N - i) * DAY, v: BNB_USD * Math.exp(x - shift) })));
+  }
+  function bnbAt(t) {
+    const s = bnbSeries(), i = Math.round((t - s[0].t) / DAY);
+    return s[Math.max(0, Math.min(s.length - 1, i))].v;
+  }
+
+  // NAV per share measured in BNB, indexed so launch = the USDT launch NAV (1.0000).
+  function seriesIn(v, unit) {
+    const s = navSeries(v);
+    if (unit !== "BNB") return s;
+    const b0 = bnbAt(s[0].t);
+    return s.map((p) => ({ t: p.t, v: (p.v * b0) / bnbAt(p.t) }));
+  }
+
+  // Return, annualized return and max drawdown for a period, in USDT (stored figures) or BNB (derived).
+  function statsIn(v, p, unit) {
+    if (v.returns[p] == null) return null;
+    if (unit !== "BNB") return { ret: v.returns[p], ann: perf(v, p, "annualized"), dd: v.maxDrawdown[p] };
+    const all = seriesIn(v, "BNB"), n = p === "ALL" ? all.length : Math.min(all.length, periodDays(v, p) + 1), s = all.slice(-n);
+    const ret = (s[s.length - 1].v / s[0].v - 1) * 100;
+    let peak = s[0].v, dd = 0;
+    s.forEach((x) => { peak = Math.max(peak, x.v); dd = Math.min(dd, (x.v / peak - 1) * 100); });
+    const ann = v.runtimeDays < 30 ? null : (Math.pow(1 + ret / 100, 365 / periodDays(v, p)) - 1) * 100;
+    return { ret, ann, dd };
+  }
+
+  const UNIT_KEY = "bav:display-unit";
+  function displayUnit() { try { return localStorage.getItem(UNIT_KEY) === "BNB" ? "BNB" : "USDT"; } catch (_) { return "USDT"; } }
+  function setDisplayUnit(u) {
+    try { localStorage.setItem(UNIT_KEY, u); } catch (_) {}
+    window.dispatchEvent(new CustomEvent("bav:unit", { detail: u }));
+  }
+
+  function normalizeDemoUnits() {
+    VAULTS.filter((v) => v.demoUnit === "BNB").forEach((v) => {
+      const native = navSeries(v);                       // built from the BNB-terms figures
+      const b0 = bnbAt(native[0].t);
+      const usdt = native.map((p) => ({ t: p.t, v: (p.v * bnbAt(p.t)) / b0 }));
+      seriesCache[v.slug] = usdt;                         // navSeries(v) now returns the USDT series
+      const end = usdt[usdt.length - 1].v;
+      v.sharePrice = end;
+      ["7D", "30D", "90D", "ALL"].forEach((k) => {
+        if (v.returns[k] == null) return;
+        const n = k === "ALL" ? usdt.length : Math.min(usdt.length, periodDays(v, k) + 1), s = usdt.slice(-n);
+        v.returns[k] = +((end / s[0].v - 1) * 100).toFixed(2);
+        let peak = s[0].v, dd = 0;
+        s.forEach((x) => { peak = Math.max(peak, x.v); dd = Math.min(dd, (x.v / peak - 1) * 100); });
+        v.maxDrawdown[k] = +dd.toFixed(2);
+      });
+      delete v.demoUnit;
+    });
   }
 
   /* ------------------------------------------------------------------ */
@@ -671,7 +739,7 @@
         $("line", hov).setAttribute("x1", px); $("line", hov).setAttribute("x2", px);
         $("circle", hov).setAttribute("cx", px); $("circle", hov).setAttribute("cy", py);
         const chg = (pts[i].v / pts[0].v - 1) * 100;
-        tip.innerHTML = `<div class="d">${fmt.date(pts[i].t)}</div><b>${pts[i].v.toFixed(4)}</b> NAV / share &nbsp;<span style="color:#5E636C">${fmt.pct(chg)}</span>`;
+        tip.innerHTML = `<div class="d">${fmt.date(pts[i].t)}</div><b>${pts[i].v.toFixed(4)}</b> ${esc(opts.unitLabel || "NAV / share")} &nbsp;<span style="color:#5E636C">${fmt.pct(chg)}</span>`;
         tip.style.left = Math.min(Math.max(px, 90), W - 90) + "px";
         tip.style.top = py + "px";
         tip.style.opacity = 1;
@@ -776,6 +844,7 @@
   const vaultMarkets = (v) => (v.rules || []).flatMap(CATALOG.ruleMarkets);
   const vaultVenues = (v) => [...new Set(vaultMarkets(v).map((m) => m.venue))];
   const vaultRisk = (v) => CATALOG.riskOf(vaultMarkets(v), v.asset) || "Low";
+  const bnbNoPriceRisk = (v) => vaultRisk(v) === "High" && CATALOG.riskOf(vaultMarkets(v), "BNB") !== "High";
   const managerLabel = (v) => (v.managerType === "human" ? `${v.manager} · Human-managed` : `${v.manager} · ERC-8004 #${v.agentId}`);
   const rulesLabel = (v) => {
     const operations = vaultMarkets(v).length;
@@ -783,11 +852,13 @@
     return `${operations} operation${operations === 1 ? "" : "s"} · ${CATALOG.capTxt(allocated)} max deployed`;
   };
 
+  normalizeDemoUnits();
+
   window.BAV = {
-    TODAY, DAY, SLOTS, ASSETS, VENUES, VAULTS, CATALOG, vaultMarkets, vaultVenues, vaultRisk, managerLabel, rulesLabel,
+    TODAY, DAY, SLOTS, ASSETS, VENUES, VAULTS, CATALOG, vaultMarkets, vaultVenues, vaultRisk, bnbNoPriceRisk, managerLabel, rulesLabel,
     platformFeeForRisk, feeBreakdown,
     $, $$, esc, fmt, perf, periodDays, historyTag, riskMeter, statusTag,
-    rng, hexAddr, short, navSeries, sparkline, lineChart, logo, agentCanvas, stackTables,
+    rng, hexAddr, short, navSeries, BNB_USD, bnbSeries, bnbAt, seriesIn, statsIn, displayUnit, setDisplayUnit, sparkline, lineChart, logo, agentCanvas, stackTables,
     shell, footerHTML, wireShell, toast, SEAL, route, DEMO_OWNER, demo,
     vault: (slug) => VAULTS.find((v) => v.slug === slug),
   };

@@ -3,8 +3,8 @@
 3:I[37457,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default"]
 4:I[81384,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js"],"PrototypePage"]
 b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default",1]
-:HL["/bnb-agent-vaults-site/_next/static/chunks/1yt1cn5fjjyfx.css","style"]
-5:Tb4c,
+:HL["/bnb-agent-vaults-site/_next/static/chunks/0kzveem4shzqp.css","style"]
+5:Tbb5,
 
 <section class="page-head">
   <div class="wrap">
@@ -21,7 +21,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
 <section>
   <div class="wrap">
     <div class="toolbar">
-      <div class="seg" id="f-asset"><button class="on" data-v="USDT">USDT</button><button data-v="BNB">BNB</button></div>
+      <span class="label">Returns in</span><div class="seg" id="f-unit"><button data-v="USDT">USDT</button><button data-v="BNB">BNB</button></div>
       <div class="seg" id="f-filter">
         <button class="on" data-v="all">All</button><button data-v="new">New &lt;30D</button>
       </div>
@@ -41,7 +41,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
 
     <div class="method">
       <span class="tag sim">Simulated</span>
-      <span><b>Methodology.</b> Returns come from on-chain NAV per share after all fees — not advertised APR. Rankings are separated by vault currency because a BNB return and a USDT return are not comparable. Annualized figures are withheld under 30 days of history.</span>
+      <span><b>Methodology.</b> Returns come from on-chain NAV per share after all fees — not advertised APR. Every vault accounts in USDT. Switch to BNB to see the same returns measured in BNB (NAV per share ÷ BNB price; BNB price simulated). Risk levels and fees are always set in USDT. Annualized figures are withheld under 30 days of history.</span>
     </div>
 
     <div class="tbl-scroll">
@@ -69,12 +69,12 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
 
 
 
-6:T1121,
+6:T132b,
 (function () {
-  const { $, $$, VAULTS, fmt, perf, riskMeter, statusTag, historyTag, navSeries, sparkline, managerLabel, rulesLabel, vaultRisk, vaultVenues } = BAV;
+  const { $, $$, VAULTS, fmt, riskMeter, statusTag, historyTag, sparkline, managerLabel, rulesLabel, vaultRisk, vaultVenues } = BAV;
   BAV.shell("vaults.html");
 
-  const st = { asset: "USDT", filter: "all", q: "", period: "30D", mode: "return", sort: "ra" };
+  const st = { unit: BAV.displayUnit(), filter: "all", q: "", period: "30D", mode: "return", sort: "ra" };
 
   const tot = VAULTS.reduce((a, v) => a + v.tvl, 0);
   const dep = VAULTS.reduce((a, v) => a + v.followers, 0);
@@ -92,12 +92,17 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
       render();
     }));
   }
-  seg("f-asset", "asset"); seg("f-filter", "filter"); seg("f-period", "period"); seg("f-mode", "mode");
+  $$("#f-unit button").forEach((b) => {
+    b.classList.toggle("on", b.dataset.v === st.unit);
+    b.addEventListener("click", () => { st.unit = b.dataset.v; BAV.setDisplayUnit(st.unit); render(); });
+  });
+  window.addEventListener("bav:unit", (e) => { st.unit = e.detail; $$("#f-unit button").forEach((b) => b.classList.toggle("on", b.dataset.v === st.unit)); });
+  seg("f-filter", "filter"); seg("f-period", "period"); seg("f-mode", "mode");
   $("#f-q").addEventListener("input", (e) => { st.q = e.target.value.toLowerCase(); render(); });
   $("#f-sort").addEventListener("change", (e) => { st.sort = e.target.value; render(); });
 
   function sliceSeries(v) {
-    const s = navSeries(v);
+    const s = BAV.seriesIn(v, st.unit);
     const d = st.period === "ALL" ? s.length : Math.min(s.length, (st.period === "7D" ? 7 : st.period === "30D" ? 30 : 90) + 1);
     return s.slice(-d);
   }
@@ -108,28 +113,27 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     $("#h-dd").textContent = `${lbl} max DD`;
 
     let rows = VAULTS.filter((v) => {
-      if (v.asset !== st.asset) return false;
       if (st.filter === "new" && v.runtimeDays >= 30) return false;
       if (st.q && !(v.name + " " + v.manager).toLowerCase().includes(st.q)) return false;
       return true;
     });
     const key = {
-      ra: (v) => { const r = v.returns[p], d = v.maxDrawdown[p]; return r == null ? -Infinity : r / Math.max(Math.abs(d || 0), 0.25); },
+      ra: (v) => { const s = BAV.statsIn(v, p, st.unit); return s == null ? -Infinity : s.ret / Math.max(Math.abs(s.dd || 0), 0.25); },
       tvl: (v) => v.tvl,
-      perf: (v) => perf(v, p, st.mode) ?? -Infinity,
-      dd: (v) => v.maxDrawdown[p] ?? -Infinity,
+      perf: (v) => { const s = BAV.statsIn(v, p, st.unit); return s == null ? -Infinity : (st.mode === "annualized" ? s.ann : s.ret) ?? -Infinity; },
+      dd: (v) => BAV.statsIn(v, p, st.unit)?.dd ?? -Infinity,
       age: (v) => v.runtimeDays,
     }[st.sort];
     rows.sort((a, b) => key(b) - key(a));
 
     $("#dir tbody").innerHTML = rows.map((v) => {
-      const r = perf(v, p, st.mode), dd = v.maxDrawdown[p], ht = historyTag(v);
+      const stats = BAV.statsIn(v, p, st.unit), r = stats == null ? null : st.mode === "annualized" ? stats.ann : stats.ret, dd = stats?.dd, ht = historyTag(v);
       const copy = v.copyOf ? BAV.vault(v.copyOf.slug) : null;
-      const reason = r == null ? (st.mode === "annualized" && v.returns[p] != null ? "Under 30 days" : "Insufficient history") : "";
+      const reason = r == null ? (stats && st.mode === "annualized" && stats.ann == null ? "Under 30 days" : "Insufficient history") : "";
       return `<tr data-slug="${v.slug}">
-        <td><div class="vname"><span class="n">${v.name}</span><span class="m">${managerLabel(v)} · ${v.asset}</span>
+        <td><div class="vname"><span class="n">${v.name}</span><span class="m">${managerLabel(v)}</span>
           <span class="tags">${statusTag(v)}${ht ? `<span class="tag">${ht}</span>` : ""}${copy ? `<span class="tag warn">Follows ${copy.name} · ${v.copyOf.lag} later</span>` : ""}</span></div></td>
-        <td><div style="font-size:14px">${rulesLabel(v)}</div>${riskMeter(vaultRisk(v))}</td>
+        <td><div style="font-size:14px">${rulesLabel(v)}</div>${riskMeter(vaultRisk(v))}${st.unit === "BNB" && BAV.bnbNoPriceRisk(v) ? `<div class="fine">No BNB price risk</div>` : ""}</td>
         <td><span class="logo-stack">${vaultVenues(v).map((id) => BAV.logo(id, "md")).join("")}</span></td>
         <td class="r">${v.sharePrice.toFixed(4)}</td>
         <td class="r ${fmt.cls(r)}">${r == null ? `<span class="na">${reason}</span>` : fmt.pct(r)}</td>
@@ -141,12 +145,12 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
       </tr>`;
     }).join("") || `<tr><td colspan="10" class="muted" style="padding:40px 0;text-align:center">No vaults match these filters.</td></tr>`;
     $$("#dir tbody tr[data-slug]").forEach((tr) => tr.addEventListener("click", () => (location.href = BAV.route("vault/" + tr.dataset.slug))));
-    $("#count").textContent = `Showing ${rows.length} of ${VAULTS.filter((v) => v.asset === st.asset).length} ${st.asset}-currency vaults. Exit cost is today's estimate of the slippage a redeemer pays; it is paid by the person leaving, not by the vault.`;
+    $("#count").textContent = `Showing ${rows.length} of ${VAULTS.length} vaults. Exit cost is today's estimate of the slippage a redeemer pays; it is paid by the person leaving, not by the vault.`;
   }
   render();
 })();
 9:X
-0:{"P":null,"c":["","vaults",""],"q":"","i":false,"f":[[["",{"children":["vaults",{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/1yt1cn5fjjyfx.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"bodyClass":"","html":"$5","runtimeVersion":"60f4844a753a","script":"$6","pageKey":"vaults"}],["$L7"],"$L8"]}],{},null,false,null]},null,false,"$9"]},null,false,null],"$La",false]],"m":"$undefined","G":["$b",["$Lc"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"w8M32aUJ1r4M5vue90itq"}
+0:{"P":null,"c":["","vaults",""],"q":"","i":false,"f":[[["",{"children":["vaults",{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/0kzveem4shzqp.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"bodyClass":"","html":"$5","runtimeVersion":"417783b7b940","script":"$6","pageKey":"vaults"}],["$L7"],"$L8"]}],{},null,false,null]},null,false,"$9"]},null,false,null],"$La",false]],"m":"$undefined","G":["$b",["$Lc"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"c2JXPEJdATUUZLmMGKtS-"}
 d:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
 e:"$Sreact.suspense"
 10:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]
@@ -154,7 +158,7 @@ e:"$Sreact.suspense"
 7:["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js","async":true,"nonce":"$undefined"}]
 8:["$","$Ld",null,{"children":["$","$e",null,{"name":"Next.MetadataOutlet","children":"$@f"}]}]
 a:["$","$1","h",{"children":[null,["$","$L10",null,{"children":"$L11"}],["$","div",null,{"hidden":true,"children":["$","$L12",null,{"children":["$","$e",null,{"name":"Next.Metadata","children":"$L13"}]}]}],null]}]
-c:["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/1yt1cn5fjjyfx.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]
+c:["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/0kzveem4shzqp.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]
 9:C
 11:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
 14:I[27201,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"IconMark"]
