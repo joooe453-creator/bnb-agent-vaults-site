@@ -1,6 +1,6 @@
 1:"$Sreact.fragment"
 2:I[81384,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js"],"PrototypePage"]
-3:T6c3d,
+3:T6c50,
 
 <header class="masthead float" id="mh">
   <div class="wrap">
@@ -35,7 +35,7 @@
   <div class="hero-content">
     <div class="wrap">
       <h1 class="display">Your agent can run a fund. <span>And earn like one.</span></h1>
-      <p class="lede">A phase-one prototype for fixed and scheduled bStock/crypto baskets, with optional asset-matched Venus or Lista yield after purchase.</p>
+      <p class="lede">A phase-one prototype for fixed and scheduled bStock/crypto baskets, with optional asset-matched Aave, Venus, or Lista yield after purchase.</p>
       <div class="hero-cta">
         <a class="btn" href="/bnb-agent-vaults-site/create/">Launch an agent vault <span class="arr">→</span></a>
         <a class="btn ghost" href="/bnb-agent-vaults-site/vaults/">Explore vaults</a>
@@ -98,7 +98,7 @@
             <dl class="kv">
               <dt>Plan</dt><dd>Weekly or −5% basket drawdown</dd>
               <dt>Basket</dt><dd>WBNB · BTCB · ETH</dd>
-              <dt>After purchase</dt><dd>Exact Venus/Lista market or hold</dd>
+              <dt>After purchase</dt><dd>Exact Aave/Venus/Lista market or hold</dd>
               <dt>Risk</dt><dd>High · price risk against USDT</dd>
               <dt>Owner seed</dt><dd>100.00 USDT · lock enforcement pending</dd>
               <dt>Launch</dt><dd class="ok">One signature</dd>
@@ -308,7 +308,7 @@
             <li data-t="02:14">Only a registry-pinned PancakeSwap pool and bounded execution are eligible.</li>
             <li data-t="02:15">Schedule and drawdown triggers share the same 24-hour cooldown.</li>
             <li data-t="02:40">At least 5% remains idle under the phase-one policy.</li>
-            <li data-t="09:00">Unsupported Venus or Lista markets are unavailable rather than silently substituted.</li>
+            <li data-t="09:00">Unsupported Aave, Venus, or Lista markets are unavailable rather than silently substituted.</li>
           </ol>
         </div>
       </div>
@@ -488,7 +488,7 @@
   BAV.lineChart($("#shot-chart"), BAV.navSeries(v), { height: 280, left: 0, label: "Sherwood Crypto Accumulator simulated NAV per share" });
 })();
 8:X
-0:{"buildId":"1T9K1N-Pjln-ImGR7UeWY","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"bodyClass":"","html":"$3","runtimeVersion":"2d0b01e4e7b6","script":"$4","pageKey":"landing"}],["$L5"],"$L6"]}],"isPartial":"$@7","staleTime":"$8","varyParams":null},{"rsc":"$L9","isPartial":"$@a","staleTime":"$8","varyParams":null},{"rsc":"$Lb","isPartial":"$@c","staleTime":"$8","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@d","rootVaryParams":null,"needsRuntimeRequest":"$@e"}
+0:{"buildId":"wLbmE8cDtb9ESl374gply","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"bodyClass":"","html":"$3","runtimeVersion":"db09e1a4c069","script":"$4","pageKey":"landing"}],["$L5"],"$L6"]}],"isPartial":"$@7","staleTime":"$8","varyParams":null},{"rsc":"$L9","isPartial":"$@a","staleTime":"$8","varyParams":null},{"rsc":"$Lb","isPartial":"$@c","staleTime":"$8","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@d","rootVaryParams":null,"needsRuntimeRequest":"$@e"}
 f:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
 10:"$Sreact.suspense"
 12:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]

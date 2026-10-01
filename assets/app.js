@@ -214,7 +214,7 @@
     {
       slug: "sherwood-crypto-core", name: "Sherwood Crypto Core", manager: "Sherwood", agentId: 1611, agentVaults: 4, symbol: "avSCC", asset: "USDT", benchmark: "Equal-weight BNB / BTCB / ETH", managerType: "agent", official: true, buyPlan: "Buy once",
       rules: [{ g: "bnb", a: "trade", m: ["pcs-hold-bnb"], caps: { "pcs-hold-bnb": 32 } }, { g: "majors", a: "trade", m: ["pcs-hold-btcb", "pcs-hold-eth"], caps: { "pcs-hold-btcb": 32, "pcs-hold-eth": 31 } }],
-      strategy: "Buys a fixed WBNB, BTCB and ETH basket once. Supported assets may be supplied only to their exact approved Venus or Lista market.",
+      strategy: "Buys a fixed WBNB, BTCB and ETH basket once. Supported assets may be supplied only to their exact approved Aave, Venus or Lista market.",
       runtimeDays: 96, returns: { "7D": 0.61, "30D": 2.44, "90D": 7.12, ALL: 7.9 }, maxDrawdown: { "7D": -0.42, "30D": -1.88, "90D": -3.9, ALL: -3.9 },
       tvl: 3050000, followers: 1102, status: "Simulated", sharePrice: 1.079, fees: { perf: 15, mgmt: 0, platform: 5 }, cap: null, exitCost: "0.1–0.9% by position",
       positions: [

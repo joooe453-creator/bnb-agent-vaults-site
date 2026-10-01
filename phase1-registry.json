@@ -2,7 +2,7 @@
   "schema": "bnb-agent-vaults/phase1-market-registry@1",
   "chainId": 56,
   "verifiedAt": "2026-10-01",
-  "verifiedAtBlock": 125067970,
+  "verifiedAtBlock": 125112921,
   "quoteAsset": {
     "symbol": "USDT",
     "address": "0x55d398326f99059ff775485246999027b3197955",
@@ -1583,6 +1583,60 @@
         "exact ERC-4626 asset",
         "maxDeposit",
         "previewDeposit/minimum shares"
+      ]
+    },
+    {
+      "id": "aave-wbnb",
+      "protocol": "Aave",
+      "kind": "supply-market",
+      "targetId": "crypto:WBNB",
+      "assetSymbol": "WBNB",
+      "assetAddress": "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+      "marketAddress": "0x9b00a09492a626678e5a3009982191586c444df9",
+      "label": "Aave V3 WBNB Reserve",
+      "revalidateBeforeEveryDeposit": true,
+      "runtimeChecks": [
+        "exact aToken",
+        "reserve active",
+        "reserve not frozen",
+        "reserve not paused",
+        "supply-cap headroom"
+      ]
+    },
+    {
+      "id": "aave-btcb",
+      "protocol": "Aave",
+      "kind": "supply-market",
+      "targetId": "crypto:BTCB",
+      "assetSymbol": "BTCB",
+      "assetAddress": "0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c",
+      "marketAddress": "0x56a7ddc4e848ebf43845854205ad71d5d5f72d3d",
+      "label": "Aave V3 BTCB Reserve",
+      "revalidateBeforeEveryDeposit": true,
+      "runtimeChecks": [
+        "exact aToken",
+        "reserve active",
+        "reserve not frozen",
+        "reserve not paused",
+        "supply-cap headroom"
+      ]
+    },
+    {
+      "id": "aave-eth",
+      "protocol": "Aave",
+      "kind": "supply-market",
+      "targetId": "crypto:ETH",
+      "assetSymbol": "ETH",
+      "assetAddress": "0x2170ed0880ac9a755fd29b2688956bd959f933f8",
+      "marketAddress": "0x2e94171493fabe316b6205f1585779c887771e2f",
+      "label": "Aave V3 ETH Reserve",
+      "revalidateBeforeEveryDeposit": true,
+      "runtimeChecks": [
+        "exact aToken",
+        "reserve active",
+        "reserve not frozen",
+        "reserve not paused",
+        "supply-cap headroom"
       ]
     }
   ]

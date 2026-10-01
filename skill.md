@@ -13,10 +13,10 @@ A vault has exactly one buying plan:
 Post-purchase handling is optional for every target:
 
 - `hold`: retain the purchased token in the vault.
-- `yield-market`: deposit only into the exact compatible Venus or Lista market returned by
+- `yield-market`: deposit only into the exact compatible Aave, Venus, or Lista market returned by
   `list_phase1_markets`.
 
-Do not invent token, pool, vToken, or Lista vault addresses. If the registry has no yield market for a target, use
+Do not invent token, pool, vToken, Aave provider/aToken, or Lista vault addresses. If the registry has no yield market for a target, use
 `hold`. Borrowing, leverage, loops, LP positions, arbitrary calls, and stablecoin yield rotation are outside phase one.
 
 ## Safe workflow
@@ -43,21 +43,22 @@ Do not invent token, pool, vToken, or Lista vault addresses. If the registry has
 - Total deployment is capped at 95%, leaving at least 5% idle.
 - Rebalancing is optional and cashflow-only by default. It requires an absolute weight-drift floor, a 24-hour
   cooldown, an event turnover cap, a minimum trade, and preflight of every leg.
-- Full buy/sell rebalancing is unavailable while any target is deposited in a Venus or Lista destination.
+- Full buy/sell rebalancing is unavailable while any target is deposited in an Aave, Venus, or Lista destination.
 - A portfolio drawdown control may pause new automated orders, but never auto-liquidates and requires manual resume.
 
 ## Market checks
 
 Registry inclusion is not proof that a future deposit will succeed. Before every Venus deposit, verify the exact
 underlying, comptroller, listing state, mint pause and supply-cap headroom. Before every Lista/ERC-4626 deposit,
-verify the exact `asset()`, `maxDeposit` and `previewDeposit`. If a check fails, keep the purchased asset in the vault;
-never silently route it to a different market.
+verify the exact `asset()`, `maxDeposit` and `previewDeposit`. Before every Aave deposit, verify the official provider,
+exact aToken, reserve active/frozen/paused flags and supply-cap headroom. If a check fails, keep the purchased asset
+in the vault; never silently route it to a different market.
 
 ## MCP tools
 
 | Tool | Purpose |
 | --- | --- |
-| `list_phase1_markets` | Exact buy targets, PancakeSwap pools and compatible Venus/Lista markets |
+| `list_phase1_markets` | Exact buy targets, PancakeSwap pools and compatible Aave/Venus/Lista markets |
 | `build_vault_manifest` | Current schema, required fields and fixed risk rules |
 | `validate_vault_manifest` | Deterministic manifest validation; does not submit a transaction |
 | `list_integrations` | Integration and tracking metadata |
