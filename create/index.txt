@@ -3,8 +3,8 @@
 3:I[37457,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default"]
 4:I[81384,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js"],"PrototypePage"]
 b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default",1]
-:HL["/bnb-agent-vaults-site/_next/static/chunks/109b3rjc9a8nh.css","style"]
-5:T2f3d,
+:HL["/bnb-agent-vaults-site/_next/static/chunks/3qxppyfa540o1.css","style"]
+5:T3272,
 
 <section class="page-head">
   <div class="wrap wide">
@@ -36,8 +36,9 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
             <div class="field"><span>Asset type</span><div class="radio-row"><label><input type="radio" name="filter" value="all" checked>All</label><label><input type="radio" name="filter" value="crypto">Crypto</label><label><input type="radio" name="filter" value="bstock">bStocks</label></div></div>
           </div>
           <div id="ca-status" class="hide" aria-live="polite"></div>
-          <div class="mkt-list hide" id="token-search-results" style="margin-top:18px"></div>
-          <div class="mkt-list" id="target-list" style="margin-top:18px"><div class="allocation-empty">Loading verified targets…</div></div>
+          <div class="sub-h" style="margin-top:18px"><span>Available assets</span><em id="target-count" aria-live="polite">Loading…</em></div>
+          <div class="mkt-list hide" id="token-search-results" tabindex="0" role="region" aria-label="Token search results"></div>
+          <div class="mkt-list" id="target-list" tabindex="0" role="region" aria-label="Available basket assets"><div class="allocation-empty">Loading verified targets…</div></div>
           <div class="sub-h" style="margin-top:28px"><span>Selected basket</span><em id="weight-total">0% / 100%</em></div>
           <div class="allocation-inputs" id="selected-list"></div>
         </div>
@@ -121,6 +122,11 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
           </div>
           <div class="sub-h" style="margin-top:28px"><span>Optional destination</span><em>Supply market and Vault are different products</em></div>
           <div class="allocation-inputs" id="post-purchase-list"></div>
+          <div class="yield-estimate" style="margin-top:18px">
+            <div class="yield-estimate-head"><span>Estimated portfolio yield APY</span><b id="portfolio-yield">—</b></div>
+            <p>Base lending interest at target weights with 95% invested and 5% cash. Assumes constant rates; excludes price returns, rewards and vault fees. Accumulation shows the fully invested scenario.</p>
+            <div class="yield-estimate-foot"><span id="yield-update">Loading rate snapshot…</span><button type="button" class="link" id="refresh-yields">Refresh rates</button></div>
+          </div>
         </div>
       </section>
 
@@ -167,7 +173,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
 
 
 
-6:Tbd61,
+6:Td6a4,
 (function () {
   "use strict";
   const { $, $$, esc, toast, DEMO_OWNER, hexAddr } = BAV;
@@ -180,6 +186,8 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     search: "",
     tokenSearchResults: [],
     selected: new Map(),
+    yieldTools: null,
+    yieldSnapshot: null,
     forkPassed: false,
     launched: false,
   };
@@ -364,6 +372,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
       symbol,
       displaySymbol: known?.displaySymbol || symbol,
       ticker: known?.ticker || symbol,
+      underlyingName: known?.underlyingName,
       address: normalized,
       decimals,
       dynamic: true,
@@ -401,17 +410,54 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
         throw new Error("Unexpected market registry");
       }
       S.registry = registry;
-      ["crypto:WBNB", "crypto:BTCB", "crypto:ETH"].forEach((id, index) => {
-        S.selected.set(id, { weightBps: index === 0 ? 3400 : 3300, marketId: "" });
-      });
+      loadYieldSnapshot();
       $("#registry-note").textContent = `${registry.targets.length} targets · liquidity at block ${registry.targets[0]?.liquidity?.verifiedAtBlock ?? "—"} · destinations rechecked before deposit.`;
       draw();
     })
     .catch((error) => {
       $("#target-list").innerHTML = `<div class="state-note error-note"><span class="dot"></span><span>${esc(error.message)}. Launch is disabled.</span></div>`;
+      $("#target-count").textContent = "Unavailable";
       $("#registry-note").textContent = "Registry unavailable. No target or yield market can be selected.";
       validate();
     });
+
+  const formatApy = (apy) => apy > 0 && apy < 0.0001 ? "<0.01%" : `${(apy * 100).toFixed(2)}%`;
+  const assetUrl = (name) => location.protocol === "file:" ? name : `${window.__BAV_BASE_PATH__ || ""}/${name}`;
+
+  async function loadYieldSnapshot() {
+    try {
+      const [module, response] = await Promise.all([
+        import(assetUrl("assets/yield-rates.mjs")), fetch(assetUrl("phase1-yields.json")),
+      ]);
+      S.yieldTools = module;
+      if (!response.ok) throw new Error("Rate snapshot unavailable");
+      const snapshot = await response.json();
+      if (snapshot.schema !== "bnb-agent-vaults/yield-rates@1" || snapshot.chainId !== 56) throw new Error("Invalid rate snapshot");
+      S.yieldSnapshot = snapshot;
+    } catch (error) {
+      $("#yield-update").textContent = error.message;
+    }
+    drawPostPurchase();
+    refresh();
+  }
+
+  $("#refresh-yields").addEventListener("click", async () => {
+    const button = $("#refresh-yields");
+    button.disabled = true;
+    button.textContent = "Refreshing…";
+    try {
+      if (!S.registry) throw new Error("Market registry is still loading.");
+      S.yieldTools ||= await import(assetUrl("assets/yield-rates.mjs"));
+      S.yieldSnapshot = await S.yieldTools.fetchYieldRates(S.registry);
+      drawPostPurchase();
+      refresh();
+    } catch (error) {
+      $("#yield-update").textContent = `Refresh failed: ${error.message}`;
+    } finally {
+      button.disabled = false;
+      button.textContent = "Refresh rates";
+    }
+  });
 
   function compatibleMarkets(targetId) {
     return S.registry ? S.registry.yieldMarkets.filter((market) => market.targetId === targetId) : [];
@@ -436,17 +482,18 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     const query = S.search.toLowerCase();
     const targets = S.registry.targets.filter((target) => {
       const typeMatch = S.filter === "all" || target.category === S.filter;
-      const textMatch = !query || `${displayName(target)} ${target.symbol} ${target.ticker} ${target.address}`.toLowerCase().includes(query);
+      const textMatch = !query || `${displayName(target)} ${target.symbol} ${target.ticker} ${target.underlyingName || ""} ${target.address}`.toLowerCase().includes(query);
       return typeMatch && textMatch;
     });
+    $("#target-count").textContent = `${targets.length} assets${targets.length > 5 ? " · Scroll to browse" : ""}`;
     $("#target-list").innerHTML = targets.map((target) => {
       const checked = S.selected.has(target.id);
       const detail = target.category === "bstock"
-        ? target.ticker
-        : (target.dynamic ? `Custom CA · ${target.address.slice(0, 6)}…${target.address.slice(-4)}` : `MC #${target.marketCapRank}`);
+        ? target.underlyingName || target.ticker
+        : (target.dynamic ? `Custom CA · ${target.address.slice(0, 6)}…${target.address.slice(-4)}` : "");
       const liquidityLabel = target.liquidity?.usd < 50000 ? "Low TVL" : "Pool TVL";
       const routeDetail = target.swap.path?.length > 1 ? `${target.swap.path.length} pools` : `${target.swap.fee / 10000}% fee`;
-      return `<label class="mkt ${checked ? "" : "off"}"><input type="checkbox" data-target="${esc(target.id)}" ${checked ? "checked" : ""}><span class="logo-stack">${target.category === "crypto" ? "◈" : "▦"}</span><span class="t">${esc(displayName(target))}<small>${esc(detail)}</small></span><span class="apy"><b>${formatUsd(target.liquidity?.usd)}</b><em>${liquidityLabel} · ${routeName(target)} · ${routeDetail}</em></span></label>`;
+      return `<label class="mkt ${checked ? "" : "off"}"><input type="checkbox" data-target="${esc(target.id)}" ${checked ? "checked" : ""}><span class="t">${esc(displayName(target))}${detail ? `<small>${esc(detail)}</small>` : ""}</span><span class="apy"><b>${formatUsd(target.liquidity?.usd)}</b><em>${liquidityLabel} · ${routeName(target)} · ${routeDetail}</em></span></label>`;
     }).join("") || `<div class="allocation-empty">No target matches this filter.</div>`;
     $$('[data-target]').forEach((input) => input.addEventListener("change", () => {
       if (input.checked) {
@@ -497,17 +544,38 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
       const options = [`<option value="">Keep in portfolio</option>`]
         .concat(markets.map((market) => {
           const kind = market.kind === "supply-market" ? "Supply market" : "Vault";
-          return `<option value="${esc(market.id)}" ${selected.marketId === market.id ? "selected" : ""}>${esc(market.protocol)} · ${kind} · ${esc(market.label)}</option>`;
+          const deposit = S.yieldTools?.currentDepositStatus(S.yieldSnapshot, market);
+          const apy = S.yieldTools?.currentRate(S.yieldSnapshot, market);
+          return `<option value="${esc(market.id)}" ${selected.marketId === market.id ? "selected" : ""} ${deposit?.supplyEnabled ? "" : "disabled"}>${esc(market.protocol)} · ${kind} · ${esc(market.label)} · ${apy === null || apy === undefined ? "APY unavailable" : `${formatApy(apy)} base APY`}${deposit?.supplyEnabled ? "" : ` · ${esc(deposit?.reason || "Status unverified")}`}</option>`;
         }));
-      const note = id === "bstock:SPCXB"
-        ? `<p class="market-note">Lista has no SPCXB deposit vault. SPCXB is collateral in other Lista markets, not the supplied asset.</p>`
-        : (!markets.length ? `<p class="market-note">No exact-asset Venus supply market or Lista vault.</p>` : "");
-      return `<div class="launch-leg" data-post-purchase="${esc(id)}"><div class="launch-leg-h"><b>${esc(displayName(target))}</b><span class="tag">${esc(target.category)}</span></div><div class="fields"><label class="field"><span>Destination</span><select data-market="${esc(id)}">${options.join("")}</select></label></div>${note}</div>`;
+      const unavailable = (S.registry.unavailableMarkets || []).filter((market) => market.targetId === id);
+      const unavailableOptions = unavailable.map((market) => `<option disabled>${esc(market.label)} · ${esc(market.reason)}</option>`);
+      const references = (S.registry.collateralMarkets || []).filter((market) => market.targetId === id);
+      const referenceOptions = references.map((market) => `<option disabled>Lista · Collateral market · ${esc(market.collateralSymbol)}/${esc(market.loanSymbol)} · View below</option>`);
+      const rate = selected.marketId ? markets.find((market) => market.id === selected.marketId) : null;
+      const apy = rate && S.yieldTools ? S.yieldTools.currentRate(S.yieldSnapshot, rate) : null;
+      const deposit = rate && S.yieldTools ? S.yieldTools.currentDepositStatus(S.yieldSnapshot, rate) : null;
+      const capacity = deposit?.headroomRaw === null ? "Uncapped" : deposit?.headroomRaw
+        ? `${(Number(deposit.headroomRaw) / (10 ** target.decimals)).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${target.symbol}` : null;
+      const depositDetail = rate ? `<p class="market-note" data-deposit-status="${esc(id)}">${esc(deposit?.reason || "Supply status unverified — refresh rates")}${deposit?.supplyEnabled && capacity ? ` · Remaining deposit capacity: ${esc(capacity)}` : ""}. Rechecked before each deposit.</p>` : "";
+      const rateDetail = rate
+        ? `<p class="market-note" data-yield-rate="${esc(id)}"><b>Base lending APY ${apy === null ? "Unavailable" : formatApy(apy)}</b> · rewards excluded${S.yieldSnapshot?.markets?.[rate.id]?.sourceUrl ? ` · <a href="${esc(S.yieldSnapshot.markets[rate.id].sourceUrl)}" target="_blank" rel="noopener noreferrer">Rate source</a>` : ""}</p>`
+        : `<p class="market-note" data-yield-rate="${esc(id)}">Base lending APY 0.00% · holding earns no lending interest.</p>`;
+      const note = !markets.length ? `<p class="market-note">No verified exact-asset yield destination.</p>` : "";
+      const referenceNotes = references.map((market) => {
+        const reference = S.yieldSnapshot?.collateralMarkets?.[market.id];
+        const age = Date.now() - Date.parse(reference?.fetchedAt);
+        const nativeApy = reference?.status === "available" && age >= -60000 && age <= 86400000 ? reference.nativeApy : null;
+        return `<p class="market-note collateral-reference"><a href="${esc(market.sourceUrl)}" target="_blank" rel="noopener noreferrer">Lista ${esc(market.collateralSymbol)}/${esc(market.loanSymbol)} market ↗</a><span>${esc(market.collateralSymbol)} is collateral; lenders supply ${esc(market.loanSymbol)}. Collateral native APY ${nativeApy === null ? "unavailable" : formatApy(nativeApy)}. Campaign rewards are separate. Collateral deposits are not enabled in this vault.</span></p>`;
+      }).join("");
+      const unavailableNotes = unavailable.map((market) => `<p class="market-note"><a href="${esc(market.sourceUrl)}" target="_blank" rel="noopener noreferrer">${esc(market.label)}</a> · ${esc(market.reason)} · checked ${esc(new Date(market.verifiedAt).toLocaleString())}.</p>`).join("");
+      return `<div class="launch-leg" data-post-purchase="${esc(id)}"><div class="launch-leg-h"><b>${esc(displayName(target))}</b><span class="tag">${esc(target.category)}</span></div><div class="fields"><label class="field"><span>Destination</span><select data-market="${esc(id)}">${options.join("")}${unavailableOptions.join("")}${referenceOptions.join("")}</select></label></div>${rateDetail}${depositDetail}${note}${unavailableNotes}${referenceNotes}</div>`;
     });
     $("#post-purchase-list").innerHTML = rows.join("") || `<div class="allocation-empty">Choose targets in step 1 before configuring post-purchase handling.</div>`;
     $$('[data-market]').forEach((select) => select.addEventListener("change", () => {
       S.selected.get(select.dataset.market).marketId = select.value;
       S.forkPassed = false;
+      drawPostPurchase();
       refresh();
     }));
   }
@@ -639,6 +707,13 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     const total = [...S.selected.values()].reduce((sum, row) => sum + row.weightBps, 0);
     if (total !== 10000) out.push(["s-1", `Basket weights must total 100% (currently ${(total / 100).toFixed(2)}%).`]);
     if ([...S.selected.values()].some((row) => !(row.weightBps > 0))) out.push(["s-1", "Every selected target needs a positive weight."]);
+    for (const [id, row] of S.selected.entries()) {
+      if (!row.marketId) continue;
+      const market = compatibleMarkets(id).find((candidate) => candidate.id === row.marketId);
+      if (!market || S.yieldTools?.currentDepositStatus(S.yieldSnapshot, market)?.supplyEnabled !== true) {
+        out.push(["s-2", "A selected destination has no fresh open supply status. Refresh rates or keep the asset in the portfolio."]);
+      }
+    }
     if (S.registry && num($("#seed").value) > 0) {
       const deploymentBps = S.mode === "lump-sum" ? 9500 : Math.round(num($("#tranche").value) * 100);
       for (const [id, row] of S.selected.entries()) {
@@ -689,6 +764,17 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     $("#s-plan").textContent = $("#rebalance-on").checked ? `${planLabel} + rebalance` : planLabel;
     $("#s-targets").textContent = String(S.selected.size);
     $("#s-markets").textContent = String(marketCount);
+    const yieldRows = [...S.selected.entries()].map(([targetId, row]) => ({ targetId, ...row }));
+    const estimatedApy = S.yieldTools && S.registry ? S.yieldTools.portfolioYield(yieldRows, S.registry.yieldMarkets, S.yieldSnapshot) : null;
+    $("#portfolio-yield").textContent = estimatedApy === null ? "—" : formatApy(estimatedApy);
+    if (S.yieldSnapshot) {
+      const age = Date.now() - Date.parse(S.yieldSnapshot.fetchedAt);
+      const timestamp = new Date(S.yieldSnapshot.fetchedAt).toLocaleString();
+      const rates = Object.values(S.yieldSnapshot.markets);
+      const available = rates.filter((rate) => rate.status === "available").length;
+      const open = rates.filter((rate) => rate.deposit?.supplyEnabled === true).length;
+      $("#yield-update").textContent = `${age > 86400000 ? "Snapshot expired · refresh rates" : `Updated ${timestamp} · ${available}/${rates.length} rates · ${open} open destinations`} · before vault fees`;
+    }
     $("#issues").innerHTML = errors.length
       ? errors.map(([, message]) => `<li class="bad"><i></i><span>${esc(message)}</span></li>`).join("")
       : `<li class="ok"><i></i><span>Configuration is internally consistent. Run the fork check before launch.</span></li>`;
@@ -798,13 +884,14 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     }
     node.classList.remove("hide");
     $("#target-list").classList.add("hide");
+    $("#target-count").textContent = `${S.tokenSearchResults.length} pools${S.tokenSearchResults.length > 5 ? " · Scroll to browse" : ""}`;
     node.innerHTML = S.tokenSearchResults.map((result) => {
       const cap = result.marketCapUsd ?? result.fdvUsd;
       const capLabel = result.marketCapUsd ? "MC" : "FDV";
       const pool = ADDRESS_RE.test(result.poolAddress) ? `${result.poolAddress.slice(0, 6)}…${result.poolAddress.slice(-4)}` : "pool";
       const fee = result.feePct ? `${result.feePct}% fee` : "fee unavailable";
       const token = `${result.address.slice(0, 6)}…${result.address.slice(-4)}`;
-      return `<button type="button" class="mkt" data-search-address="${esc(result.address)}" data-search-pool="${esc(result.poolAddress)}" aria-label="Pin ${esc(result.symbol)} ${esc(result.version)} pool"><span aria-hidden="true">+</span><span class="logo-stack">◈</span><span class="t">${esc(result.symbol)}<small>${esc(result.name)} · CA ${esc(token)} · ${esc(result.version)} · ${esc(fee)} · Pool ${esc(pool)}</small></span><span class="apy"><b>${cap ? `${capLabel} ${formatUsd(cap)}` : "MC unavailable"}</b><em>Liquidity ${formatUsd(result.liquidityUsd)}</em></span></button>`;
+      return `<button type="button" class="mkt" data-search-address="${esc(result.address)}" data-search-pool="${esc(result.poolAddress)}" aria-label="Pin ${esc(result.symbol)} ${esc(result.version)} pool"><span aria-hidden="true">+</span><span class="t">${esc(result.symbol)}<small>${esc(result.name)} · CA ${esc(token)} · ${esc(result.version)} · ${esc(fee)} · Pool ${esc(pool)}</small></span><span class="apy"><b>${cap ? `${capLabel} ${formatUsd(cap)}` : "MC unavailable"}</b><em>Liquidity ${formatUsd(result.liquidityUsd)}</em></span></button>`;
     }).join("");
     $$('[data-search-address]').forEach((button) => button.addEventListener("click", () => findContractPool(button.dataset.searchAddress, button.dataset.searchPool)));
   }
@@ -998,7 +1085,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
   function validate() { refresh(); }
 })();
 9:X
-0:{"P":null,"c":["","create",""],"q":"","i":false,"f":[[["",{"children":["create",{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/109b3rjc9a8nh.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"bodyClass":"has-mcta","html":"$5","runtimeVersion":"db09e1a4c069","script":"$6","pageKey":"create"}],["$L7"],"$L8"]}],{},null,false,null]},null,false,"$9"]},null,false,null],"$La",false]],"m":"$undefined","G":["$b",["$Lc"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"wLbmE8cDtb9ESl374gply"}
+0:{"P":null,"c":["","create",""],"q":"","i":false,"f":[[["",{"children":["create",{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/3qxppyfa540o1.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"bodyClass":"has-mcta","html":"$5","runtimeVersion":"db09e1a4c069","script":"$6","pageKey":"create"}],["$L7"],"$L8"]}],{},null,false,null]},null,false,"$9"]},null,false,null],"$La",false]],"m":"$undefined","G":["$b",["$Lc"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"2A03bJnrvDrUmF3SwYB9a"}
 d:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
 e:"$Sreact.suspense"
 10:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]
@@ -1006,7 +1093,7 @@ e:"$Sreact.suspense"
 7:["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js","async":true,"nonce":"$undefined"}]
 8:["$","$Ld",null,{"children":["$","$e",null,{"name":"Next.MetadataOutlet","children":"$@f"}]}]
 a:["$","$1","h",{"children":[null,["$","$L10",null,{"children":"$L11"}],["$","div",null,{"hidden":true,"children":["$","$L12",null,{"children":["$","$e",null,{"name":"Next.Metadata","children":"$L13"}]}]}],null]}]
-c:["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/109b3rjc9a8nh.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]
+c:["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/3qxppyfa540o1.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]
 9:C
 11:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
 14:I[27201,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"IconMark"]

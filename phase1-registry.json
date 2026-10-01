@@ -2,7 +2,7 @@
   "schema": "bnb-agent-vaults/phase1-market-registry@1",
   "chainId": 56,
   "verifiedAt": "2026-10-01",
-  "verifiedAtBlock": 125112921,
+  "verifiedAtBlock": 125127123,
   "quoteAsset": {
     "symbol": "USDT",
     "address": "0x55d398326f99059ff775485246999027b3197955",
@@ -398,6 +398,7 @@
       "category": "bstock",
       "symbol": "AAPLB",
       "ticker": "AAPL",
+      "underlyingName": "Apple Inc.",
       "address": "0x431a3bee82e2ca41e49895cbece5bb0f76a89b7a",
       "decimals": 18,
       "swap": {
@@ -429,6 +430,7 @@
       "category": "bstock",
       "symbol": "AMCB",
       "ticker": "AMC",
+      "underlyingName": "AMC Entertainment Holdings",
       "address": "0x96e7d606e229448ef817a7f35fd7394c3e15d00c",
       "decimals": 18,
       "swap": {
@@ -460,6 +462,7 @@
       "category": "bstock",
       "symbol": "AMZNB",
       "ticker": "AMZN",
+      "underlyingName": "Amazon.com, Inc.",
       "address": "0x1a4b499833a79a09ad7cf1d42d7dacf71e92eb00",
       "decimals": 18,
       "swap": {
@@ -491,6 +494,7 @@
       "category": "bstock",
       "symbol": "BABAB",
       "ticker": "BABA",
+      "underlyingName": "Alibaba Group Holding",
       "address": "0x4ef9d3062c7f6eba4aae4990c5036598c6eff4ec",
       "decimals": 18,
       "swap": {
@@ -522,6 +526,7 @@
       "category": "bstock",
       "symbol": "BMNRB",
       "ticker": "BMNR",
+      "underlyingName": "Bitmine Immersion Technologies",
       "address": "0x3548da95a9effe481e8604664d75e95821e557f5",
       "decimals": 18,
       "swap": {
@@ -553,6 +558,7 @@
       "category": "bstock",
       "symbol": "BNCB",
       "ticker": "BNC",
+      "underlyingName": "CEA Industries",
       "address": "0x4902c5ebc598265ed2212b559b042de8a5eeec3f",
       "decimals": 18,
       "swap": {
@@ -584,6 +590,7 @@
       "category": "bstock",
       "symbol": "CRCLB",
       "ticker": "CRCL",
+      "underlyingName": "Circle Internet Group",
       "address": "0x80f3d493ebce97e343c53d29a137942416b4ffc0",
       "decimals": 18,
       "swap": {
@@ -615,6 +622,7 @@
       "category": "bstock",
       "symbol": "DJTB",
       "ticker": "DJT",
+      "underlyingName": "Trump Media & Technology Group",
       "address": "0xf2ec508422174ee564de98187db9359d318afb6b",
       "decimals": 18,
       "swap": {
@@ -646,6 +654,7 @@
       "category": "bstock",
       "symbol": "FLNCB",
       "ticker": "FLNC",
+      "underlyingName": "Fluence Energy",
       "address": "0x4af1d41cd9dd950dca43984b43aaa2a8702714ac",
       "decimals": 18,
       "swap": {
@@ -677,6 +686,7 @@
       "category": "bstock",
       "symbol": "GMEB",
       "ticker": "GME",
+      "underlyingName": "GameStop Corp.",
       "address": "0x46ceefda28dd7207059ed19b0acdc026955bb15c",
       "decimals": 18,
       "swap": {
@@ -708,6 +718,7 @@
       "category": "bstock",
       "symbol": "GOOGLB",
       "ticker": "GOOGL",
+      "underlyingName": "Alphabet Inc. (Google)",
       "address": "0x3f53de71c126bdabae20f9cd64848d317f6c3238",
       "decimals": 18,
       "swap": {
@@ -739,6 +750,7 @@
       "category": "bstock",
       "symbol": "HOODB",
       "ticker": "HOOD",
+      "underlyingName": "Robinhood Markets",
       "address": "0xa394dcea3fd3847fd793afbfd163e2e3858b7c65",
       "decimals": 18,
       "swap": {
@@ -770,6 +782,7 @@
       "category": "bstock",
       "symbol": "INTCB",
       "ticker": "INTC",
+      "underlyingName": "Intel Corporation",
       "address": "0xe614e2fc6c787035ff51f452e8e826bfd32d5283",
       "decimals": 18,
       "swap": {
@@ -801,6 +814,7 @@
       "category": "bstock",
       "symbol": "METAB",
       "ticker": "META",
+      "underlyingName": "Meta Platforms",
       "address": "0x7425889fe94f9d693e8daefe88bcced6acfef4c0",
       "decimals": 18,
       "swap": {
@@ -832,6 +846,7 @@
       "category": "bstock",
       "symbol": "MRNAB",
       "ticker": "MRNA",
+      "underlyingName": "Moderna, Inc.",
       "address": "0x5fd86da9b05abe396fe9d02a4a213a7c00556503",
       "decimals": 18,
       "swap": {
@@ -863,6 +878,7 @@
       "category": "bstock",
       "symbol": "MSFTB",
       "ticker": "MSFT",
+      "underlyingName": "Microsoft Corporation",
       "address": "0x80106cb3ead06659a5ad19df39d9b4733863b9b0",
       "decimals": 18,
       "swap": {
@@ -894,6 +910,7 @@
       "category": "bstock",
       "symbol": "MSTRB",
       "ticker": "MSTR",
+      "underlyingName": "Strategy Inc. (MicroStrategy)",
       "address": "0xe87afb3076aeb0f9b14e368de8145ae6a2826a14",
       "decimals": 18,
       "swap": {
@@ -925,6 +942,7 @@
       "category": "bstock",
       "symbol": "MUB",
       "ticker": "MU",
+      "underlyingName": "Micron Technology",
       "address": "0xcdf2f3e0fa43c47a6662a91c9e4a7c5f69762699",
       "decimals": 18,
       "swap": {
@@ -956,6 +974,7 @@
       "category": "bstock",
       "symbol": "NFLXB",
       "ticker": "NFLX",
+      "underlyingName": "Netflix, Inc.",
       "address": "0xd6829ea836b6fa224d099d40e54b31262f874631",
       "decimals": 18,
       "swap": {
@@ -987,6 +1006,7 @@
       "category": "bstock",
       "symbol": "NOKB",
       "ticker": "NOK",
+      "underlyingName": "Nokia Corporation",
       "address": "0x7c4d7a180d737dd5a70d8065a90e6746a69c37ea",
       "decimals": 18,
       "swap": {
@@ -1018,6 +1038,7 @@
       "category": "bstock",
       "symbol": "NVDAB",
       "ticker": "NVDA",
+      "underlyingName": "NVIDIA Corporation",
       "address": "0x02fca66c1d1afb4e2a7884261eb00f63598a7436",
       "decimals": 18,
       "swap": {
@@ -1049,6 +1070,7 @@
       "category": "bstock",
       "symbol": "QQQB",
       "ticker": "QQQ",
+      "underlyingName": "Invesco QQQ ETF",
       "address": "0x205812cdbed920aff76c6580abd681a46d11efc7",
       "decimals": 18,
       "swap": {
@@ -1080,6 +1102,7 @@
       "category": "bstock",
       "symbol": "SKHYB",
       "ticker": "SKHY",
+      "underlyingName": "SK hynix",
       "address": "0xca750ef65f295bbecd685abf54e82caf297bdb61",
       "decimals": 18,
       "swap": {
@@ -1111,6 +1134,7 @@
       "category": "bstock",
       "symbol": "SNDKB",
       "ticker": "SNDK",
+      "underlyingName": "Sandisk Corporation",
       "address": "0x3ee4df61bd4f867e349beae8bfe07bc31b4850fb",
       "decimals": 18,
       "swap": {
@@ -1142,6 +1166,7 @@
       "category": "bstock",
       "symbol": "SNXXB",
       "ticker": "SNXX",
+      "underlyingName": "Tradr 2X Long SNDK Daily ETF",
       "address": "0x9e82e3da8f1115b73d24bb24113ab836ffdab6b6",
       "decimals": 18,
       "swap": {
@@ -1173,6 +1198,7 @@
       "category": "bstock",
       "symbol": "SOXLB",
       "ticker": "SOXL",
+      "underlyingName": "Direxion Daily Semiconductor Bull 3X ETF",
       "address": "0xd97d097a89113fa59b76c572e5b2eb647e8eefaf",
       "decimals": 18,
       "swap": {
@@ -1204,6 +1230,7 @@
       "category": "bstock",
       "symbol": "SOXSB",
       "ticker": "SOXS",
+      "underlyingName": "Direxion Daily Semiconductor Bear 3X ETF",
       "address": "0xe28cd11c99af2df76bb8ada4cd0ef3904378280f",
       "decimals": 18,
       "swap": {
@@ -1235,6 +1262,7 @@
       "category": "bstock",
       "symbol": "SPCXB",
       "ticker": "SPCX",
+      "underlyingName": "SpaceX",
       "address": "0xbe9d156892e55e7154bcd3cb0fea677f9d3103e1",
       "decimals": 18,
       "swap": {
@@ -1266,6 +1294,7 @@
       "category": "bstock",
       "symbol": "SPYB",
       "ticker": "SPY",
+      "underlyingName": "State Street SPDR S&P 500 ETF Trust",
       "address": "0x7138b48df7d98d7e3cc221bfe7192d0a178182d8",
       "decimals": 18,
       "swap": {
@@ -1297,6 +1326,7 @@
       "category": "bstock",
       "symbol": "SQQQB",
       "ticker": "SQQQ",
+      "underlyingName": "ProShares UltraPro Short QQQ",
       "address": "0x25e572b466d152604d9e6c3e53b432b978825342",
       "decimals": 18,
       "swap": {
@@ -1328,6 +1358,7 @@
       "category": "bstock",
       "symbol": "TQQQB",
       "ticker": "TQQQ",
+      "underlyingName": "ProShares UltraPro QQQ",
       "address": "0x462b5f13b7c7748279358962925c5de83bb9e598",
       "decimals": 18,
       "swap": {
@@ -1359,6 +1390,7 @@
       "category": "bstock",
       "symbol": "TSLAB",
       "ticker": "TSLA",
+      "underlyingName": "Tesla, Inc.",
       "address": "0x5b1910eaad6450e50f816082aa078c41f10c292f",
       "decimals": 18,
       "swap": {
@@ -1390,6 +1422,7 @@
       "category": "bstock",
       "symbol": "TSMB",
       "ticker": "TSM",
+      "underlyingName": "Taiwan Semiconductor Manufacturing Company",
       "address": "0xab78b89b5bb00236be0b4b20704cbfa04efc711c",
       "decimals": 18,
       "swap": {
@@ -1427,12 +1460,16 @@
       "assetAddress": "0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c",
       "marketAddress": "0x882c173bc7ff3b7786ca16dfed3dfffb9ee7847b",
       "label": "Venus vBTC",
+      "rateSource": {
+        "comptrollerAddress": "0xfd36e2c2a6789db23113685031d7f16329158384"
+      },
       "revalidateBeforeEveryDeposit": true,
       "runtimeChecks": [
-        "exact underlying",
+        "exact underlying/comptroller",
         "listed",
+        "protocol not paused",
         "mint not paused",
-        "supply-cap headroom"
+        "positive supply-cap headroom"
       ]
     },
     {
@@ -1444,12 +1481,16 @@
       "assetAddress": "0x2170ed0880ac9a755fd29b2688956bd959f933f8",
       "marketAddress": "0xf508fcd89b8bd15579dc79a6827cb4686a3592c8",
       "label": "Venus vETH",
+      "rateSource": {
+        "comptrollerAddress": "0xfd36e2c2a6789db23113685031d7f16329158384"
+      },
       "revalidateBeforeEveryDeposit": true,
       "runtimeChecks": [
-        "exact underlying",
+        "exact underlying/comptroller",
         "listed",
+        "protocol not paused",
         "mint not paused",
-        "supply-cap headroom"
+        "positive supply-cap headroom"
       ]
     },
     {
@@ -1461,12 +1502,16 @@
       "assetAddress": "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
       "marketAddress": "0x6bca74586218db34cdb402295796b79663d816e9",
       "label": "Venus vWBNB",
+      "rateSource": {
+        "comptrollerAddress": "0xfd36e2c2a6789db23113685031d7f16329158384"
+      },
       "revalidateBeforeEveryDeposit": true,
       "runtimeChecks": [
-        "exact underlying",
+        "exact underlying/comptroller",
         "listed",
+        "protocol not paused",
         "mint not paused",
-        "supply-cap headroom"
+        "positive supply-cap headroom"
       ]
     },
     {
@@ -1478,12 +1523,16 @@
       "assetAddress": "0x02fca66c1d1afb4e2a7884261eb00f63598a7436",
       "marketAddress": "0xeb8ca841cbe1bc4832a10b15c7dab1081edad371",
       "label": "Venus vNVDAB",
+      "rateSource": {
+        "comptrollerAddress": "0xfd36e2c2a6789db23113685031d7f16329158384"
+      },
       "revalidateBeforeEveryDeposit": true,
       "runtimeChecks": [
-        "exact underlying",
+        "exact underlying/comptroller",
         "listed",
+        "protocol not paused",
         "mint not paused",
-        "supply-cap headroom"
+        "positive supply-cap headroom"
       ]
     },
     {
@@ -1495,12 +1544,16 @@
       "assetAddress": "0xca750ef65f295bbecd685abf54e82caf297bdb61",
       "marketAddress": "0x3e281461efb3d53ec20db207674373ed8ef3bba9",
       "label": "Venus vSKHYB",
+      "rateSource": {
+        "comptrollerAddress": "0xfd36e2c2a6789db23113685031d7f16329158384"
+      },
       "revalidateBeforeEveryDeposit": true,
       "runtimeChecks": [
-        "exact underlying",
+        "exact underlying/comptroller",
         "listed",
+        "protocol not paused",
         "mint not paused",
-        "supply-cap headroom"
+        "positive supply-cap headroom"
       ]
     },
     {
@@ -1512,12 +1565,16 @@
       "assetAddress": "0xbe9d156892e55e7154bcd3cb0fea677f9d3103e1",
       "marketAddress": "0xc36dfacc7a125859c106f29b9f2d874ccf29a55a",
       "label": "Venus vSPCXB",
+      "rateSource": {
+        "comptrollerAddress": "0xfd36e2c2a6789db23113685031d7f16329158384"
+      },
       "revalidateBeforeEveryDeposit": true,
       "runtimeChecks": [
-        "exact underlying",
+        "exact underlying/comptroller",
         "listed",
+        "protocol not paused",
         "mint not paused",
-        "supply-cap headroom"
+        "positive supply-cap headroom"
       ]
     },
     {
@@ -1529,12 +1586,121 @@
       "assetAddress": "0x5b1910eaad6450e50f816082aa078c41f10c292f",
       "marketAddress": "0x97421799419eb782628e73e7220d8e0a207469a3",
       "label": "Venus vTSLAB",
+      "rateSource": {
+        "comptrollerAddress": "0xfd36e2c2a6789db23113685031d7f16329158384"
+      },
       "revalidateBeforeEveryDeposit": true,
       "runtimeChecks": [
-        "exact underlying",
+        "exact underlying/comptroller",
         "listed",
+        "protocol not paused",
         "mint not paused",
-        "supply-cap headroom"
+        "positive supply-cap headroom"
+      ]
+    },
+    {
+      "id": "venus:ADA:vADA",
+      "protocol": "Venus",
+      "kind": "supply-market",
+      "targetId": "crypto:ADA",
+      "assetSymbol": "ADA",
+      "assetAddress": "0x3ee2200efb3400fabb9aacf31297cbdd1d435d47",
+      "marketAddress": "0x9a0af7fdb2065ce470d72664de73cae409da28ec",
+      "label": "Venus vADA",
+      "rateSource": {
+        "comptrollerAddress": "0xfd36e2c2a6789db23113685031d7f16329158384"
+      },
+      "revalidateBeforeEveryDeposit": true,
+      "runtimeChecks": [
+        "exact underlying/comptroller",
+        "listed",
+        "protocol not paused",
+        "mint not paused",
+        "positive supply-cap headroom"
+      ]
+    },
+    {
+      "id": "venus:DOGE:vDOGE",
+      "protocol": "Venus",
+      "kind": "supply-market",
+      "targetId": "crypto:DOGE",
+      "assetSymbol": "DOGE",
+      "assetAddress": "0xba2ae424d960c26247dd6c32edc70b295c744c43",
+      "marketAddress": "0xec3422ef92b2fb59e84c8b02ba73f1fe84ed8d71",
+      "label": "Venus vDOGE",
+      "rateSource": {
+        "comptrollerAddress": "0xfd36e2c2a6789db23113685031d7f16329158384"
+      },
+      "revalidateBeforeEveryDeposit": true,
+      "runtimeChecks": [
+        "exact underlying/comptroller",
+        "listed",
+        "protocol not paused",
+        "mint not paused",
+        "positive supply-cap headroom"
+      ]
+    },
+    {
+      "id": "venus:LINK:vLINK",
+      "protocol": "Venus",
+      "kind": "supply-market",
+      "targetId": "crypto:LINK",
+      "assetSymbol": "LINK",
+      "assetAddress": "0xf8a0bf9cf54bb92f17374d9e9a321e6a111a51bd",
+      "marketAddress": "0x650b940a1033b8a1b1873f78730fcfc73ec11f1f",
+      "label": "Venus vLINK",
+      "rateSource": {
+        "comptrollerAddress": "0xfd36e2c2a6789db23113685031d7f16329158384"
+      },
+      "revalidateBeforeEveryDeposit": true,
+      "runtimeChecks": [
+        "exact underlying/comptroller",
+        "listed",
+        "protocol not paused",
+        "mint not paused",
+        "positive supply-cap headroom"
+      ]
+    },
+    {
+      "id": "venus:SOL:vSOL",
+      "protocol": "Venus",
+      "kind": "supply-market",
+      "targetId": "crypto:SOL",
+      "assetSymbol": "SOL",
+      "assetAddress": "0x570a5d26f7765ecb712c0924e4de545b89fd43df",
+      "marketAddress": "0xbf515ba4d1b52ffdceabf20d31d705ce789f2cec",
+      "label": "Venus vSOL",
+      "rateSource": {
+        "comptrollerAddress": "0xfd36e2c2a6789db23113685031d7f16329158384"
+      },
+      "revalidateBeforeEveryDeposit": true,
+      "runtimeChecks": [
+        "exact underlying/comptroller",
+        "listed",
+        "protocol not paused",
+        "mint not paused",
+        "positive supply-cap headroom"
+      ]
+    },
+    {
+      "id": "venus:XRP:vXRP",
+      "protocol": "Venus",
+      "kind": "supply-market",
+      "targetId": "crypto:XRP",
+      "assetSymbol": "XRP",
+      "assetAddress": "0x1d2f0da169ceb9fc7b3144628db156f3f6c60dbe",
+      "marketAddress": "0xb248a295732e0225acd3337607cc01068e3b9c10",
+      "label": "Venus vXRP",
+      "rateSource": {
+        "comptrollerAddress": "0xfd36e2c2a6789db23113685031d7f16329158384"
+      },
+      "revalidateBeforeEveryDeposit": true,
+      "runtimeChecks": [
+        "exact underlying/comptroller",
+        "listed",
+        "protocol not paused",
+        "mint not paused",
+        "positive supply-cap headroom"
       ]
     },
     {
@@ -1594,6 +1760,11 @@
       "assetAddress": "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
       "marketAddress": "0x9b00a09492a626678e5a3009982191586c444df9",
       "label": "Aave V3 WBNB Reserve",
+      "rateSource": {
+        "poolAddress": "0x6807dc923806fe8fd134338eabca509979a7e0cb",
+        "dataProviderAddress": "0xc90df74a7c16245c5f5c5870327ceb38fe5d5328",
+        "addressesProviderAddress": "0xff75b6da14ffbbfd355daf7a2731456b3562ba6d"
+      },
       "revalidateBeforeEveryDeposit": true,
       "runtimeChecks": [
         "exact aToken",
@@ -1612,6 +1783,11 @@
       "assetAddress": "0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c",
       "marketAddress": "0x56a7ddc4e848ebf43845854205ad71d5d5f72d3d",
       "label": "Aave V3 BTCB Reserve",
+      "rateSource": {
+        "poolAddress": "0x6807dc923806fe8fd134338eabca509979a7e0cb",
+        "dataProviderAddress": "0xc90df74a7c16245c5f5c5870327ceb38fe5d5328",
+        "addressesProviderAddress": "0xff75b6da14ffbbfd355daf7a2731456b3562ba6d"
+      },
       "revalidateBeforeEveryDeposit": true,
       "runtimeChecks": [
         "exact aToken",
@@ -1630,6 +1806,11 @@
       "assetAddress": "0x2170ed0880ac9a755fd29b2688956bd959f933f8",
       "marketAddress": "0x2e94171493fabe316b6205f1585779c887771e2f",
       "label": "Aave V3 ETH Reserve",
+      "rateSource": {
+        "poolAddress": "0x6807dc923806fe8fd134338eabca509979a7e0cb",
+        "dataProviderAddress": "0xc90df74a7c16245c5f5c5870327ceb38fe5d5328",
+        "addressesProviderAddress": "0xff75b6da14ffbbfd355daf7a2731456b3562ba6d"
+      },
       "revalidateBeforeEveryDeposit": true,
       "runtimeChecks": [
         "exact aToken",
@@ -1638,6 +1819,35 @@
         "reserve not paused",
         "supply-cap headroom"
       ]
+    }
+  ],
+  "collateralMarkets": [
+    {
+      "id": "0xe52b068bb5b6225de1800b434bdd465246faea79352000acad88bdff312eab95",
+      "protocol": "Lista",
+      "kind": "collateral-market",
+      "targetId": "bstock:SPCXB",
+      "collateralSymbol": "SPCXB",
+      "collateralAddress": "0xbe9d156892e55e7154bcd3cb0fea677f9d3103e1",
+      "loanSymbol": "USDC",
+      "loanAddress": "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
+      "marketAddress": "0x8f73b65b4caaf64fba2af91cc5d4a2a1318e5d8c",
+      "sourceUrl": "https://lista.org/lending/market/bsc/0xe52b068bb5b6225de1800b434bdd465246faea79352000acad88bdff312eab95?tab=market",
+      "rateSourceUrl": "https://api.lista.org/api/moolah/market/0xe52b068bb5b6225de1800b434bdd465246faea79352000acad88bdff312eab95?chain=bsc",
+      "selectable": false
+    }
+  ],
+  "unavailableMarkets": [
+    {
+      "id": "venus:TRX:vTRXOLD",
+      "protocol": "Venus",
+      "targetId": "crypto:TRX",
+      "label": "Venus vTRXOLD",
+      "reason": "Unavailable: supply paused, supply cap reached",
+      "selectable": false,
+      "sourceUrl": "https://bscscan.com/address/0x61edcfe8dd6ba3c891cb9bec2dc7657b3b422e93#readProxyContract",
+      "verifiedAt": "2026-10-01T15:48:12.520Z",
+      "blockNumber": 125127123
     }
   ]
 }

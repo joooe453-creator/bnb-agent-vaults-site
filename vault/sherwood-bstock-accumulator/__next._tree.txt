@@ -1,2 +1,2 @@
-:HL["/bnb-agent-vaults-site/_next/static/chunks/109b3rjc9a8nh.css","style"]
-0:{"tree":{"name":"","param":null,"prefetchHints":4176,"slots":{"children":{"name":"vault","param":null,"prefetchHints":4192,"slots":{"children":{"name":"slug","param":{"type":"d","key":"sherwood-bstock-accumulator","siblings":[]},"prefetchHints":4192,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}}}},"staleTime":300,"buildId":"wLbmE8cDtb9ESl374gply"}
+:HL["/bnb-agent-vaults-site/_next/static/chunks/3qxppyfa540o1.css","style"]
+0:{"tree":{"name":"","param":null,"prefetchHints":4176,"slots":{"children":{"name":"vault","param":null,"prefetchHints":4192,"slots":{"children":{"name":"slug","param":{"type":"d","key":"sherwood-bstock-accumulator","siblings":[]},"prefetchHints":4192,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}}}},"staleTime":300,"buildId":"2A03bJnrvDrUmF3SwYB9a"}
