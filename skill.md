@@ -30,14 +30,21 @@ Do not invent token, pool, vToken, or Lista vault addresses. If the registry has
 6. Call `validate_vault_manifest`. Do not present a vault as deployable unless every check passes and a BSC fork
    dry-run has passed.
 
-## Accumulation semantics
+## Accumulation and rebalancing semantics
 
 - `trancheBps` is 1–25% of available cash.
-- Schedule interval is 1–90 days.
+- A schedule declares its cadence, future start date/time, IANA time zone and end condition. Supported intervals are
+  up to 365 days, 52 weeks, or 12 months.
+- Missed and failed scheduled orders are skipped without catch-up; edits apply from the next cycle.
+- Calendar schedules preserve local clock time across daylight-saving changes and use the last valid day in short months.
 - Drawdown is 1–30% and is measured from `last-executed-basket-index`.
 - Schedule and drawdown triggers share a minimum 24-hour cooldown. If both fire, execute only one tranche.
 - A failed purchase does not move the basket reference or consume the cooldown.
 - Total deployment is capped at 95%, leaving at least 5% idle.
+- Rebalancing is optional and cashflow-only by default. It requires an absolute weight-drift floor, a 24-hour
+  cooldown, an event turnover cap, a minimum trade, and preflight of every leg.
+- Full buy/sell rebalancing is unavailable while any target is deposited in a Venus or Lista destination.
+- A portfolio drawdown control may pause new automated orders, but never auto-liquidates and requires manual resume.
 
 ## Market checks
 
