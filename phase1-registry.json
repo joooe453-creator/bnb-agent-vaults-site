@@ -34,6 +34,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0x36696169c63e42cd08ce11f5deebbcebae652050",
         "fee": 500
+      },
+      "liquidity": {
+        "usd": 12020516.53,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -48,6 +54,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0x46cf1cf8c69595804ba91dfdd8d6b960c9b0a7c4",
         "fee": 500
+      },
+      "liquidity": {
+        "usd": 23736641.16,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -62,6 +74,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0xbe141893e4c6ad9272e8c04bab7e6a10604501a5",
         "fee": 500
+      },
+      "liquidity": {
+        "usd": 5405580.29,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -76,6 +94,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0xe9b9998b2ec5430d2246c7f1f8d9f298c97d7365",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 516635.48,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -90,6 +114,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0x52fe6c3cff0dcd50b75ec2b785ef4f95b4ee2094",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 52501.99,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -104,6 +134,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0x7530beb7bde5843f668cf31b996fa1f748c9b6b1",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 238665.46,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -118,6 +154,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0xfd95cb1391999006eb91797a7c62acfe88b20292",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 2511361.86,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -132,6 +174,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0x52a427db0b2d9154a5f4ad09d22f3792f754b6fc",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 78904.16,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -146,6 +194,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0x32c51041f3d7a66ac14aba7485444efb6e15efe1",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 857739.21,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -160,6 +214,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0x29967c54c5bf12e8158c8894376064b30ebab297",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 915673.85,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -174,6 +234,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0x9aadbd51515432dbb77c0a7f69c2b2c211f0c837",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 62278.71,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -188,6 +254,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0x1f7083a138f980b60eb1582f01ca3b1d6c46ad10",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 63965.24,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -202,6 +274,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0x908d49048eb3a7bedfd238972403842805eaf2be",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 153771.18,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -216,6 +294,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0x89001d846f7ca36ee089f73eefc25657e1798144",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 1714508.45,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -230,6 +314,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0xfeef70ff6f58f0a900e28a77e5a8945afb343923",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 293094.52,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -244,6 +334,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0x4dd8e7c67033ef4a745bb9f82a7c57c676eb2481",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 534739.95,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -258,6 +354,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0xc2151a561e928d16576d75ea88544543ac63d80b",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 192484.43,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -272,6 +374,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0xcc992887e9cee37a698541e2f6d1675453fbcfcc",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 59330.85,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -286,6 +394,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0x5018b018ceb7645c927c5cf246786f89ebcbe7ea",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 211414.32,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -300,6 +414,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0x692081209619735f25700557078ab084d3e5d007",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 365094.04,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -314,6 +434,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0x9e75ced0a01590890917c5180c3e3ed6a86a071e",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 17896.96,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -328,6 +454,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0xafab4441d8b354bba790229c0e235e7e6187b3d0",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 152545.85,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -342,6 +474,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0xd76cb6e9f642cdc7c33c9d4fc6bdd858116dcc84",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 47711.6,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -356,6 +494,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0x8fb4243b553ac29ba088acf00b9b7da24bd6690c",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 4802934.37,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -370,6 +514,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0x7615a051a7d6ed1d1b5f922825991acab4e4e574",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 3.11,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -384,6 +534,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0xd7d30f434b12f7ed9b0ae11ff1c754745a10ad52",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 566104.25,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -398,6 +554,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0xe4b5403f5103b02d1e8193b0d7d76d49f3f8ad77",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 208345.41,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -412,6 +574,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0x54800dc47a2d16c91eff4f5326962a417c9d2553",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 25771.88,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -426,6 +594,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0x3d7d950377eca7b4af7233716ff17def00ab2045",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 75519.52,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -440,6 +614,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0xd5c0572126a707196aaba2b6952d67fc2a140651",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 62502.73,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -454,6 +634,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0x977daffc095b33872e2741c19568925015c35b4d",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 2419296.62,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -468,6 +654,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0x066b9c1e47303ea27c1e965fc7e3d65546675351",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 589.7,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -482,6 +674,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0x0fb2f4765a9c718e30a1b419279bac4bd4e27cc0",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 59806.03,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -496,6 +694,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0xf6a5f768f583a695b6cdd772fb138921c5bae4e9",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 49849.5,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -510,6 +714,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0xb0f5e5400e8f0f7c242f2b7740c004f020579c41",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 1972266.24,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     },
     {
@@ -524,6 +734,12 @@
         "quoteSymbol": "USDT",
         "poolAddress": "0x03f59988f5c366046321cccd2bf0e3878e2ed69c",
         "fee": 2500
+      },
+      "liquidity": {
+        "usd": 108376.67,
+        "verifiedAt": "2026-10-01T10:12:42.000Z",
+        "verifiedAtBlock": 125082420,
+        "methodology": "Pool token balances valued at the PancakeSwap V3 pool spot price; TVL is not guaranteed executable depth."
       }
     }
   ],
@@ -531,6 +747,7 @@
     {
       "id": "venus:BTCB:vBTC",
       "protocol": "Venus",
+      "kind": "supply-market",
       "targetId": "crypto:BTCB",
       "assetSymbol": "BTCB",
       "assetAddress": "0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c",
@@ -547,6 +764,7 @@
     {
       "id": "venus:ETH:vETH",
       "protocol": "Venus",
+      "kind": "supply-market",
       "targetId": "crypto:ETH",
       "assetSymbol": "ETH",
       "assetAddress": "0x2170ed0880ac9a755fd29b2688956bd959f933f8",
@@ -563,6 +781,7 @@
     {
       "id": "venus:WBNB:vWBNB",
       "protocol": "Venus",
+      "kind": "supply-market",
       "targetId": "crypto:WBNB",
       "assetSymbol": "WBNB",
       "assetAddress": "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
@@ -579,6 +798,7 @@
     {
       "id": "venus:NVDAB:vNVDAB",
       "protocol": "Venus",
+      "kind": "supply-market",
       "targetId": "bstock:NVDAB",
       "assetSymbol": "NVDAB",
       "assetAddress": "0x02fca66c1d1afb4e2a7884261eb00f63598a7436",
@@ -595,6 +815,7 @@
     {
       "id": "venus:SKHYB:vSKHYB",
       "protocol": "Venus",
+      "kind": "supply-market",
       "targetId": "bstock:SKHYB",
       "assetSymbol": "SKHYB",
       "assetAddress": "0xca750ef65f295bbecd685abf54e82caf297bdb61",
@@ -611,6 +832,7 @@
     {
       "id": "venus:SPCXB:vSPCXB",
       "protocol": "Venus",
+      "kind": "supply-market",
       "targetId": "bstock:SPCXB",
       "assetSymbol": "SPCXB",
       "assetAddress": "0xbe9d156892e55e7154bcd3cb0fea677f9d3103e1",
@@ -627,6 +849,7 @@
     {
       "id": "venus:TSLAB:vTSLAB",
       "protocol": "Venus",
+      "kind": "supply-market",
       "targetId": "bstock:TSLAB",
       "assetSymbol": "TSLAB",
       "assetAddress": "0x5b1910eaad6450e50f816082aa078c41f10c292f",
@@ -643,6 +866,7 @@
     {
       "id": "lista:lista-wbnb-gauntlet",
       "protocol": "Lista",
+      "kind": "vault",
       "targetId": "crypto:WBNB",
       "assetSymbol": "WBNB",
       "assetAddress": "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
@@ -658,6 +882,7 @@
     {
       "id": "lista:lista-btcb",
       "protocol": "Lista",
+      "kind": "vault",
       "targetId": "crypto:BTCB",
       "assetSymbol": "BTCB",
       "assetAddress": "0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c",
@@ -673,6 +898,7 @@
     {
       "id": "lista:lista-nvdab-flap",
       "protocol": "Lista",
+      "kind": "vault",
       "targetId": "bstock:NVDAB",
       "assetSymbol": "NVDAB",
       "assetAddress": "0x02fca66c1d1afb4e2a7884261eb00f63598a7436",

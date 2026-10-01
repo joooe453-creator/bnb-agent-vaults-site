@@ -1,2 +1,2 @@
-:HL["/bnb-agent-vaults-site/_next/static/chunks/1yt1cn5fjjyfx.css","style"]
-0:{"tree":{"name":"","param":null,"prefetchHints":4176,"slots":{"children":{"name":"vault","param":null,"prefetchHints":4192,"slots":{"children":{"name":"slug","param":{"type":"d","key":"sherwood-crypto-accumulator","siblings":[]},"prefetchHints":4192,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}}}},"staleTime":300,"buildId":"mWC-ehP3RUvaprNBN-tex"}
+:HL["/bnb-agent-vaults-site/_next/static/chunks/2x0poba04p9_2.css","style"]
+0:{"tree":{"name":"","param":null,"prefetchHints":4176,"slots":{"children":{"name":"vault","param":null,"prefetchHints":4192,"slots":{"children":{"name":"slug","param":{"type":"d","key":"sherwood-crypto-accumulator","siblings":[]},"prefetchHints":4192,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}}}},"staleTime":300,"buildId":"DKYr5vm1dhWdXXe3Jr2ri"}

@@ -1,15 +1,15 @@
 1:"$Sreact.fragment"
 2:I[81384,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js"],"PrototypePage"]
-3:T1f99,
+3:T1cb3,
 
 <section class="page-head">
   <div class="wrap wide">
     <div class="row">
-      <div><h1>Launch a phase-one vault</h1><p class="lede">Choose a bStock and crypto basket first, then decide how to buy it. Yield markets are optional.</p></div>
+      <div><h1>Launch a phase-one vault</h1><p class="lede">Choose assets first. Buying plan and destination come next.</p></div>
       <div class="summary three" style="grid-template-columns:repeat(3,minmax(120px,1fr))">
         <div><div class="label">Targets</div><div class="v" id="s-targets">—</div></div>
         <div><div class="label">Plan</div><div class="v" id="s-plan">—</div></div>
-        <div><div class="label">Yield markets</div><div class="v" id="s-markets">—</div></div>
+        <div><div class="label">Destinations</div><div class="v" id="s-markets">—</div></div>
       </div>
     </div>
   </div>
@@ -25,7 +25,7 @@
 
     <form id="f" autocomplete="off" onsubmit="return false">
       <section class="article" id="s-1">
-        <header><span class="rn">01</span><h2>Build the basket</h2><p>Choose the assets and weights first. Only phase-one bStocks and crypto with a verified purchase route are listed.</p></header>
+        <header><span class="rn">01</span><h2>Build the basket</h2><p>Only assets with verified USDT routes are shown.</p></header>
         <div class="body">
           <div class="fields">
             <label class="field"><span>Find a target</span><input id="search" placeholder="BTCB, NVDA, AAPL…"></label>
@@ -34,16 +34,15 @@
           <div class="mkt-list" id="target-list" style="margin-top:18px"><div class="allocation-empty">Loading verified targets…</div></div>
           <div class="sub-h" style="margin-top:28px"><span>Selected basket</span><em id="weight-total">0% / 100%</em></div>
           <div class="allocation-inputs" id="selected-list"></div>
-          <p class="fine" style="margin-top:14px">Each target uses its registry-pinned PancakeSwap V3 route. Basket weights must total 100% before launch.</p>
         </div>
       </section>
 
       <section class="article" id="s-2">
-        <header><span class="rn">02</span><h2>Choose the operations</h2><p>Choose one buying plan, then optionally place each purchased asset into an exact-match Venus or Lista market.</p></header>
+        <header><span class="rn">02</span><h2>Choose the operations</h2><p>Pick how to buy, then optionally choose a destination.</p></header>
         <div class="body">
           <div class="choice-chips" id="mode-choices">
-            <button type="button" class="choice-card on" data-mode="lump-sum"><b>Buy once</b><small>Deploy each settled contribution batch once, using the basket weights below.</small></button>
-            <button type="button" class="choice-card" data-mode="accumulate"><b>Accumulate</b><small>Buy fixed tranches on a schedule, a basket drawdown, or either trigger.</small></button>
+            <button type="button" class="choice-card on" data-mode="lump-sum"><b>Buy once</b><small>Invest settled cash once.</small></button>
+            <button type="button" class="choice-card" data-mode="accumulate"><b>Accumulate</b><small>Use a schedule, drawdown trigger, or both.</small></button>
           </div>
           <div id="accumulate" class="hide" style="margin-top:24px">
             <div class="toggle-row">
@@ -60,14 +59,13 @@
             </div>
             <p class="fine" style="margin-top:14px">If both triggers fire together, only one tranche is bought. Failed trades do not move the reference price or consume the cooldown.</p>
           </div>
-          <div class="fixed-terms" style="margin-top:24px">
-            <div><b>95%</b><span>maximum capital deployed</span></div>
-            <div><b>1%</b><span>maximum execution slippage</span></div>
-            <div><b>5%</b><span>minimum idle reserve</span></div>
+          <div class="guardrails" style="margin-top:24px">
+            <span><b>95%</b> max invested</span>
+            <span><b>1%</b> slippage cap</span>
+            <span><b>5%</b> cash reserve</span>
           </div>
-          <div class="sub-h" style="margin-top:28px"><span>After purchase <em>optional</em></span></div>
+          <div class="sub-h" style="margin-top:28px"><span>Optional destination</span><em>Supply market and Vault are different products</em></div>
           <div class="allocation-inputs" id="post-purchase-list"></div>
-          <p class="fine" style="margin-top:14px">“Hold only” is intentional: if an exact token is not supported by Venus or a Lista ERC-4626 vault, no yield option is offered. Every enabled market is rechecked immediately before each deposit; if it is paused, delisted, full, or mismatched, the asset remains held.</p>
         </div>
       </section>
 
@@ -114,7 +112,7 @@
 
 
 
-4:T3cad,
+4:T3f4b,
 (function () {
   "use strict";
   const { $, $$, esc, toast, DEMO_OWNER, hexAddr } = BAV;
@@ -131,6 +129,12 @@
   };
   const manager = hexAddr("phase1-manager");
   const num = (value) => Number(String(value).trim());
+  const formatUsd = (value) => {
+    if (!Number.isFinite(value)) return "Unavailable";
+    if (value >= 1e6) return `$${(value / 1e6).toFixed(value >= 1e7 ? 1 : 2)}M`;
+    if (value >= 1e3) return `$${(value / 1e3).toFixed(value >= 1e5 ? 0 : 1)}K`;
+    return `$${value.toFixed(value >= 100 ? 0 : 2)}`;
+  };
   const registryUrl = location.protocol === "file:"
     ? "phase1-registry.json"
     : `${window.__BAV_BASE_PATH__ || ""}/phase1-registry.json`;
@@ -141,14 +145,19 @@
       return response.json();
     })
     .then((registry) => {
-      if (registry.schema !== "bnb-agent-vaults/phase1-market-registry@1" || registry.chainId !== 56) {
+      const liquidityValid = Array.isArray(registry.targets)
+        && registry.targets.length > 0
+        && registry.targets.every((target) => Number.isFinite(target.liquidity?.usd) && target.liquidity.usd > 0);
+      const destinationKindsValid = Array.isArray(registry.yieldMarkets)
+        && registry.yieldMarkets.every((market) => ["supply-market", "vault"].includes(market.kind));
+      if (registry.schema !== "bnb-agent-vaults/phase1-market-registry@1" || registry.chainId !== 56 || !liquidityValid || !destinationKindsValid) {
         throw new Error("Unexpected market registry");
       }
       S.registry = registry;
       ["crypto:WBNB", "crypto:BTCB", "crypto:ETH"].forEach((id, index) => {
         S.selected.set(id, { weightBps: index === 0 ? 3400 : 3300, marketId: "" });
       });
-      $("#registry-note").textContent = `${registry.targets.length} buyable targets · ${registry.yieldMarkets.length} exact Venus/Lista markets · verified at BSC block ${registry.verifiedAtBlock}. Live checks still run before every deposit.`;
+      $("#registry-note").textContent = `${registry.targets.length} targets · liquidity at block ${registry.targets[0]?.liquidity?.verifiedAtBlock ?? "—"} · destinations rechecked before deposit.`;
       draw();
     })
     .catch((error) => {
@@ -182,7 +191,7 @@
     });
     $("#target-list").innerHTML = targets.map((target) => {
       const checked = S.selected.has(target.id);
-      return `<label class="mkt ${checked ? "" : "off"}"><input type="checkbox" data-target="${esc(target.id)}" ${checked ? "checked" : ""}><span class="logo-stack">${target.category === "crypto" ? "◈" : "▦"}</span><span class="t">${esc(target.symbol)}<small>${target.category === "bstock" ? `${esc(target.ticker)} · tokenized stock` : "Crypto"} · PancakeSwap V3</small></span><span class="apy"><b>Buyable</b><em>USDT pool · ${target.swap.fee / 10000}% fee</em></span></label>`;
+      return `<label class="mkt ${checked ? "" : "off"}"><input type="checkbox" data-target="${esc(target.id)}" ${checked ? "checked" : ""}><span class="logo-stack">${target.category === "crypto" ? "◈" : "▦"}</span><span class="t">${esc(target.symbol)}<small>${target.category === "bstock" ? esc(target.ticker) : "Crypto"}</small></span><span class="apy"><b>${formatUsd(target.liquidity?.usd)}</b><em>Pool TVL · ${target.swap.fee / 10000}% fee</em></span></label>`;
     }).join("") || `<div class="allocation-empty">No target matches this filter.</div>`;
     $$('[data-target]').forEach((input) => input.addEventListener("change", () => {
       if (input.checked) {
@@ -206,7 +215,7 @@
     if (!S.registry) return;
     const rows = [...S.selected.entries()].map(([id, selected]) => {
       const target = S.registry.targets.find((candidate) => candidate.id === id);
-      return `<div class="leg" data-selected="${esc(id)}"><div class="leg-h"><b>${esc(target.symbol)}</b><span class="tag">${esc(target.category)}</span><button type="button" class="rm" data-remove="${esc(id)}">Remove</button></div><div class="fields"><label class="field"><span>Basket weight</span><div class="suffix"><input data-weight="${esc(id)}" value="${selected.weightBps / 100}" inputmode="decimal"><b>%</b></div></label><div class="field"><span>Purchase route</span><div class="locked"><span>PancakeSwap V3 · USDT</span><span class="label">Registry pinned</span></div></div></div></div>`;
+      return `<div class="launch-leg" data-selected="${esc(id)}"><div class="launch-leg-h"><b>${esc(target.symbol)}</b><span class="tag">${esc(target.category)}</span><span class="route">USDT · Pancake V3</span><button type="button" class="rm" data-remove="${esc(id)}">Remove</button></div><div class="fields"><label class="field"><span>Basket weight</span><div class="suffix"><input data-weight="${esc(id)}" value="${selected.weightBps / 100}" inputmode="decimal"><b>%</b></div></label></div></div>`;
     });
     $("#selected-list").innerHTML = rows.join("") || `<div class="allocation-empty">Select at least one crypto or bStock target.</div>`;
     $$('[data-weight]').forEach((input) => input.addEventListener("input", () => {
@@ -227,12 +236,15 @@
     const rows = [...S.selected.entries()].map(([id, selected]) => {
       const target = S.registry.targets.find((candidate) => candidate.id === id);
       const markets = compatibleMarkets(id);
-      const options = [`<option value="">Hold in vault</option>`]
-        .concat(markets.map((market) => `<option value="${esc(market.id)}" ${selected.marketId === market.id ? "selected" : ""}>${esc(market.label)}</option>`));
-      const support = markets.length
-        ? `${markets.map((market) => market.protocol).join(" / ")} support verified; live capacity is not guaranteed.`
-        : "No matching Venus or Lista market. Hold only.";
-      return `<div class="leg" data-post-purchase="${esc(id)}"><div class="leg-h"><b>${esc(target.symbol)}</b><span class="tag">${esc(target.category)}</span></div><div class="fields"><label class="field"><span>After purchase <em>optional</em></span><select data-market="${esc(id)}" ${markets.length ? "" : "disabled"}>${options.join("")}</select></label><div class="field"><span>Eligibility</span><div class="locked"><span>${esc(support)}</span><span class="label">Exact asset</span></div></div></div></div>`;
+      const options = [`<option value="">Keep in portfolio</option>`]
+        .concat(markets.map((market) => {
+          const kind = market.kind === "supply-market" ? "Supply market" : "Vault";
+          return `<option value="${esc(market.id)}" ${selected.marketId === market.id ? "selected" : ""}>${esc(market.protocol)} · ${kind} · ${esc(market.label)}</option>`;
+        }));
+      const note = id === "bstock:SPCXB"
+        ? `<p class="market-note">Lista has no SPCXB deposit vault. SPCXB is collateral in other Lista markets, not the supplied asset.</p>`
+        : (!markets.length ? `<p class="market-note">No exact-asset Venus supply market or Lista vault.</p>` : "");
+      return `<div class="launch-leg" data-post-purchase="${esc(id)}"><div class="launch-leg-h"><b>${esc(target.symbol)}</b><span class="tag">${esc(target.category)}</span></div><div class="fields"><label class="field"><span>Destination</span><select data-market="${esc(id)}">${options.join("")}</select></label></div>${note}</div>`;
     });
     $("#post-purchase-list").innerHTML = rows.join("") || `<div class="allocation-empty">Choose targets in step 1 before configuring post-purchase handling.</div>`;
     $$('[data-market]').forEach((select) => select.addEventListener("change", () => {
@@ -260,6 +272,7 @@
           mode: "yield-market",
           marketId: market.id,
           protocol: market.protocol,
+          marketKind: market.kind,
           marketAddress: market.marketAddress,
           fallback: "hold",
           revalidateBeforeEveryDeposit: true,
@@ -332,13 +345,13 @@
     $$("#toc .ck").forEach((check, index) => check.classList.toggle("ok", !errors.some(([section]) => section === `s-${index + 1}`)));
     const targetNames = S.registry ? [...S.selected.keys()].map((id) => S.registry.targets.find((target) => target.id === id)?.symbol).filter(Boolean) : [];
     $("#sentence").textContent = targetNames.length
-      ? `${name || "This vault"} ${S.mode === "lump-sum" ? "buys once" : "accumulates in fixed tranches"} across ${targetNames.join(", ")}. Unavailable yield markets fall back to holding the asset.`
+      ? `${name || "This vault"} ${S.mode === "lump-sum" ? "buys once" : "accumulates in fixed tranches"} across ${targetNames.join(", ")}. Unavailable destinations fall back to holding the asset.`
       : "Select a portfolio to generate the phase-one manifest.";
-    $("#meta").innerHTML = `<span class="tag">${S.mode === "lump-sum" ? "Buy once" : "Accumulate"}</span><span class="tag">${S.selected.size} targets</span><span class="tag">${marketCount} yield markets</span><span class="tag">5% idle</span>`;
+    $("#meta").innerHTML = `<span class="tag">${S.mode === "lump-sum" ? "Buy once" : "Accumulate"}</span><span class="tag">${S.selected.size} targets</span><span class="tag">${marketCount} destinations</span><span class="tag">5% idle</span>`;
     $("#rules").innerHTML = [
       ["Buy", total === 10000 ? "Use the declared basket weights; deploy at most 95% of cash." : "Weights are incomplete."],
-      ["Yield", marketCount ? "Use only each target's exact selected Venus/Lista market; otherwise hold." : "Hold purchased assets in the vault."],
-      ["Guard", "Recheck the underlying, listing/pause state and deposit capacity before every yield deposit."],
+      ["Destination", marketCount ? "Use only the selected exact-asset supply market or vault; otherwise hold." : "Hold purchased assets in the portfolio."],
+      ["Guard", "Recheck the asset, listing/pause state and deposit capacity before every deposit."],
     ].map(([label, value]) => `<li><b>${label}</b><span>${esc(value)}</span></li>`).join("");
     $("#json").textContent = JSON.stringify(buildManifest(), null, 2);
   }
@@ -370,7 +383,7 @@
   $("#sign").addEventListener("click", async () => {
     if (problems().length) return;
     $("#sign").disabled = true;
-    const steps = ["Validate exact token and pool addresses", "Recheck selected Venus/Lista asset bindings", "Simulate buys, slippage guards and fallback paths"];
+    const steps = ["Validate exact token and pool addresses", "Recheck selected destinations", "Simulate buys, slippage guards and fallback paths"];
     $("#steps").innerHTML = steps.map((step) => `<li><i></i><span>${esc(step)}</span></li>`).join("");
     const rows = $$("#steps li");
     for (const row of rows) {
@@ -390,7 +403,7 @@
 8:X
 d:X
 d:C
-0:{"buildId":"mWC-ehP3RUvaprNBN-tex","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"bodyClass":"has-mcta","html":"$3","runtimeVersion":"2d0b01e4e7b6","script":"$4","pageKey":"create"}],["$L5"],"$L6"]}],"isPartial":"$@7","staleTime":"$8","varyParams":null},{"rsc":"$L9","isPartial":"$@a","staleTime":"$8","varyParams":null},{"rsc":"$Lb","isPartial":"$@c","staleTime":"$8","varyParams":"$d"},{"rsc":"$Le","isPartial":"$@f","staleTime":"$8","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@10","rootVaryParams":null,"needsRuntimeRequest":"$@11"}
+0:{"buildId":"DKYr5vm1dhWdXXe3Jr2ri","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"bodyClass":"has-mcta","html":"$3","runtimeVersion":"2d0b01e4e7b6","script":"$4","pageKey":"create"}],["$L5"],"$L6"]}],"isPartial":"$@7","staleTime":"$8","varyParams":null},{"rsc":"$L9","isPartial":"$@a","staleTime":"$8","varyParams":null},{"rsc":"$Lb","isPartial":"$@c","staleTime":"$8","varyParams":"$d"},{"rsc":"$Le","isPartial":"$@f","staleTime":"$8","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@10","rootVaryParams":null,"needsRuntimeRequest":"$@11"}
 12:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
 13:"$Sreact.suspense"
 15:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]
@@ -398,12 +411,12 @@ d:C
 17:I[27201,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"IconMark"]
 18:I[39756,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default"]
 19:I[37457,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default"]
-:HL["/bnb-agent-vaults-site/_next/static/chunks/1yt1cn5fjjyfx.css","style"]
+:HL["/bnb-agent-vaults-site/_next/static/chunks/2x0poba04p9_2.css","style"]
 5:["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js","async":true}]
 6:["$","$L12",null,{"children":["$","$13",null,{"name":"Next.MetadataOutlet","children":"$@14"}]}]
 9:["$","$1","h",{"children":[null,["$","$L15",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","div",null,{"hidden":true,"children":["$","$L16",null,{"children":["$","$13",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"BNB Agent Vaults — Agent-managed funds on BNB Chain"}],["$","meta","1",{"name":"description","content":"Launch and follow non-custodial, policy-bound agent vaults on BNB Chain."}],["$","meta","2",{"name":"codex-preview","content":"development"}],["$","link","3",{"rel":"shortcut icon","href":"/bnb-agent-vaults-site/favicon.svg"}],["$","link","4",{"rel":"icon","href":"/bnb-agent-vaults-site/favicon.svg"}],["$","$L17","5",{}]]}]}]}],null]}]
 b:["$","$1","c",{"children":[null,["$","$L18",null,{"parallelRouterKey":"children","template":["$","$L19",null,{}]}]]}]
-e:["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/1yt1cn5fjjyfx.css","precedence":"next"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L18",null,{"parallelRouterKey":"children","template":["$","$L19",null,{}],"notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]]}]}]}]]}]
+e:["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/2x0poba04p9_2.css","precedence":"next"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L18",null,{"parallelRouterKey":"children","template":["$","$L19",null,{}],"notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]]}]}]}]]}]
 14:null
 11:true
 8:300
