@@ -4,7 +4,7 @@
 4:I[81384,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js"],"PrototypePage"]
 b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default",1]
 :HL["/bnb-agent-vaults-site/_next/static/chunks/2xc67r4mlzs7s.css","style"]
-5:T1d9a,
+5:T1df7,
 
 <section class="page-head">
   <div class="wrap wide">
@@ -32,10 +32,11 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
         <header><span class="rn">01</span><h2>Build the basket</h2><p>Only assets with verified USDT routes are shown.</p></header>
         <div class="body">
           <div class="fields">
-            <label class="field"><span>Find a target</span><div class="target-search"><input id="search" placeholder="BTC, WBNB, NVDA or BSC contract"><button type="button" class="btn" id="find-ca">Find CA</button></div></label>
+            <label class="field"><span>Find a target</span><div class="target-search"><input id="search" placeholder="BTC, Hype, NVDA or BSC contract"><button type="button" class="btn" id="find-ca">Search</button></div></label>
             <div class="field"><span>Asset type</span><div class="radio-row"><label><input type="radio" name="filter" value="all" checked>All</label><label><input type="radio" name="filter" value="crypto">Crypto</label><label><input type="radio" name="filter" value="bstock">bStocks</label></div></div>
           </div>
           <div id="ca-status" class="hide" aria-live="polite"></div>
+          <div class="mkt-list hide" id="token-search-results" style="margin-top:18px"></div>
           <div class="mkt-list" id="target-list" style="margin-top:18px"><div class="allocation-empty">Loading verified targets…</div></div>
           <div class="sub-h" style="margin-top:28px"><span>Selected basket</span><em id="weight-total">0% / 100%</em></div>
           <div class="allocation-inputs" id="selected-list"></div>
@@ -118,7 +119,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
 
 
 
-6:T7ee6,
+6:T9a1f,
 (function () {
   "use strict";
   const { $, $$, esc, toast, DEMO_OWNER, hexAddr } = BAV;
@@ -129,6 +130,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     mode: "lump-sum",
     filter: "all",
     search: "",
+    tokenSearchResults: [],
     selected: new Map(),
     forkPassed: false,
     launched: false,
@@ -145,6 +147,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     ? "phase1-registry.json"
     : `${window.__BAV_BASE_PATH__ || ""}/phase1-registry.json`;
   const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
+  const TOKEN_SEARCH_URL = "https://api.geckoterminal.com/api/v2/search/pools";
   const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
   const Q192 = 2n ** 192n;
   const PRICE_SCALE = 10n ** 30n;
@@ -586,8 +589,126 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     node.innerHTML = `<span class="dot"></span><span>${esc(message)}</span>`;
   }
 
-  async function findContractPool() {
-    const address = $("#search").value.trim();
+  const normalizeTokenQuery = (value) => String(value || "").normalize("NFKC").trim().toLowerCase();
+  const positiveNumber = (value) => {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+  };
+
+  function parseTokenSearchPages(pages, rawQuery) {
+    const query = normalizeTokenQuery(rawQuery);
+    const rows = [];
+    pages.forEach((page) => {
+      const included = new Map((Array.isArray(page?.included) ? page.included : []).map((item) => [item.id, item]));
+      (Array.isArray(page?.data) ? page.data : []).forEach((pool) => {
+        const dexId = pool?.relationships?.dex?.data?.id || "";
+        if (!["pancakeswap-v2-bsc", "pancakeswap-v3-bsc"].includes(dexId)) return;
+        const attributes = pool?.attributes || {};
+        const poolName = String(attributes.name || "");
+        const feeMatch = poolName.match(/(\d+(?:\.\d+)?)%\s*$/);
+        const version = dexId === "pancakeswap-v2-bsc" ? "V2" : "V3";
+        const feePct = version === "V2" ? 0.25 : positiveNumber(feeMatch?.[1]);
+        const baseTokenId = pool?.relationships?.base_token?.data?.id;
+        [baseTokenId, pool?.relationships?.quote_token?.data?.id].forEach((tokenId) => {
+          const token = included.get(tokenId);
+          const address = String(token?.attributes?.address || "").toLowerCase();
+          const name = String(token?.attributes?.name || "").trim().slice(0, 80);
+          const symbol = String(token?.attributes?.symbol || "").trim().slice(0, 24);
+          if (!ADDRESS_RE.test(address) || ![name, symbol].some((value) => normalizeTokenQuery(value).includes(query))) return;
+          const isBaseToken = tokenId === baseTokenId;
+          rows.push({
+            address,
+            name: name || symbol,
+            symbol: symbol || "TOKEN",
+            poolAddress: String(attributes.address || "").toLowerCase(),
+            version,
+            feePct,
+            marketCapUsd: isBaseToken ? positiveNumber(attributes.market_cap_usd) : null,
+            fdvUsd: isBaseToken ? positiveNumber(attributes.fdv_usd) : null,
+            liquidityUsd: positiveNumber(attributes.reserve_in_usd) || 0,
+          });
+        });
+      });
+    });
+    const deepestByAddress = new Map();
+    rows.forEach((row) => {
+      const current = deepestByAddress.get(row.address);
+      const hasValuation = row.marketCapUsd !== null || row.fdvUsd !== null;
+      const currentHasValuation = current && (current.marketCapUsd !== null || current.fdvUsd !== null);
+      if (!current || (hasValuation && !currentHasValuation) || (hasValuation === currentHasValuation && row.liquidityUsd > current.liquidityUsd)) {
+        deepestByAddress.set(row.address, row);
+      }
+    });
+    rows.forEach((row) => {
+      const reference = deepestByAddress.get(row.address);
+      row.marketCapUsd = reference.marketCapUsd;
+      row.fdvUsd = reference.fdvUsd;
+    });
+    return rows.sort((left, right) => {
+      const rightCap = right.marketCapUsd ?? right.fdvUsd ?? -1;
+      const leftCap = left.marketCapUsd ?? left.fdvUsd ?? -1;
+      return rightCap - leftCap || right.liquidityUsd - left.liquidityUsd || left.symbol.localeCompare(right.symbol);
+    });
+  }
+
+  function drawTokenSearchResults() {
+    const node = $("#token-search-results");
+    if (!S.tokenSearchResults.length) {
+      node.classList.add("hide");
+      $("#target-list").classList.remove("hide");
+      node.innerHTML = "";
+      return;
+    }
+    node.classList.remove("hide");
+    $("#target-list").classList.add("hide");
+    node.innerHTML = S.tokenSearchResults.map((result) => {
+      const cap = result.marketCapUsd ?? result.fdvUsd;
+      const capLabel = result.marketCapUsd ? "MC" : "FDV";
+      const pool = ADDRESS_RE.test(result.poolAddress) ? `${result.poolAddress.slice(0, 6)}…${result.poolAddress.slice(-4)}` : "pool";
+      const fee = result.feePct ? `${result.feePct}% fee` : "fee unavailable";
+      const token = `${result.address.slice(0, 6)}…${result.address.slice(-4)}`;
+      return `<button type="button" class="mkt" data-search-address="${esc(result.address)}" aria-label="Verify ${esc(result.symbol)} on-chain"><span aria-hidden="true">+</span><span class="logo-stack">◈</span><span class="t">${esc(result.symbol)}<small>${esc(result.name)} · CA ${esc(token)} · ${esc(result.version)} · ${esc(fee)} · Pool ${esc(pool)}</small></span><span class="apy"><b>${cap ? `${capLabel} ${formatUsd(cap)}` : "MC unavailable"}</b><em>Liquidity ${formatUsd(result.liquidityUsd)}</em></span></button>`;
+    }).join("");
+    $$('[data-search-address]').forEach((button) => button.addEventListener("click", () => findContractPool(button.dataset.searchAddress)));
+  }
+
+  let tokenSearchController = null;
+  async function searchTokenName() {
+    const rawQuery = $("#search").value;
+    const query = normalizeTokenQuery(rawQuery);
+    if (query.length < 2 || query.length > 64) return showCaStatus("Enter 2–64 characters or an exact BSC contract address.", true);
+    const button = $("#find-ca");
+    button.disabled = true;
+    button.textContent = "Searching…";
+    tokenSearchController?.abort();
+    const controller = new AbortController();
+    tokenSearchController = controller;
+    const timer = setTimeout(() => controller.abort(), 12000);
+    showCaStatus("Searching BNB Chain PancakeSwap tokens by name and ticker.", false);
+    try {
+      const params = new URLSearchParams({ query: rawQuery.trim(), network: "bsc", include: "base_token,quote_token,dex", page: "1" });
+      const response = await fetch(`${TOKEN_SEARCH_URL}?${params}`, { headers: { accept: "application/json" }, signal: controller.signal });
+      if (!response.ok) throw new Error(`Search provider returned ${response.status}`);
+      S.tokenSearchResults = parseTokenSearchPages([await response.json()], query);
+      drawTokenSearchResults();
+      if (!S.tokenSearchResults.length) {
+        showCaStatus(`No PancakeSwap token name or ticker contains “${rawQuery.trim()}”.`, true);
+      } else {
+        showCaStatus(`${S.tokenSearchResults.length} pools · sorted by market cap (FDV only when unavailable). Select one to verify the Pancake route on-chain.`, false);
+      }
+    } catch (error) {
+      if (controller.signal.aborted) showCaStatus("Token search timed out. Try again.", true);
+      else showCaStatus(error?.message || "Token search is unavailable.", true);
+    } finally {
+      clearTimeout(timer);
+      if (tokenSearchController === controller) tokenSearchController = null;
+      button.disabled = false;
+      button.textContent = "Search";
+    }
+  }
+
+  async function findContractPool(addressOverride) {
+    const address = typeof addressOverride === "string" ? addressOverride.trim() : $("#search").value.trim();
     if (!S.registry) return showCaStatus("Market registry is still loading.", true);
     if (!ADDRESS_RE.test(address)) return showCaStatus("Enter a valid BSC contract address.", true);
     const button = $("#find-ca");
@@ -613,8 +734,13 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
       showCaStatus(error?.message || "Unable to verify this contract.", true);
     } finally {
       button.disabled = false;
-      button.textContent = "Find CA";
+      button.textContent = "Search";
     }
+  }
+
+  function runTargetSearch() {
+    const value = $("#search").value.trim();
+    return ADDRESS_RE.test(value) ? findContractPool(value) : searchTokenName();
   }
 
   $$('[data-mode]').forEach((button) => button.addEventListener("click", () => {
@@ -624,14 +750,19 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     $("#accumulate").classList.toggle("hide", S.mode !== "accumulate");
     refresh();
   }));
-  $("#search").addEventListener("input", (event) => { S.search = event.target.value; drawTargets(); });
+  $("#search").addEventListener("input", (event) => {
+    S.search = event.target.value;
+    S.tokenSearchResults = [];
+    drawTokenSearchResults();
+    drawTargets();
+  });
   $("#search").addEventListener("keydown", (event) => {
-    if (event.key === "Enter" && ADDRESS_RE.test(event.currentTarget.value.trim())) {
+    if (event.key === "Enter") {
       event.preventDefault();
-      findContractPool();
+      runTargetSearch();
     }
   });
-  $("#find-ca").addEventListener("click", findContractPool);
+  $("#find-ca").addEventListener("click", runTargetSearch);
   $$('input[name=filter]').forEach((input) => input.addEventListener("change", () => { S.filter = input.value; drawTargets(); }));
   ["interval", "dip", "tranche", "name", "note", "pf", "mf", "seed"].forEach((id) => $("#" + id).addEventListener("input", () => { S.forkPassed = false; refresh(); }));
   ["schedule-on", "dip-on"].forEach((id) => $("#" + id).addEventListener("change", () => {
@@ -682,7 +813,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
   function validate() { refresh(); }
 })();
 9:X
-0:{"P":null,"c":["","create",""],"q":"","i":false,"f":[[["",{"children":["create",{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/2xc67r4mlzs7s.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"bodyClass":"has-mcta","html":"$5","runtimeVersion":"2d0b01e4e7b6","script":"$6","pageKey":"create"}],["$L7"],"$L8"]}],{},null,false,null]},null,false,"$9"]},null,false,null],"$La",false]],"m":"$undefined","G":["$b",["$Lc"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"Xs0c39p64-6k5Rep3hIr_"}
+0:{"P":null,"c":["","create",""],"q":"","i":false,"f":[[["",{"children":["create",{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/2xc67r4mlzs7s.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"bodyClass":"has-mcta","html":"$5","runtimeVersion":"2d0b01e4e7b6","script":"$6","pageKey":"create"}],["$L7"],"$L8"]}],{},null,false,null]},null,false,"$9"]},null,false,null],"$La",false]],"m":"$undefined","G":["$b",["$Lc"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"X9R2WnB9iElzpI3-0dq2H"}
 d:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
 e:"$Sreact.suspense"
 10:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]
