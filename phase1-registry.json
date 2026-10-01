@@ -12,7 +12,7 @@
   "cryptoCatalog": {
     "verifiedAt": "2026-10-01",
     "source": "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false",
-    "methodology": "First 10 non-stable global market-cap assets with an official PancakeSwap BSC token and a direct USDT V3 pool; wrapped BSC representations are shown under the underlying asset symbol."
+    "methodology": "First 10 non-stable global market-cap assets with an official PancakeSwap BSC token and a direct USDT V3 pool; wrapped assets are labeled explicitly."
   },
   "discovery": {
     "rpcUrl": "https://bsc-dataseed.bnbchain.org",
@@ -117,8 +117,8 @@
       "id": "crypto:WBNB",
       "category": "crypto",
       "symbol": "WBNB",
-      "displaySymbol": "BNB",
-      "ticker": "BNB",
+      "displaySymbol": "WBNB (Wrapped BNB)",
+      "ticker": "WBNB (Wrapped BNB)",
       "marketCapRank": 4,
       "coingeckoId": "binancecoin",
       "nativeWrap": true,

@@ -1,6 +1,6 @@
 1:"$Sreact.fragment"
 2:I[81384,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js"],"PrototypePage"]
-3:T1d99,
+3:T1d9a,
 
 <section class="page-head">
   <div class="wrap wide">
@@ -28,7 +28,7 @@
         <header><span class="rn">01</span><h2>Build the basket</h2><p>Only assets with verified USDT routes are shown.</p></header>
         <div class="body">
           <div class="fields">
-            <label class="field"><span>Find a target</span><div class="target-search"><input id="search" placeholder="BTC, BNB, NVDA or BSC contract"><button type="button" class="btn" id="find-ca">Find CA</button></div></label>
+            <label class="field"><span>Find a target</span><div class="target-search"><input id="search" placeholder="BTC, WBNB, NVDA or BSC contract"><button type="button" class="btn" id="find-ca">Find CA</button></div></label>
             <div class="field"><span>Asset type</span><div class="radio-row"><label><input type="radio" name="filter" value="all" checked>All</label><label><input type="radio" name="filter" value="crypto">Crypto</label><label><input type="radio" name="filter" value="bstock">bStocks</label></div></div>
           </div>
           <div id="ca-status" class="hide" aria-live="polite"></div>
@@ -114,7 +114,7 @@
 
 
 
-4:T7f12,
+4:T7ee6,
 (function () {
   "use strict";
   const { $, $$, esc, toast, DEMO_OWNER, hexAddr } = BAV;
@@ -380,7 +380,7 @@
       const checked = S.selected.has(target.id);
       const detail = target.category === "bstock"
         ? target.ticker
-        : (target.dynamic ? `Custom CA · ${target.address.slice(0, 6)}…${target.address.slice(-4)}` : `MC #${target.marketCapRank}${target.nativeWrap ? " · WBNB route" : ""}`);
+        : (target.dynamic ? `Custom CA · ${target.address.slice(0, 6)}…${target.address.slice(-4)}` : `MC #${target.marketCapRank}`);
       const liquidityLabel = target.liquidity?.usd < 50000 ? "Low TVL" : "Pool TVL";
       const routeDetail = target.swap.path?.length > 1 ? `${target.swap.path.length} pools` : `${target.swap.fee / 10000}% fee`;
       return `<label class="mkt ${checked ? "" : "off"}"><input type="checkbox" data-target="${esc(target.id)}" ${checked ? "checked" : ""}><span class="logo-stack">${target.category === "crypto" ? "◈" : "▦"}</span><span class="t">${esc(displayName(target))}<small>${esc(detail)}</small></span><span class="apy"><b>${formatUsd(target.liquidity?.usd)}</b><em>${liquidityLabel} · ${routeName(target)} · ${routeDetail}</em></span></label>`;
@@ -680,7 +680,7 @@
 8:X
 d:X
 d:C
-0:{"buildId":"q4Pa0A_dpirazeg4mNmLG","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"bodyClass":"has-mcta","html":"$3","runtimeVersion":"2d0b01e4e7b6","script":"$4","pageKey":"create"}],["$L5"],"$L6"]}],"isPartial":"$@7","staleTime":"$8","varyParams":null},{"rsc":"$L9","isPartial":"$@a","staleTime":"$8","varyParams":null},{"rsc":"$Lb","isPartial":"$@c","staleTime":"$8","varyParams":"$d"},{"rsc":"$Le","isPartial":"$@f","staleTime":"$8","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@10","rootVaryParams":null,"needsRuntimeRequest":"$@11"}
+0:{"buildId":"Xs0c39p64-6k5Rep3hIr_","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"bodyClass":"has-mcta","html":"$3","runtimeVersion":"2d0b01e4e7b6","script":"$4","pageKey":"create"}],["$L5"],"$L6"]}],"isPartial":"$@7","staleTime":"$8","varyParams":null},{"rsc":"$L9","isPartial":"$@a","staleTime":"$8","varyParams":null},{"rsc":"$Lb","isPartial":"$@c","staleTime":"$8","varyParams":"$d"},{"rsc":"$Le","isPartial":"$@f","staleTime":"$8","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@10","rootVaryParams":null,"needsRuntimeRequest":"$@11"}
 12:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
 13:"$Sreact.suspense"
 15:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]
