@@ -42,14 +42,13 @@
     { id: "venus", name: "Venus", logo: "venus" },
   ];
 
-  // Fees are derived in one place so the create and vault pages cannot show
-  // different splits. The creator sets a gross fee; the platform receives 15%
-  // of that fee in addition to its own risk-based performance fee.
-  const platformFeeForRisk = (risk) => (risk === "High" ? 5 : 3);
-  const feeBreakdown = (creatorPerformancePct, platformPerformancePct) => {
+  // The current contracts give the protocol 10% of manager fees. There is no
+  // separate risk-tier platform performance fee in the deployed economics.
+  const platformFeeForRisk = () => 0;
+  const feeBreakdown = (creatorPerformancePct) => {
     const creatorGross = Number(creatorPerformancePct) || 0;
-    const platformBase = Number(platformPerformancePct) || 0;
-    const platformShareOfCreator = creatorGross * 0.15;
+    const platformBase = 0;
+    const platformShareOfCreator = creatorGross * 0.1;
     return {
       total: creatorGross + platformBase,
       creatorGross,
@@ -100,7 +99,7 @@
     lend({ id: "venus-supply-usd1", g: "stable", venue: "venus", kind: "Market", name: "Venus · USD1", sub: "Core pool supply", apy: 1.90, tokens: ["USD1"] });
     lend({ id: "lista-vault-0x9a17", g: "stable", venue: "lista", kind: "Vault", name: "Gauntlet x Lista DAO U Vault", sub: "U · curated by Gauntlet x Lista DAO", apy: 1.41, tvl: 49.93e6, tokens: ["U"] });
     lend({ id: "lista-vault-0xfa27", g: "stable", venue: "lista", kind: "Vault", name: "Gauntlet x Lista DAO USD1 Vault", sub: "USD1 · curated by Gauntlet x Lista DAO", apy: 1.07, tvl: 138.20e6, tokens: ["USD1"] });
-    lend({ id: "lista-vault-0x8a06", g: "stable", venue: "lista", kind: "Vault", name: "Lista USDC Vault", sub: "USDC · curated by Lista DAO", apy: 0.01, incentives: [{ token: "LISTA", apy: 9.24 }], tvl: 0.93e6, tokens: ["USDC"] });
+    lend({ id: "lista-vault-0x8a06", g: "stable", venue: "lista", kind: "Vault", name: "Lista USDC Vault", sub: "USDC · curated by Lista DAO", apy: 0.01, apyNote: "+9.24% LISTA, not counted", tvl: 0.93e6, tokens: ["USDC"] });
     // BNB
     lend({ id: "lista-vault-0xd5cf", g: "bnb", venue: "lista", kind: "Vault", name: "MEV BNB Vault", sub: "BNB · curated by MEV Capital", apy: 1.72, tvl: 0.03e6, tokens: ["BNB"] });
     lend({ id: "lista-stake-slisbnb", g: "bnb", venue: "lista", kind: "Staking", name: "Stake BNB → slisBNB", sub: "Lista liquid staking · exits via DEX, or a 7–15 day unstake", apy: 0.83, tokens: ["slisBNB"] });
@@ -140,8 +139,6 @@
       id, g: groupOf(coll), a: "borrow", venue, kind: "Loop", name: `${coll} / ${loan}`, tokens: [coll, loan],
       loop: { kind, coll, loan, lltv, cap, def, borrow, rew, liq, sub, yld, stake: !!stake, max: 1 / (1 - cap / 100), dflt: 1 / (1 - def / 100) },
     }));
-    const POINTS = { "lista-susde-usdt": "Ethena 5x points" };
-    M.forEach((m) => { if (POINTS[m.id]) m.points = POINTS[m.id]; });
     const byId = Object.fromEntries(M.map((m) => [m.id, m]));
     const denomFam = (asset) => (asset === "BNB" ? "bnb" : "stable");
     // Holding the vault's own asset is not a market.
@@ -162,9 +159,6 @@
     }
     const levTxt = (x) => (Math.round(x * 10) / 10).toFixed(1) + "×";
     const pct = (n) => (n == null ? "—" : (n >= 10 ? n.toFixed(1) : n.toFixed(2)) + "%");
-    const incentiveApy = (m) => (m.incentives || []).reduce((s, x) => s + x.apy, 0);
-    const totalApy = (m) => (m.apy || 0) + incentiveApy(m);
-    const incentiveTxt = (m) => (m.incentives || []).map((x) => `+ ${pct(x.apy)} $${x.token} incentive`).join(" ");
     const capTxt = (n) => `${Math.round((Number(n) || 0) * 10) / 10}%`;
     const usd = (n) => (n >= 1e6 ? "$" + (n / 1e6).toFixed(n >= 1e8 ? 0 : 1) + "M" : "$" + Math.round(n / 1e3) + "K");
     // Leverage x on a loop: LTV = 1 − 1/x. Liquidation comes after the collateral falls by 1 − LTV / LLTV against the loan.
@@ -210,7 +204,7 @@
       return `${name} can ${joinAnd(phrases)}. <em>Nothing else.</em>`;
     }
     const maxLeverage = (rules) => Math.max(1, ...rules.filter((r) => r.a === "borrow").flatMap((r) => ruleMarkets(r).map((m) => effLev(m, r.lev))));
-    return { label, GROUPS, ACTIONS, MARKETS: M, byId, BSTOCKS, VNAME, groupOf, familyOf, denomFam, marketsFor, ruleMarkets, allocationCap, totalAllocation, minIdleAllocation, effLev, riskOf, levTxt, pct, incentiveApy, totalApy, incentiveTxt, capTxt, usd, loopRisk, carry, pairNames, describe, maxLeverage };
+    return { label, GROUPS, ACTIONS, MARKETS: M, byId, BSTOCKS, VNAME, groupOf, familyOf, denomFam, marketsFor, ruleMarkets, allocationCap, totalAllocation, minIdleAllocation, effLev, riskOf, levTxt, pct, capTxt, usd, loopRisk, carry, pairNames, describe, maxLeverage };
   })();
 
   /* ------------------------------------------------------------------ */
@@ -218,69 +212,63 @@
   /* ------------------------------------------------------------------ */
   const VAULTS = [
     {
-      slug: "northstar-multi", name: "Northstar Multi-Strategy", manager: "Northstar", agentId: 1611, agentVaults: 2, symbol: "avNMS", asset: "USDT", benchmark: "Venus USDT supply rate", managerType: "agent",
-      rules: [{ g: "stable", a: "lend", m: ["venus-supply-usdt", "lista-vault-0x6d67"], caps: { "venus-supply-usdt": 30, "lista-vault-0x6d67": 14 } }, { g: "bnb", a: "borrow", m: ["lista-slisbnb-bnb-fixed-term"], caps: { "lista-slisbnb-bnb-fixed-term": 24 }, lev: 4.2 }, { g: "majors", a: "trade", m: ["pcs-hold-btcb"], caps: { "pcs-hold-btcb": 10 } }, { g: "stocks", a: "trade", m: ["pcs-hold-nvdab", "pcs-hold-spyb"], caps: { "pcs-hold-nvdab": 7, "pcs-hold-spyb": 7 } }],
-      strategy: "Keeps a stablecoin core on Venus, runs a slisBNB loop, and rotates a sleeve of majors and bStocks.",
+      slug: "sherwood-crypto-core", name: "Sherwood Crypto Core", manager: "Sherwood", agentId: 1611, agentVaults: 4, symbol: "avSCC", asset: "USDT", benchmark: "Equal-weight BNB / BTCB / ETH", managerType: "agent", official: true, buyPlan: "Buy once",
+      rules: [{ g: "bnb", a: "trade", m: ["pcs-hold-bnb"], caps: { "pcs-hold-bnb": 32 } }, { g: "majors", a: "trade", m: ["pcs-hold-btcb", "pcs-hold-eth"], caps: { "pcs-hold-btcb": 32, "pcs-hold-eth": 31 } }],
+      strategy: "Buys a fixed WBNB, BTCB and ETH basket once. Supported assets may be supplied only to their exact approved Venus or Lista market.",
       runtimeDays: 96, returns: { "7D": 0.61, "30D": 2.44, "90D": 7.12, ALL: 7.9 }, maxDrawdown: { "7D": -0.42, "30D": -1.88, "90D": -3.9, ALL: -3.9 },
-      tvl: 3050000, followers: 1102, status: "Live", sharePrice: 1.079, fees: { perf: 15, mgmt: 0, platform: 5 }, cap: null, exitCost: "0.1–0.9% by position",
+      tvl: 3050000, followers: 1102, status: "Simulated", sharePrice: 1.079, fees: { perf: 15, mgmt: 0, platform: 5 }, cap: null, exitCost: "0.1–0.9% by position",
       positions: [
-        { p: "Venus", loc: "vUSDT", w: 30, by: "vToken × exchange rate", st: "Supplying · 3.34%" },
-        { p: "Lista DAO", loc: "USDT lending vault", w: 14, by: "Vault shares", st: "Supplying · 2.84%" },
-        { p: "Lista DAO", loc: "slisBNB / BNB · fixed-term", w: 24, by: "Staking rate × BNB − debt", st: "LTV 76.0% · 4.2×" },
-        { p: "PancakeSwap", loc: "BTCB · NVDAB · SPYB", w: 24, by: "Oracle · Atlas / APRO", st: "Held" },
-        { p: "Idle", loc: "USDT in vault", w: 8, by: "Balance", st: "Instant exits" },
+        { p: "Lista DAO", loc: "WBNB vault", w: 32, by: "ERC-4626 shares", st: "Optional supply · live-gated" },
+        { p: "Venus", loc: "vBTC", w: 32, by: "vToken × exchange rate", st: "Optional supply · live-gated" },
+        { p: "PancakeSwap", loc: "ETH", w: 31, by: "Oracle + TWAP", st: "Held" },
+        { p: "Idle", loc: "USDT in vault", w: 5, by: "Balance", st: "Execution reserve" },
       ],
     },
     {
-      slug: "stable-yield-router", name: "Stable Yield Router", manager: "Orbit Agent", agentId: 942, agentVaults: 1, symbol: "avSYR", asset: "USDT", benchmark: "Venus USDT supply rate", managerType: "agent",
-      rules: [{ g: "stable", a: "lend", m: ["venus-supply-usdt", "venus-supply-usdc"], caps: { "venus-supply-usdt": 50, "venus-supply-usdc": 40 } }],
-      strategy: "Moves USDT and USDC between Venus and Lista lending as rates change.",
+      slug: "sherwood-bstock-core", name: "Sherwood bStock Core", manager: "Sherwood", agentId: 942, agentVaults: 4, symbol: "avSBC", asset: "USDT", benchmark: "Hold SPYB", managerType: "agent", official: true, buyPlan: "Buy once",
+      rules: [{ g: "stocks", a: "trade", m: ["pcs-hold-nvdab", "pcs-hold-tslab", "pcs-hold-spcxb", "pcs-hold-skhyb"], caps: { "pcs-hold-nvdab": 24, "pcs-hold-tslab": 24, "pcs-hold-spcxb": 24, "pcs-hold-skhyb": 23 } }],
+      strategy: "Buys a fixed NVDAB, TSLAB, SPCXB and SKHYB basket once, with post-purchase yield disabled by default.",
       runtimeDays: 128, returns: { "7D": 0.24, "30D": 1.02, "90D": 3.31, ALL: 4.76 }, maxDrawdown: { "7D": -0.03, "30D": -0.12, "90D": -0.38, ALL: -0.62 },
-      tvl: 2860000, followers: 984, status: "Live", sharePrice: 1.0476, fees: { perf: 10, mgmt: 0, platform: 3 }, cap: null, exitCost: "< 0.1%",
+      tvl: 2860000, followers: 984, status: "Simulated", sharePrice: 1.0476, fees: { perf: 10, mgmt: 0, platform: 3 }, cap: null, exitCost: "< 0.1%",
       positions: [
-        { p: "Venus", loc: "vUSDT", w: 48, by: "vToken × exchange rate", st: "Supplying · 3.34%" },
-        { p: "Venus", loc: "vUSDC", w: 37, by: "vToken × exchange rate", st: "Supplying · 3.81%" },
-        { p: "Idle", loc: "USDT in vault", w: 15, by: "Balance", st: "Instant exits" },
+        { p: "PancakeSwap", loc: "NVDAB", w: 24, by: "Oracle + TWAP", st: "Held" },
+        { p: "PancakeSwap", loc: "TSLAB · SPCXB · SKHYB", w: 71, by: "Oracle + TWAP", st: "Held" },
+        { p: "Idle", loc: "USDT in vault", w: 5, by: "Balance", st: "Execution reserve" },
       ],
     },
     {
-      slug: "bnb-bluechip-momentum", name: "Bluechip Momentum", manager: "Sable Quant", agentId: 1306, agentVaults: 3, symbol: "avBCM", asset: "USDT", benchmark: "Equal-weight BNB / BTCB / ETH", managerType: "agent",
-      rules: [{ g: "bnb", a: "trade", m: ["pcs-hold-bnb"], caps: { "pcs-hold-bnb": 38 } }, { g: "majors", a: "trade", m: ["pcs-hold-btcb"], caps: { "pcs-hold-btcb": 26 } }, { g: "majors", a: "lend", m: ["venus-supply-eth"], caps: { "venus-supply-eth": 21 } }],
-      strategy: "Trend-following exposure across BNB, BTCB and ETH with volatility-aware position sizing.",
+      slug: "sherwood-crypto-accumulator", name: "Sherwood Crypto Accumulator", manager: "Sherwood", agentId: 1306, agentVaults: 4, symbol: "avSCA", asset: "USDT", benchmark: "Equal-weight BNB / BTCB / ETH", managerType: "agent", official: true, buyPlan: "Weekly or −5%",
+      rules: [{ g: "bnb", a: "trade", m: ["pcs-hold-bnb"], caps: { "pcs-hold-bnb": 32 } }, { g: "majors", a: "trade", m: ["pcs-hold-btcb", "pcs-hold-eth"], caps: { "pcs-hold-btcb": 32, "pcs-hold-eth": 31 } }],
+      strategy: "Buys a 10% cash tranche weekly or after a 5% basket decline, with one shared 24-hour cooldown.",
       runtimeDays: 73, returns: { "7D": 2.16, "30D": 6.42, "90D": null, ALL: 13.88 }, maxDrawdown: { "7D": -1.92, "30D": -4.74, "90D": null, ALL: -8.16 },
-      tvl: 2170000, followers: 803, status: "Live", sharePrice: 1.1388, fees: { perf: 15, mgmt: 0, platform: 5 }, cap: 5000000, exitCost: "< 0.5% at $100K",
-      pendingChange: { what: "Add Venus · BTCB lending with a 10% NAV cap", hours: 18 },
+      tvl: 2170000, followers: 803, status: "Simulated", sharePrice: 1.1388, fees: { perf: 15, mgmt: 0, platform: 5 }, cap: 5000000, exitCost: "< 0.5% at $100K",
       positions: [
-        { p: "PancakeSwap", loc: "WBNB", w: 38, by: "Oracle · Chainlink / Atlas", st: "Held" },
-        { p: "PancakeSwap", loc: "BTCB", w: 26, by: "Oracle · Chainlink / Atlas", st: "Held" },
-        { p: "Venus", loc: "vETH", w: 21, by: "vToken × oracle", st: "Supplying · 1.36%" },
-        { p: "Idle", loc: "USDT in vault", w: 15, by: "Balance", st: "Instant exits" },
+        { p: "PancakeSwap", loc: "WBNB · BTCB · ETH", w: 64, by: "Oracle + TWAP", st: "Accumulating" },
+        { p: "Idle", loc: "USDT in vault", w: 36, by: "Balance", st: "Next trigger eligible" },
       ],
     },
     {
-      slug: "liquid-staking-loop", name: "Liquid Staking Loop", manager: "Kepler AI", agentId: 1422, agentVaults: 1, symbol: "avLSL", asset: "USDT", demoUnit: "BNB", benchmark: "Hold slisBNB", managerType: "agent",
-      rules: [{ g: "bnb", a: "borrow", m: ["lista-slisbnb-bnb-fixed-term"], caps: { "lista-slisbnb-bnb-fixed-term": 90 }, lev: 5 }],
-      strategy: "Buys BNB with USDT, stakes it to slisBNB and loops on Lista at about 4.6×. In USDT it moves with BNB; in BNB it earns the staking carry.",
+      slug: "sherwood-bstock-accumulator", name: "Sherwood bStock Accumulator", manager: "Sherwood", agentId: 1422, agentVaults: 4, symbol: "avSBA", asset: "USDT", benchmark: "Hold SPYB", managerType: "agent", official: true, buyPlan: "Monthly or −8%",
+      rules: [{ g: "stocks", a: "trade", m: ["pcs-hold-nvdab", "pcs-hold-spyb", "pcs-hold-aaplb", "pcs-hold-googlb"], caps: { "pcs-hold-nvdab": 24, "pcs-hold-spyb": 24, "pcs-hold-aaplb": 24, "pcs-hold-googlb": 23 } }],
+      strategy: "Buys a 12% cash tranche monthly or after an 8% basket decline. Unsupported yield assets stay held.",
       runtimeDays: 41, returns: { "7D": 0.04, "30D": 0.18, "90D": null, ALL: 0.24 }, maxDrawdown: { "7D": -0.02, "30D": -0.05, "90D": null, ALL: -0.06 },
-      tvl: 1940000, followers: 677, status: "Live", sharePrice: 1.0024, fees: { perf: 10, mgmt: 0, platform: 5 }, cap: null, exitCost: "≈ 0.8% on $7.5K",
+      tvl: 1940000, followers: 677, status: "Simulated", sharePrice: 1.0024, fees: { perf: 10, mgmt: 0, platform: 5 }, cap: null, exitCost: "0.2–0.9% by target",
       positions: [
-        { p: "Lista DAO", loc: "slisBNB / BNB · fixed-term", w: 90, by: "Staking rate × BNB − debt", st: "LTV 78.4% · 4.6×" },
-        { p: "Idle", loc: "USDT in vault", w: 10, by: "Balance", st: "Instant exits" },
+        { p: "PancakeSwap", loc: "NVDAB · SPYB · AAPLB · GOOGLB", w: 60, by: "Oracle + TWAP", st: "Accumulating" },
+        { p: "Idle", loc: "USDT in vault", w: 40, by: "Balance", st: "Next trigger eligible" },
       ],
     },
     {
-      slug: "mag7-rotation", name: "Mag 7 Rotation", manager: "Tickerline", agentId: null, agentVaults: 2, symbol: "avM7R", asset: "USDT", benchmark: "Hold SPYB", managerType: "human",
-      rules: [{ g: "stocks", a: "trade", m: ["pcs-hold-nvdab", "pcs-hold-googlb", "pcs-hold-aaplb"], caps: { "pcs-hold-nvdab": 30, "pcs-hold-googlb": 25, "pcs-hold-aaplb": 20 } }, { g: "stable", a: "lend", m: ["lista-vault-0xfa27", "venus-supply-usd1"], caps: { "lista-vault-0xfa27": 10, "venus-supply-usd1": 10 } }],
-      strategy: "Rotates between the largest US tech names in bStocks and parks spare cash in USD1 lending when momentum fades.",
+      slug: "mag7-rotation", name: "Mag 7 Accumulator", manager: "Tickerline", agentId: 1807, agentVaults: 2, symbol: "avM7A", asset: "USDT", benchmark: "Hold SPYB", managerType: "agent", buyPlan: "Weekly or −6%",
+      rules: [{ g: "stocks", a: "trade", m: ["pcs-hold-nvdab", "pcs-hold-googlb", "pcs-hold-aaplb"], caps: { "pcs-hold-nvdab": 30, "pcs-hold-googlb": 25, "pcs-hold-aaplb": 20 } }],
+      strategy: "Buys a fixed NVDAB, GOOGLB and AAPLB basket in 10% cash tranches weekly or after a 6% basket decline.",
       runtimeDays: 52, returns: { "7D": 1.42, "30D": 4.91, "90D": null, ALL: 7.84 }, maxDrawdown: { "7D": -1.18, "30D": -3.96, "90D": null, ALL: -5.72 },
-      tvl: 1210000, followers: 512, status: "Live", sharePrice: 1.0784, fees: { perf: 15, mgmt: 0, platform: 5 }, cap: 1500000, exitCost: "0.2–0.7% at $100K",
+      tvl: 1210000, followers: 512, status: "Simulated", sharePrice: 1.0784, fees: { perf: 15, mgmt: 0, platform: 5 }, cap: 1500000, exitCost: "0.2–0.7% at $100K",
       positions: [
         { p: "PancakeSwap", loc: "NVDAB", w: 28, by: "Atlas · APRO · TWAP", st: "Held" },
         { p: "PancakeSwap", loc: "GOOGLB", w: 22, by: "Atlas · TWAP", st: "Held" },
         { p: "PancakeSwap", loc: "AAPLB", w: 18, by: "Atlas · TWAP", st: "Held" },
-        { p: "Lista DAO", loc: "Gauntlet x Lista DAO USD1 Vault", market: "lista-vault-0xfa27", w: 10, by: "Vault shares", st: "Supplying · 1.07%" },
-        { p: "Venus", loc: "vUSD1", market: "venus-supply-usd1", w: 6, by: "vToken × exchange rate", st: "Supplying · 1.90%" },
-        { p: "Idle", loc: "USDT in vault", w: 16, by: "Balance", st: "Instant exits" },
+        { p: "Idle", loc: "USDT in vault", w: 32, by: "Balance", st: "Next trigger eligible" },
       ],
     },
     {
@@ -288,23 +276,10 @@
       rules: [{ g: "stocks", a: "trade", m: ["pcs-hold-nvdab"], caps: { "pcs-hold-nvdab": 70 } }],
       strategy: "Buys NVDAB every Monday with a fixed share of idle USDT. Nothing else.",
       runtimeDays: 9, returns: { "7D": 2.08, "30D": null, "90D": null, ALL: 3.41 }, maxDrawdown: { "7D": -2.64, "30D": null, "90D": null, ALL: -2.64 },
-      tvl: 184000, followers: 96, status: "Live", sharePrice: 1.0341, fees: { perf: 10, mgmt: 0, platform: 5 }, cap: null, exitCost: "≈ 0.4% at $100K",
+      tvl: 184000, followers: 96, status: "Simulated", sharePrice: 1.0341, fees: { perf: 10, mgmt: 0, platform: 5 }, cap: null, exitCost: "≈ 0.4% at $100K",
       positions: [
         { p: "PancakeSwap", loc: "NVDAB", w: 64, by: "Atlas · APRO · TWAP", st: "Held" },
         { p: "Idle", loc: "USDT in vault", w: 36, by: "Balance", st: "Next buy Monday" },
-      ],
-    },
-    {
-      slug: "lista-rate-hopper", name: "Lista Rate Hopper", manager: "Mirror Labs", agentId: 1790, agentVaults: 4, symbol: "avLRH", asset: "USDT", benchmark: "Venus USDT supply rate", managerType: "agent",
-      rules: [{ g: "stable", a: "lend", m: ["venus-supply-usdt", "venus-supply-usdc"], caps: { "venus-supply-usdt": 50, "venus-supply-usdc": 40 } }],
-      strategy: "Low-fee USDT lending across Venus and Lista.",
-      runtimeDays: 11, returns: { "7D": 0.21, "30D": null, "90D": null, ALL: 0.33 }, maxDrawdown: { "7D": -0.02, "30D": null, "90D": null, ALL: -0.02 },
-      tvl: 420000, followers: 61, status: "Live", sharePrice: 1.0033, fees: { perf: 5, mgmt: 0, platform: 3 }, cap: null, exitCost: "< 0.1%",
-      copyOf: { slug: "stable-yield-router", lag: "14 min" },
-      positions: [
-        { p: "Venus", loc: "vUSDT", w: 47, by: "vToken × exchange rate", st: "Supplying · 3.34%" },
-        { p: "Venus", loc: "vUSDC", w: 38, by: "vToken × exchange rate", st: "Supplying · 3.81%" },
-        { p: "Idle", loc: "USDT in vault", w: 15, by: "Balance", st: "Instant exits" },
       ],
     },
   ];
@@ -317,9 +292,9 @@
   const freshDemoState = () => ({
     balances: { USDT: 24850, BNB: 18.42 },
     holdings: {
-      "stable-yield-router": { shares: 20000, cost: 1 },
-      "bnb-bluechip-momentum": { shares: 3200, cost: 1.0625 },
-      "mag7-rotation": { shares: 4600, cost: 1.0214 },
+      "sherwood-crypto-core": { shares: 20000, cost: 1 },
+      "sherwood-crypto-accumulator": { shares: 3200, cost: 1.0625 },
+      "sherwood-bstock-core": { shares: 4600, cost: 1.0214 },
     },
     activities: [],
     launchedVaults: [],
@@ -418,9 +393,12 @@
     return `<span class="risk"><i>${[1, 2, 3].map((i) => `<b class="${i <= lvl ? "on" : ""}"></b>`).join("")}</i>${r}</span>`;
   }
   function statusTag(v) {
-    return v.status === "Paused"
+    const state = v.status === "Paused"
       ? `<span class="tag paused"><span class="dot"></span>Paused</span>`
-      : `<span class="tag"><span class="dot"></span>Live</span>`;
+      : v.status === "Simulated"
+        ? `<span class="tag sim">Simulated</span>`
+        : `<span class="tag"><span class="dot"></span>Live</span>`;
+    return `${v.official ? `<span class="tag">Official</span>` : ""}${state}`;
   }
 
   // Deterministic PRNG so every render of a vault looks identical
@@ -462,67 +440,6 @@
       }
     }
     return (seriesCache[v.slug] = out.map((p, i) => ({ t: TODAY - (N - i) * DAY, v: p })));
-  }
-
-  const BNB_USD = 758.28; // demo spot, 2026-09-30
-  let bnbCache;
-  function bnbSeries() {
-    if (bnbCache) return bnbCache;
-    const N = 200, r = rng("bnb-usd-demo"), w = [0];
-    for (let i = 1; i <= N; i++) w.push(w[i - 1] + gauss(r) * 0.025);
-    const shift = w[N];
-    return (bnbCache = w.map((x, i) => ({ t: TODAY - (N - i) * DAY, v: BNB_USD * Math.exp(x - shift) })));
-  }
-  function bnbAt(t) {
-    const s = bnbSeries(), i = Math.round((t - s[0].t) / DAY);
-    return s[Math.max(0, Math.min(s.length - 1, i))].v;
-  }
-
-  // NAV per share measured in BNB, indexed so launch = the USDT launch NAV (1.0000).
-  function seriesIn(v, unit) {
-    const s = navSeries(v);
-    if (unit !== "BNB") return s;
-    const b0 = bnbAt(s[0].t);
-    return s.map((p) => ({ t: p.t, v: (p.v * b0) / bnbAt(p.t) }));
-  }
-
-  // Return, annualized return and max drawdown for a period, in USDT (stored figures) or BNB (derived).
-  function statsIn(v, p, unit) {
-    if (v.returns[p] == null) return null;
-    if (unit !== "BNB") return { ret: v.returns[p], ann: perf(v, p, "annualized"), dd: v.maxDrawdown[p] };
-    const all = seriesIn(v, "BNB"), n = p === "ALL" ? all.length : Math.min(all.length, periodDays(v, p) + 1), s = all.slice(-n);
-    const ret = (s[s.length - 1].v / s[0].v - 1) * 100;
-    let peak = s[0].v, dd = 0;
-    s.forEach((x) => { peak = Math.max(peak, x.v); dd = Math.min(dd, (x.v / peak - 1) * 100); });
-    const ann = v.runtimeDays < 30 ? null : (Math.pow(1 + ret / 100, 365 / periodDays(v, p)) - 1) * 100;
-    return { ret, ann, dd };
-  }
-
-  const UNIT_KEY = "bav:display-unit";
-  function displayUnit() { try { return localStorage.getItem(UNIT_KEY) === "BNB" ? "BNB" : "USDT"; } catch (_) { return "USDT"; } }
-  function setDisplayUnit(u) {
-    try { localStorage.setItem(UNIT_KEY, u); } catch (_) {}
-    window.dispatchEvent(new CustomEvent("bav:unit", { detail: u }));
-  }
-
-  function normalizeDemoUnits() {
-    VAULTS.filter((v) => v.demoUnit === "BNB").forEach((v) => {
-      const native = navSeries(v);                       // built from the BNB-terms figures
-      const b0 = bnbAt(native[0].t);
-      const usdt = native.map((p) => ({ t: p.t, v: (p.v * bnbAt(p.t)) / b0 }));
-      seriesCache[v.slug] = usdt;                         // navSeries(v) now returns the USDT series
-      const end = usdt[usdt.length - 1].v;
-      v.sharePrice = end;
-      ["7D", "30D", "90D", "ALL"].forEach((k) => {
-        if (v.returns[k] == null) return;
-        const n = k === "ALL" ? usdt.length : Math.min(usdt.length, periodDays(v, k) + 1), s = usdt.slice(-n);
-        v.returns[k] = +((end / s[0].v - 1) * 100).toFixed(2);
-        let peak = s[0].v, dd = 0;
-        s.forEach((x) => { peak = Math.max(peak, x.v); dd = Math.min(dd, (x.v / peak - 1) * 100); });
-        v.maxDrawdown[k] = +dd.toFixed(2);
-      });
-      delete v.demoUnit;
-    });
   }
 
   /* ------------------------------------------------------------------ */
@@ -739,7 +656,7 @@
         $("line", hov).setAttribute("x1", px); $("line", hov).setAttribute("x2", px);
         $("circle", hov).setAttribute("cx", px); $("circle", hov).setAttribute("cy", py);
         const chg = (pts[i].v / pts[0].v - 1) * 100;
-        tip.innerHTML = `<div class="d">${fmt.date(pts[i].t)}</div><b>${pts[i].v.toFixed(4)}</b> ${esc(opts.unitLabel || "NAV / share")} &nbsp;<span style="color:#5E636C">${fmt.pct(chg)}</span>`;
+        tip.innerHTML = `<div class="d">${fmt.date(pts[i].t)}</div><b>${pts[i].v.toFixed(4)}</b> NAV / share &nbsp;<span style="color:#5E636C">${fmt.pct(chg)}</span>`;
         tip.style.left = Math.min(Math.max(px, 90), W - 90) + "px";
         tip.style.top = py + "px";
         tip.style.opacity = 1;
@@ -844,21 +761,18 @@
   const vaultMarkets = (v) => (v.rules || []).flatMap(CATALOG.ruleMarkets);
   const vaultVenues = (v) => [...new Set(vaultMarkets(v).map((m) => m.venue))];
   const vaultRisk = (v) => CATALOG.riskOf(vaultMarkets(v), v.asset) || "Low";
-  const bnbNoPriceRisk = (v) => vaultRisk(v) === "High" && CATALOG.riskOf(vaultMarkets(v), "BNB") !== "High";
   const managerLabel = (v) => (v.managerType === "human" ? `${v.manager} · Human-managed` : `${v.manager} · ERC-8004 #${v.agentId}`);
   const rulesLabel = (v) => {
     const operations = vaultMarkets(v).length;
     const allocated = CATALOG.totalAllocation(v.rules || []);
-    return `${operations} operation${operations === 1 ? "" : "s"} · ${CATALOG.capTxt(allocated)} max deployed`;
+    return `${v.buyPlan ? `${v.buyPlan} · ` : ""}${operations} target${operations === 1 ? "" : "s"} · ${CATALOG.capTxt(allocated)} max deployed`;
   };
 
-  normalizeDemoUnits();
-
   window.BAV = {
-    TODAY, DAY, SLOTS, ASSETS, VENUES, VAULTS, CATALOG, vaultMarkets, vaultVenues, vaultRisk, bnbNoPriceRisk, managerLabel, rulesLabel,
+    TODAY, DAY, SLOTS, ASSETS, VENUES, VAULTS, CATALOG, vaultMarkets, vaultVenues, vaultRisk, managerLabel, rulesLabel,
     platformFeeForRisk, feeBreakdown,
     $, $$, esc, fmt, perf, periodDays, historyTag, riskMeter, statusTag,
-    rng, hexAddr, short, navSeries, BNB_USD, bnbSeries, bnbAt, seriesIn, statsIn, displayUnit, setDisplayUnit, sparkline, lineChart, logo, agentCanvas, stackTables,
+    rng, hexAddr, short, navSeries, sparkline, lineChart, logo, agentCanvas, stackTables,
     shell, footerHTML, wireShell, toast, SEAL, route, DEMO_OWNER, demo,
     vault: (slug) => VAULTS.find((v) => v.slug === slug),
   };

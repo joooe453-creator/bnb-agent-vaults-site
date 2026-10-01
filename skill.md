@@ -1,131 +1,60 @@
----
-name: bnb-agent-vaults
-description: Become a fund manager on BNB Chain. Choose exact market operations and a NAV allocation cap for each, get your owner to sign, and trade inside limits the vault contract enforces.
----
+# BNB Agent Vaults — Phase 1
 
-# BNB Agent Vaults — skill for agents
+Use this integration to design and validate a phase-one basket vault on BNB Smart Chain. This endpoint does not
+deploy a vault or submit transactions.
 
-> Status: prototype. Contracts are unaudited and not deployed to mainnet, and the MCP endpoint below is not live yet. Until it is, describe the vault to your owner and send them to the website's “Launch a vault” page.
+## Product boundary
 
-You are about to run a fund. Depositors put money into a vault (ERC-4626 on BNB Chain). You trade it inside rules that the vault contract checks on every transaction. Your owner earns a performance fee on profit above the high-water mark. You can trade the money; you can never move it out.
+A vault has exactly one buying plan:
 
-## 1. Connect
+1. `lump-sum`: buy the declared bStock/crypto basket once for each settled contribution batch.
+2. `accumulate`: buy fixed tranches on a schedule, after a basket drawdown, or when either trigger fires.
 
-MCP endpoint (streamable HTTP): `<MCP_URL>`
+Post-purchase handling is optional for every target:
 
-Claude Code:
+- `hold`: retain the purchased token in the vault.
+- `yield-market`: deposit only into the exact compatible Venus or Lista market returned by
+  `list_phase1_markets`.
 
-```
-claude mcp add --transport http bnb-agent-vaults <MCP_URL>
-```
+Do not invent token, pool, vToken, or Lista vault addresses. If the registry has no yield market for a target, use
+`hold`. Borrowing, leverage, loops, LP positions, arbitrary calls, and stablecoin yield rotation are outside phase one.
 
-Any other MCP client: add the same URL as a streamable HTTP server.
+## Safe workflow
 
-## 2. Make your trading key
+1. Call `list_phase1_markets` immediately before building a manifest.
+2. Select 1–10 targets and make integer `weightBps` total exactly `10000`.
+3. Copy each target's token address, PancakeSwap V3 pool, and fee exactly from the registry.
+4. Add a yield market only when its `targetId` equals the selected target's id. Set
+   `revalidateBeforeEveryDeposit: true` and `fallback: "hold"`.
+5. Use `build_vault_manifest` to inspect the current schema and fixed limits.
+6. Call `validate_vault_manifest`. Do not present a vault as deployable unless every check passes and a BSC fork
+   dry-run has passed.
 
-```
-npx bnb-agent-vaults operator new
-```
+## Accumulation semantics
 
-This creates a key in the system keychain and prints its address. It is your operator key: it can only call `execute` on your vault. It must be a different address from your owner's wallet — the contract rejects the vault otherwise.
+- `trancheBps` is 1–25% of available cash.
+- Schedule interval is 1–90 days.
+- Drawdown is 1–30% and is measured from `last-executed-basket-index`.
+- Schedule and drawdown triggers share a minimum 24-hour cooldown. If both fire, execute only one tranche.
+- A failed purchase does not move the basket reference or consume the cooldown.
+- Total deployment is capped at 95%, leaving at least 5% idle.
 
-If you do not have an ERC-8004 identity yet, register one for this address first.
+## Market checks
 
-Never ask your owner for their private key, seed phrase or a signature you cannot explain in one sentence.
+Registry inclusion is not proof that a future deposit will succeed. Before every Venus deposit, verify the exact
+underlying, comptroller, listing state, mint pause and supply-cap headroom. Before every Lista/ERC-4626 deposit,
+verify the exact `asset()`, `maxDeposit` and `previewDeposit`. If a check fails, keep the purchased asset in the vault;
+never silently route it to a different market.
 
-## 3. Find markets
+## MCP tools
 
-```
-list_markets({ asset: "stable", action: "lend" })
-→ [ { id: "lista-vault-0xb5a3", name: "RockawayX PT Yield", kind: "Vault", apy: 4.14, tvlUsd: 1770000 },
-    { id: "venus-supply-usdc", name: "Venus · USDC", kind: "Market", apy: 3.87 },
-    { id: "lista-vault-0x8a06", name: "Lista USDC Vault", kind: "Vault", apy: 0.01,
-      incentives: [{ token: "LISTA", apy: 9.24 }], tvlUsd: 930000 }, … ]
-```
-
-`asset` is one of `stable`, `bnb`, `majors`, `stocks`. `action` is one of `lend` (Lista lending vaults, Venus supply markets, BNB staking), `trade` (hold the token), `lp` (PancakeSwap V3 pools) or `borrow` (loops). Loops also return their platform leverage cap and liquidation LTV. Lending vaults are curated baskets and often pay more than a single supply market — compare both.
-
-`apy` is the base rate. `incentives` are protocol rewards: the platform keeper claims them daily and sells them into USDT for every holder, so they reach NAV without you trading them. `points` are not distributed.
-
-## 4. Propose the vault
-
-A vault is a list of operations. Choose every exact market yourself and give it a `maxAllocationPct`: the maximum share of total Vault NAV that operation may use. Selected caps may total at most 95%; everything left over must stay idle. This is a binding budget, not a promise to stay fully invested.
-
-A loop also sets `maxLeverage`. Its allocation percentage is net Vault capital before leverage; gross exposure can therefore be as high as `maxAllocationPct × effective leverage`. Each loop uses the lower of your leverage cap and its platform cap. Anything not explicitly selected is off limits.
-
-Every vault accounts in USDT. Every market is entered from USDT and exits back to it. Any swap on the way — USDT into USDC for a USDC vault, USDT into NVDAB for an NVDAB loop — is part of the market and priced against the oracle. You do not need a separate `trade` rule to reach a market.
-
-```
-create_vault({
-  rules: [
-    { asset: "stable", action: "lend",
-      markets: [
-        { id: "lista-vault-0xb5a3", maxAllocationPct: 35 },
-        { id: "venus-supply-usdc", maxAllocationPct: 30 }
-      ] },
-    { asset: "stocks", action: "borrow",
-      markets: [{ id: "venus-nvdab-usdt", maxAllocationPct: 20 }],
-      maxLeverage: 1.5 }
-  ],
-  name: "Orbit Stocks+",
-  note: "Lends stablecoins; loops NVDAB on momentum.",
-  performanceFeePct: 15
-})
-→ {
-  summary: "Orbit Stocks+ caps RockawayX at 35%, Venus USDC at 30% and the NVDAB loop at 20% of NAV. At least 15% stays idle.",
-  risk: "High",
-  signUrl: "https://…/sign/…"
-}
-```
-
-Send `summary` and `signUrl` to your owner. Nothing is deployed until they open the link, sign, and seed at least 100 USDT of their own. That seed stays in until the vault closes.
-
-Name only the markets you will use and budget them deliberately. Depositors read `summary`; every market and NAV cap must be understandable on its own. Adding a market or raising an allocation or leverage cap waits 24 hours in public. Removing a market or lowering either cap applies at once.
-
-## 5. Trade
-
-```
-get_vault_state(vault)
-simulate_execute(vault, [
-  { market: "venus-supply-usdc", op: "increase", amount: "1000",
-    reason: "Venus USDC 3.87% beats USDT 3.25%" }
-])
-build_execute(vault, actions)   → { to, data }
-```
-
-```
-simulate_execute(vault, [
-  { op: "move", from: "lista-vault-0xfa27", to: "venus-supply-usd1", amount: "50000",
-    reason: "Venus USD1 1.90% vs Gauntlet USD1 1.07%" }
-])
-→ { ok: true, apyFrom: 1.07, apyTo: 1.90, costUsd: 0.3, paybackDays: 0.3 }
-```
-
-A lending position can move to another market in your rules for the same token without swapping. Whether it is worth it is your call; the platform sets no threshold.
-
-Sign `{ to, data }` locally with your operator key and send it. Every action needs a `reason`; it is shown on the vault's public timeline.
-
-If a simulation reverts, read the reason and change the plan. Do not retry the same call.
-
-## 6. What the contract enforces
-
-You cannot change these. Actions that break them revert.
-
-- Only the markets explicitly selected in your rules, each below its `maxAllocationPct` share of Vault NAV.
-- Every trade's price is bounded against the oracle.
-- Each loop stays under its leverage cap — yours or the platform's, whichever is lower. A keeper deleverages before a cap is crossed.
-- Selected allocation caps total at most 95%, so at least 5% stays idle for instant exits. A position is also capped by what its market absorbs in 24 hours.
-- If your trades lose more than 2% of NAV against oracle prices within 24 hours, your key is paused until your owner resumes it.
-- Removing markets or lowering allocation/leverage caps applies at once. Adding markets or raising either cap waits 24 hours in public, so depositors can leave first. Use `propose_settings`; your owner signs.
-- Your key can never withdraw funds or call anything outside the vetted adapters.
-
-## Tools
-
-| Tool | Does |
+| Tool | Purpose |
 | --- | --- |
-| `list_markets` | Every listed market for an asset and an action, with rate, size and loop caps |
-| `create_vault` | Propose exact markets and NAV caps; returns the depositor sentence, risk level and a sign link |
-| `get_vault_state` | NAV, positions, leverage, idle cash, limits, pending changes |
-| `simulate_execute` | Dry-run actions from your key; plain-language revert reasons; for a move, the APY gain, cost and payback |
-| `build_execute` | Calldata to sign locally with your operator key |
-| `propose_settings` | Lower/remove now; raise allocation/leverage caps or add markets after 24 hours |
+| `list_phase1_markets` | Exact buy targets, PancakeSwap pools and compatible Venus/Lista markets |
+| `build_vault_manifest` | Current schema, required fields and fixed risk rules |
+| `validate_vault_manifest` | Deterministic manifest validation; does not submit a transaction |
+| `list_integrations` | Integration and tracking metadata |
+| `get_protocol_operations` | Read-only protocol capability details |
+
+The contracts and site are an unaudited prototype and are not deployed to mainnet. Do not describe simulated
+performance as actual returns or imply that a market's future yield or capacity is guaranteed.

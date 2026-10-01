@@ -1,6 +1,6 @@
 1:"$Sreact.fragment"
 2:I[81384,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js"],"PrototypePage"]
-3:T188d,
+3:T17d0,
 
 <section class="vhead">
   <div class="wrap">
@@ -28,8 +28,8 @@
       <!-- Performance -->
       <div class="panel">
         <div class="panel-h">
-          <h3 id="p-title">Net asset value per share</h3>
-          <div class="perf-controls"><div class="seg" id="p-unit"><button data-u="USDT">USDT</button><button data-u="BNB">BNB</button></div><div class="seg" id="p-period"><button data-v="7D">7D</button><button class="on" data-v="30D">30D</button><button data-v="90D">90D</button><button data-v="ALL">All</button></div></div>
+          <h3>Net asset value per share</h3>
+          <div class="seg" id="p-period"><button data-v="7D">7D</button><button class="on" data-v="30D">30D</button><button data-v="90D">90D</button><button data-v="ALL">All</button></div>
         </div>
         <div class="chart-meta">
           <div><div class="big" id="p-big"></div><div class="sub" id="p-sub"></div></div>
@@ -42,13 +42,13 @@
             <thead><tr><th>Period</th><th class="r">Net return</th><th class="r">Annualized</th><th class="r">Max drawdown</th><th class="r">Start NAV</th><th class="r">End NAV</th></tr></thead>
             <tbody></tbody>
           </table></div>
-          <p class="fine" style="margin-top:14px">Net return = NAV/share(t₁) ÷ NAV/share(t₀) − 1, from on-chain NAV after fees. If an oracle goes stale, deposits and redemptions pause and the gap is marked — never interpolated or replaced with an advertised APR.</p>
+          <p class="fine" style="margin-top:14px">Prototype return = simulated NAV/share(t₁) ÷ simulated NAV/share(t₀) − 1 after modeled fees. These figures are not live on-chain results or an advertised APR.</p>
         </div>
       </div>
 
       <!-- Rules -->
       <div class="panel">
-        <div class="panel-h"><h3>Rules</h3><span class="tag">Binding</span></div>
+        <div class="panel-h"><h3>Rules</h3><span class="tag">Manifest · simulated</span></div>
         <div class="panel-b">
           <p class="sentence" id="v-sentence"></p>
           <div class="legs" id="v-legs" style="margin-top:16px"></div>
@@ -60,7 +60,7 @@
       <!-- Allocation caps + rule changes -->
       <div class="two">
         <div class="panel">
-          <div class="panel-h"><h3>Capital budgets</h3><span class="label">Binding · by Vault NAV</span></div>
+          <div class="panel-h"><h3>Capital budgets</h3><span class="label">Manifest · simulated NAV</span></div>
           <div class="panel-b">
             <div class="alloc-bar" id="alloc-bar" role="img"></div>
             <table class="tbl" id="alloc-tbl"><thead><tr><th>Exact market operation</th><th class="r">Max NAV</th><th class="r">Max value now</th></tr></thead><tbody></tbody></table>
@@ -133,19 +133,20 @@
 
 
 
-4:Taae5,
+4:T92ee,
 (function () {
-  const { $, $$, esc, fmt, riskMeter, statusTag, historyTag, lineChart, hexAddr, short, ASSETS, SLOTS, toast, demo, logo, CATALOG: C, vaultMarkets, vaultRisk, managerLabel, rulesLabel, platformFeeForRisk, feeBreakdown } = BAV;
+  const { $, $$, esc, fmt, perf, riskMeter, statusTag, historyTag, navSeries, lineChart, hexAddr, short, ASSETS, SLOTS, toast, demo, logo, CATALOG: C, vaultMarkets, vaultRisk, managerLabel, rulesLabel, platformFeeForRisk, feeBreakdown } = BAV;
   BAV.shell("vaults.html");
 
-  const slug = new URLSearchParams(location.search).get("slug") || location.pathname.split("/").filter(Boolean).pop() || "stable-yield-router";
+  const slug = new URLSearchParams(location.search).get("slug") || location.pathname.split("/").filter(Boolean).pop() || "sherwood-crypto-core";
   const v = BAV.vault(slug) || BAV.VAULTS[0];
   const copy = v.copyOf ? BAV.vault(v.copyOf.slug) : null;
   const human = v.managerType === "human";
+  const BNB_USD = 758.28;
   document.title = v.name + " — BNB Agent Vaults";
-  const A = "USDT";
-  const money = (n) => fmt.n(n, 2) + " USDT";
-  const toUsd = (x) => x;
+  const A = v.asset;
+  const money = (n) => fmt.n(n, A === "BNB" ? 4 : 2) + " " + A;
+  const toUsd = (x) => (A === "BNB" ? x * BNB_USD : x);
   // Rules become editable sets for the demo owner controls below.
   v.rules = (v.rules || []).map((r) => ({ g: r.g, a: r.a, m: new Set(r.m), caps: { ...(r.caps || {}) }, lev: r.lev || 1 }));
   v.pendingAdds = v.pendingAdds || [];
@@ -154,67 +155,50 @@
   $("#c-name").textContent = v.name;
   $("#v-name").textContent = v.name;
   $("#v-strat").textContent = v.strategy;
-  let unit = BAV.displayUnit();
   function drawTags() {
     const ht = historyTag(v);
-    $("#v-tags").innerHTML = `${statusTag(v)}<span class="tag">${riskMeter(vaultRisk(v))}</span><span class="tag">${esc(managerLabel(v))}</span><span class="tag">${A} · ${v.symbol}</span>${unit === "BNB" && BAV.bnbNoPriceRisk(v) ? `<span class="tag">In BNB: no BNB price risk</span>` : ""}${ht ? `<span class="tag">${ht}</span>` : ""}${copy ? `<span class="tag warn">Follows ${copy.name}</span>` : ""}<span class="tag sim">Simulated</span>`;
+    $("#v-tags").innerHTML = `${statusTag(v)}<span class="tag">${riskMeter(vaultRisk(v))}</span><span class="tag">${esc(managerLabel(v))}</span><span class="tag">${A} · ${v.symbol}</span>${ht ? `<span class="tag">${ht}</span>` : ""}${copy ? `<span class="tag warn">Follows ${copy.name}</span>` : ""}<span class="tag sim">Simulated</span>`;
   }
 
   /* Key figures */
-  function drawKeyfig() {
-    const stats = BAV.statsIn(v, "ALL", unit);
-    $("#keyfig").innerHTML = `
-      <div><div class="label">NAV / share</div><div class="v">${v.sharePrice.toFixed(4)}</div><div class="s">On-chain, live · ≈ ${(v.sharePrice / BAV.BNB_USD).toFixed(6)} BNB</div></div>
-      <div><div class="label">Assets under mgmt.</div><div class="v">${fmt.usd(v.tvl)}</div><div class="s">${v.cap ? "Capacity " + fmt.usd(v.cap, 0) : "No capacity cap"}</div></div>
-      <div><div class="label">Since inception</div><div class="v ${fmt.cls(stats.ret)}">${fmt.pct(stats.ret)}</div><div class="s">Net of fees, in ${unit}</div></div>
-      <div><div class="label">Max drawdown</div><div class="v">${fmt.pct(stats.dd)}</div><div class="s">Net of fees, in ${unit}</div></div>
-      <div><div class="label">Track record</div><div class="v">${v.runtimeDays}<span style="font-size:15px;color:var(--muted)"> days</span></div><div class="s">${historyTag(v) || "Since launch"}</div></div>
-      <div><div class="label">Exit cost today</div><div class="v" style="font-size:22px">${v.exitCost}</div><div class="s">Paid by the redeemer</div></div>`;
-  }
+  $("#keyfig").innerHTML = `
+    <div><div class="label">NAV / share</div><div class="v">${v.sharePrice.toFixed(4)}</div><div class="s">Simulated ledger</div></div>
+    <div><div class="label">Assets under mgmt.</div><div class="v">${fmt.usd(v.tvl)}</div><div class="s">${v.cap ? "Capacity " + fmt.usd(v.cap, 0) : "No capacity cap"}</div></div>
+    <div><div class="label">Since inception</div><div class="v ${fmt.cls(v.returns.ALL)}">${fmt.pct(v.returns.ALL)}</div><div class="s">Net of fees, in ${A}</div></div>
+    <div><div class="label">Max drawdown</div><div class="v">${fmt.pct(v.maxDrawdown.ALL)}</div><div class="s">Since inception</div></div>
+    <div><div class="label">Track record</div><div class="v">${v.runtimeDays}<span style="font-size:15px;color:var(--muted)"> days</span></div><div class="s">${historyTag(v) || "Since launch"}</div></div>
+    <div><div class="label">Exit cost today</div><div class="v" style="font-size:22px">${v.exitCost}</div><div class="s">Paid by the redeemer</div></div>`;
 
   /* Performance */
+  const S = navSeries(v);
   const periods = ["7D", "30D", "90D", "ALL"];
-  const sliceFor = (p) => {
-    const s = BAV.seriesIn(v, unit);
-    return p === "ALL" ? s : s.slice(-Math.min(s.length, BAV.periodDays(v, p) + 1));
-  };
+  const sliceFor = (p) => (p === "ALL" ? S : S.slice(-Math.min(S.length, (p === "7D" ? 7 : p === "30D" ? 30 : 90) + 1)));
   let period = v.returns["30D"] == null ? "ALL" : "30D";
   const drawPerf = () => {
     $$("#p-period button").forEach((b) => b.classList.toggle("on", b.dataset.v === period));
-    const s = sliceFor(period), stats = BAV.statsIn(v, period, unit), r = stats?.ret, label = period === "ALL" ? "since inception" : period;
-    const complete = stats != null;
-    $("#p-title").textContent = unit === "BNB" ? "NAV per share in BNB terms" : "Net asset value per share";
+    const s = sliceFor(period), r = v.returns[period], label = period === "ALL" ? "since inception" : period;
+    const complete = r != null;
     $("#p-big").innerHTML = complete ? `<span class="${fmt.cls(r)}">${fmt.pct(r)}</span>` : `<span class="muted" style="font-size:22px">Not enough history yet</span>`;
-    $("#p-sub").textContent = complete ? `Net return, ${label}, in ${unit}` : `A complete ${period} window does not exist yet — showing available data, in ${unit}.`;
+    $("#p-sub").textContent = complete ? `Net return, ${label}` : `A complete ${period} window does not exist yet — showing available data.`;
     $("#p-range").textContent = `${fmt.date(s[0].t)} → ${fmt.date(s[s.length - 1].t)}`;
-    $("#p-src").textContent = `Source: on-chain NAV per share · benchmark ${v.benchmark}${unit === "BNB" ? " · BNB price simulated" : ""}`;
-    lineChart($("#chart"), s, { height: window.innerWidth < 720 ? 230 : 300, label: `${v.name} NAV per share, ${label}, in ${unit}`, unitLabel: unit === "BNB" ? "in BNB terms" : "NAV / share" });
+    $("#p-src").textContent = `Source: simulated NAV series · benchmark ${v.benchmark}`;
+    lineChart($("#chart"), s, { height: window.innerWidth < 720 ? 230 : 300, label: `${v.name} NAV per share, ${label}` });
   };
   $$("#p-period button").forEach((b) => b.addEventListener("click", () => { period = b.dataset.v; drawPerf(); }));
-  function drawPerfTable() {
-    const heads = $$("#perf-tbl thead th");
-    heads[4].textContent = unit === "BNB" ? "Start (BNB terms)" : "Start NAV";
-    heads[5].textContent = unit === "BNB" ? "End (BNB terms)" : "End NAV";
-    $("#perf-tbl tbody").innerHTML = periods.map((p) => {
-      const stats = BAV.statsIn(v, p, unit), s = sliceFor(p), ok = stats != null;
-      return `<tr><td>${p === "ALL" ? "Since inception" : p}</td>
-        <td class="r ${fmt.cls(stats?.ret)}">${ok ? fmt.pct(stats.ret) : '<span class="na">Not enough history</span>'}</td>
-        <td class="r">${ok && stats.ann != null ? fmt.pct(stats.ann) : '<span class="na">—</span>'}</td>
-        <td class="r">${ok ? fmt.pct(stats.dd) : '<span class="na">—</span>'}</td>
-        <td class="r">${ok ? s[0].v.toFixed(4) : "—"}</td>
-        <td class="r">${ok ? s[s.length - 1].v.toFixed(4) : "—"}</td></tr>`;
-    }).join("");
-  }
-  function drawUnit() {
-    $$("#p-unit button").forEach((b) => b.classList.toggle("on", b.dataset.u === unit));
-    drawTags(); drawKeyfig(); drawPerf(); drawPerfTable();
-  }
-  $$("#p-unit button").forEach((b) => b.addEventListener("click", () => { unit = b.dataset.u; BAV.setDisplayUnit(unit); drawUnit(); }));
-  window.addEventListener("bav:unit", (e) => { unit = e.detail; });
-  drawUnit();
+  drawPerf();
+
+  $("#perf-tbl tbody").innerHTML = periods.map((p) => {
+    const r = v.returns[p], a = perf(v, p, "annualized"), s = sliceFor(p), ok = r != null;
+    return `<tr><td>${p === "ALL" ? "Since inception" : p}</td>
+      <td class="r ${fmt.cls(r)}">${ok ? fmt.pct(r) : '<span class="na">Not enough history</span>'}</td>
+      <td class="r">${ok && a != null ? fmt.pct(a) : '<span class="na">—</span>'}</td>
+      <td class="r">${ok ? fmt.pct(v.maxDrawdown[p]) : '<span class="na">—</span>'}</td>
+      <td class="r">${ok ? s[0].v.toFixed(4) : "—"}</td>
+      <td class="r">${ok ? v.sharePrice.toFixed(4) : "—"}</td></tr>`;
+  }).join("");
 
   /* Rules — the same sentence and rules the manager signed at launch */
-  const marketChip = (m, r) => `<span class="chip ro">${logo(m.venue)}${esc(C.label(m))} · max ${C.capTxt(C.allocationCap(r, m.id))} NAV${m.a === "lend" && m.apy != null ? ` · ${C.pct(m.apy)}${m.incentives ? ` ${esc(C.incentiveTxt(m))}` : ""}` : m.a === "borrow" ? ` · ${C.levTxt(C.effLev(m, r.lev))} leverage` : ""}</span>`;
+  const marketChip = (m, r) => `<span class="chip ro">${logo(m.venue)}${esc(C.label(m))} · max ${C.capTxt(C.allocationCap(r, m.id))} NAV${m.a === "lend" && m.apy != null ? ` · ${C.pct(m.apy)}` : m.a === "borrow" ? ` · ${C.levTxt(C.effLev(m, r.lev))} leverage` : ""}</span>`;
   function aiSummary() {
     const r = vaultRisk(v), lev = C.maxLeverage(v.rules), hasLoop = v.rules.some((x) => x.a === "borrow");
     const base = r === "Low"
@@ -230,8 +214,8 @@
     const f = v.fees, split = feeBreakdown(f.perf, f.platform), hasLoop = v.rules.some((r) => r.a === "borrow");
     $("#rules").innerHTML = [
       ["Cannot", `Use any market not named above or exceed an operation's NAV allocation cap. ${hasLoop ? "Borrow outside its loops, or push a loop past its leverage cap — a keeper deleverages first." : "Borrow."} Keep less than ${C.capTxt(C.minIdleAllocation(v.rules))} idle, or take a position larger than its market absorbs in 24 hours. Withdraw depositors' money.`],
-      ["You pay", `${split.total}% of profit above the high-water mark: a ${split.creatorGross}% creator fee plus a ${split.platformBase}% platform fee. The creator receives ${split.creatorNet}% and the platform receives ${split.platformTotal}% after its 15% share of the creator fee. ${f.mgmt ? `${f.mgmt}% yearly management fee.` : "No management fee."} No entry or exit fee. Fees are measured on USDT NAV, so gains from BNB or other assets rising count as profit.`],
-      ["Leave", `Any time after a 24-hour deposit cooldown; large exits settle within 12 hours. You pay your own slippage — about ${v.exitCost} today.`],
+      ["You pay", `${split.total}% of profit above the high-water mark. The creator receives ${split.creatorNet}% and the protocol receives ${split.platformTotal}% under the current 10% fee-share setting. ${f.mgmt ? `${f.mgmt}% annualized management fee during active strategy time.` : "No management fee."} No entry or exit fee.`],
+      ["Leave", `Redeem directly before capital moves. While a strategy is live, queue the exit and claim after settlement. Estimated unwind cost: ${v.exitCost}.`],
     ].map(([k, t]) => `<li><b>${k}</b><span>${t}</span></li>`).join("");
     $("#ai").textContent = aiSummary();
   }
@@ -253,13 +237,11 @@
     $("#rc-tag").innerHTML = pc ? `<span class="tag warn">Pending</span>` : `<span class="tag">None pending</span>`;
     $("#rc").innerHTML = (pc
       ? `<div class="h4">${esc(pc.what)}</div>
-         <div class="state-note"><span class="dot" style="background:var(--warn)"></span><span>Takes effect in <b>${pc.hours} hours</b>. If you disagree, redeem before then — exits settle within 12 hours.</span></div>
+         <div class="state-note"><span class="dot" style="background:var(--warn)"></span><span>Takes effect in <b>${pc.hours} hours</b>. If you disagree, redeem before capital moves; active-strategy requests settle only after exit.</span></div>
          <button class="btn sm ghost block" id="rc-red">Redeem before it applies</button>`
-      : `<p style="font-size:14px;color:var(--ink-2)">Adding a market or raising its NAV allocation or loop leverage cap is announced here and waits 24 hours. Removing a market or lowering either cap applies at once.</p>`)
-      + `<p class="fine" style="margin-top:12px">Holders are alerted on Telegram when a change is announced.</p>
-         <button class="btn sm ghost block" id="edit-open" style="margin-top:14px">Edit rules · owner</button>`;
+      : `<p style="font-size:14px;color:var(--ink-2)">Phase-one targets, weights and yield choices are fixed in the launch manifest. Create a new vault to use a different mandate.</p>`)
+      + `<p class="fine" style="margin-top:12px">This prototype does not submit rule changes or transactions.</p>`;
     if ($("#rc-red")) $("#rc-red").addEventListener("click", () => openTab("red"));
-    $("#edit-open").addEventListener("click", openEdit);
   }
 
   /* Positions */
@@ -270,7 +252,7 @@
       <dt>${human ? "Manager" : "Agent"}</dt><dd>${human ? `${esc(v.manager)} · a person` : `${esc(v.manager)} · #${v.agentId}`}</dd>
       <dt>Trades from</dt><dd>${human ? "The owner's wallet" : "The agent's own key"}</dd>
       <dt>Vaults opened by this ${human ? "manager" : "agent"}</dt><dd>${v.agentVaults}${v.agentVaults > 1 ? " (incl. closed)" : ""}</dd>
-      <dt>Owner stake</dt><dd>Locked until close</dd>
+      <dt>Creator seed</dt><dd>Manifest field · on-chain lock pending</dd>
     </dl>${copy ? `<div class="state-note"><span class="dot" style="background:var(--warn)"></span><span>Trades closely follow <a href="${BAV.route("vault/" + copy.slug)}" style="text-decoration:underline">${copy.name}</a>, on average ${v.copyOf.lag} later.</span></div>` : ""}`;
 
   /* Ticket */
@@ -282,7 +264,7 @@
     const pc = v.pendingChange;
     if (tab === "sub") {
       const note = pc ? ["var(--warn)", `A rule change takes effect in ${pc.hours} hours: ${pc.what}. Read it before you deposit.`]
-        : ["var(--pos)", "Shares are issued at live NAV. Deposits pause automatically if an oracle goes stale."];
+        : ["var(--pos)", "Demo shares use simulated NAV. Production basket issuance and oracle enforcement are pending."];
       $("#ticket-body").innerHTML = `
         <div style="display:flex;justify-content:space-between"><span class="label">Amount</span><span class="fine">Demo balance ${fmt.n(bal(), 2)} ${A}</span></div>
         <div class="amount"><input id="amt" inputmode="decimal" placeholder="0.00"><span class="unit">${A}</span></div>
@@ -291,7 +273,7 @@
           <dt>NAV / share</dt><dd>${v.sharePrice.toFixed(4)}</dd>
           <dt>Estimated shares</dt><dd id="est">—</dd>
           <dt>Entry fee</dt><dd>0.00%</dd>
-          <dt>Redeemable after</dt><dd>24 hours</dd>
+          <dt>Redemption model</dt><dd>Direct while idle · queued while a strategy is active</dd>
         </dl>
         <div class="state-note"><span class="dot" style="background:${note[0]}"></span><span>${esc(note[1])}</span></div>
         <button class="btn block" id="go">Simulate deposit</button>`;
@@ -308,7 +290,7 @@
           <dt>Indicative value</dt><dd id="est">—</dd>
           <dt>Exit cost today</dt><dd>${v.exitCost}</dd>
           <dt>Your max slippage</dt><dd><input id="slip" value="0.5" inputmode="decimal" style="width:56px;height:30px;padding:0 8px;border:1px solid var(--line);border-radius:8px;background:var(--field);color:var(--ink);text-align:right"> %</dd>
-          <dt>Settles</dt><dd>Instant from idle · ≤ 12 h otherwise</dd>
+          <dt>Settles</dt><dd>After the live strategy settles</dd>
         </dl>
         <div class="state-note"><span class="dot" style="background:var(--pos)"></span><span>You pay your own slippage, so the people who stay don't. If the market can't fill within your limit, the request waits.</span></div>
         <button class="btn block" id="go">Simulate redemption</button>`;
@@ -334,110 +316,54 @@
   let idleUsd = v.tvl * idleShare, lossToday = 0;
   const marketShares = {};
   v.rules.forEach((r) => C.ruleMarkets(r).forEach((m) => {
-    const position = v.positions.find((x) => x.market === m.id) || v.positions.find((x) => !x.market && x.p !== "Idle" && (x.loc.toLowerCase().includes(m.name.toLowerCase()) || m.tokens.some((t) => x.loc.split(/[^A-Za-z0-9]+/).includes(t))));
+    const position = v.positions.find((x) => x.p !== "Idle" && (x.loc.toLowerCase().includes(m.name.toLowerCase()) || m.tokens.some((t) => x.loc.split(/[^A-Za-z0-9]+/).includes(t))));
     marketShares[m.id] = position ? position.w : 0;
   }));
   const tradeLog = [];
-  const MOVE_GAS_USD = 0.3, SWAP_COST_PCT = 0.05; // demo stand-ins
-  const ruleMarketsAll = () => v.rules.flatMap((r) => C.ruleMarkets(r));
-  const moveTargets = (m) => (m.a !== "lend" ? [] : ruleMarketsAll().filter((x) => x.a === "lend" && x.id !== m.id && x.tokens[0] === m.tokens[0]));
   const DEPTH = { Deep: 500e3, Medium: 50e3, Thin: 10e3 };
   // What one market can absorb in 24 hours (demo stand-in for the keeper's on-chain figure).
   const depthOf = (m) => (m.a === "trade" ? (m.g === "stocks" ? DEPTH[m.tier] : m.g === "stable" ? 5e6 : 2e6)
     : m.kind === "Vault" ? m.tvl * 0.2 : m.a === "borrow" ? Math.min(m.loop.liq * 0.5, 5e6) : m.a === "lp" ? 1e6 : 5e6);
-  const slipOf = (m) => (m.a === "lend" && m.tokens[0] === "USDT" ? 0.1 : 0.5);
+  const slipOf = (m) => (m.a === "lend" && m.tokens[0] === (A === "BNB" ? "BNB" : "USDT") ? 0.1 : 0.5);
   function drawTrade() {
     if (!human) return;
     $("#trade").classList.remove("hide");
-    const ruleFor = (m) => v.rules.find((r) => r.m.has(m.id));
-    const optionText = (m) => `${C.label(m)} · max ${C.capTxt(C.allocationCap(ruleFor(m), m.id))} NAV${m.a === "lend" && m.apy != null ? ` · ${C.pct(m.apy)}${m.incentives ? ` ${C.incentiveTxt(m)}` : ""}` : ""}`;
-    const regularOpts = () => v.rules.map((r) => `<optgroup label="${C.GROUPS[r.g].name} · ${C.ACTIONS[r.a].name}">${C.ruleMarkets(r).map((m) => `<option value="${m.id}">${esc(optionText(m))}</option>`).join("")}</optgroup>`).join("");
-    const moveFrom = () => ruleMarketsAll().filter((m) => moveTargets(m).length);
-    const canMove = moveFrom().length > 0;
+    const opts = v.rules.map((r) => `<optgroup label="${C.GROUPS[r.g].name} · ${C.ACTIONS[r.a].name}">${C.ruleMarkets(r).map((m) => `<option value="${m.id}">${esc(C.label(m))} · max ${C.capTxt(C.allocationCap(r, m.id))} NAV${m.a === "lend" && m.apy != null ? ` · ${C.pct(m.apy)}` : ""}</option>`).join("")}</optgroup>`).join("");
     $("#trade-body").innerHTML = `
       <p class="fine" style="margin-bottom:12px">Choose one allowed market, say why you are changing it, then preview the exact-market, allocation, liquidity, oracle and reserve checks before signing.</p>
-      <label class="field"><span id="t-m-label">Market <em>only this vault's rules</em></span><select id="t-m">${regularOpts()}</select></label>
-      <label class="field hide" id="t-to-f" style="margin-top:12px"><span>To <em>same token, no swap</em></span><select id="t-to"></select></label>
-      <div class="seg" id="t-dir" style="margin-top:12px"><button type="button" class="on" data-d="inc">Add to position</button><button type="button" data-d="dec">Reduce position</button>${canMove ? `<button type="button" data-d="move">Move</button>` : ""}</div>
+      <label class="field"><span>Market <em>only this vault's rules</em></span><select id="t-m">${opts}</select></label>
+      <div class="seg" id="t-dir" style="margin-top:12px"><button type="button" class="on" data-d="inc">Add to position</button><button type="button" data-d="dec">Reduce position</button></div>
       <label class="field" style="margin-top:12px"><span id="t-amt-label">Amount from idle cash <em>in ${A}</em></span><div class="suffix"><input id="t-amt" inputmode="decimal" placeholder="0"><b>${A}</b></div></label>
       <label class="field hide" id="t-lev-f" style="margin-top:12px"><span>Target leverage <em id="t-lev-cap"></em></span><div class="suffix"><input id="t-lev" inputmode="decimal" value="1.5"><b>×</b></div></label>
       <label class="field" style="margin-top:12px"><span>Reason <em>required · public on the timeline</em></span><input id="t-why" placeholder="e.g. NVDAB broke its 20-day high"></label>
-      <div id="t-note" style="margin-top:14px"></div>
       <ul class="checks" id="t-checks" style="margin-top:14px"></ul>
       <button type="button" class="btn block" id="t-go" style="margin-top:12px">Preview contract checks</button>
       <div id="t-log" style="margin-top:14px"></div>`;
     let dir = "inc", checked = false;
     const market = () => C.byId[$("#t-m").value];
-    const target = () => C.byId[$("#t-to").value];
-    const rule = () => ruleFor(market());
-    const actionLabel = () => (dir === "inc" ? "Add to position" : dir === "dec" ? "Reduce position" : "Move");
-    const renderLog = () => {
-      $("#t-log").innerHTML = tradeLog.length ? `<div class="label" style="margin-bottom:8px">Your recent trades · demo</div>` + tradeLog.slice(0, 4).map((e) => `<div class="state-note" style="margin-bottom:8px"><span class="dot" style="background:var(--pos)"></span><span>${e.html}</span></div>`).join("") : "";
-    };
-    const reset = () => { checked = false; $("#t-note").innerHTML = ""; $("#t-checks").innerHTML = ""; $("#t-go").textContent = "Preview contract checks"; };
-    const syncTarget = () => {
-      if (dir !== "move") return;
-      $("#t-to").innerHTML = moveTargets(market()).map((m) => `<option value="${m.id}">${esc(optionText(m))}</option>`).join("");
-    };
-    const syncMode = (marketChanged = false) => {
-      if (!marketChanged) $("#t-m").innerHTML = dir === "move" ? moveFrom().map((m) => `<option value="${m.id}">${esc(optionText(m))}</option>`).join("") : regularOpts();
-      const m = market(), isMove = dir === "move", isLoop = m.a === "borrow";
-      $("#t-m-label").innerHTML = isMove ? "From <em>same-token lending position</em>" : "Market <em>only this vault's rules</em>";
-      $("#t-to-f").classList.toggle("hide", !isMove);
-      if (isMove) syncTarget();
-      $("#t-lev-f").classList.toggle("hide", isMove || !isLoop || dir !== "inc");
-      $("#t-amt-label").innerHTML = isMove ? "Amount to move <em>value in USDT</em>" : `${dir === "inc" ? "Amount from idle cash" : "Position value to unwind"} <em>in ${A}</em>`;
+    const rule = () => v.rules.find((r) => r.m.has($("#t-m").value));
+    const actionLabel = () => (dir === "inc" ? "Add to position" : "Reduce position");
+    const reset = () => { checked = false; $("#t-checks").innerHTML = ""; $("#t-go").textContent = "Preview contract checks"; };
+    const syncLev = () => {
+      const m = market(), isLoop = m.a === "borrow";
+      $("#t-lev-f").classList.toggle("hide", !isLoop || dir !== "inc");
+      $("#t-amt-label").innerHTML = `${dir === "inc" ? "Amount from idle cash" : "Position value to unwind"} <em>in ${A}</em>`;
       if (isLoop) $("#t-lev-cap").textContent = `this loop's cap ${C.levTxt(C.effLev(m, rule().lev))}`;
     };
-    $("#t-m").addEventListener("change", () => { syncMode(true); reset(); });
-    $("#t-to").addEventListener("change", reset);
-    $$("#t-dir button").forEach((b) => b.addEventListener("click", () => { dir = b.dataset.d; $$("#t-dir button").forEach((x) => x.classList.toggle("on", x === b)); syncMode(); reset(); }));
+    $("#t-m").addEventListener("change", () => { syncLev(); reset(); });
+    $$("#t-dir button").forEach((b) => b.addEventListener("click", () => { dir = b.dataset.d; $$("#t-dir button").forEach((x) => x.classList.toggle("on", x === b)); syncLev(); reset(); }));
     ["#t-amt", "#t-lev", "#t-why"].forEach((s) => $(s).addEventListener("input", reset));
-    syncMode(true); renderLog();
+    syncLev();
     $("#t-go").addEventListener("click", () => {
       const m = market(), x = parseFloat($("#t-amt").value), usd = toUsd(x);
       if (!(x > 0)) { toast("Enter an amount greater than zero"); return; }
       if (checked) {
-        const why = $("#t-why").value.trim();
-        if (dir === "move") {
-          const to = target(), tok = m.tokens[0], diff = C.totalApy(to) - C.totalApy(m), movePct = usd / v.tvl * 100;
-          marketShares[m.id] = Math.max(0, (marketShares[m.id] || 0) - movePct);
-          marketShares[to.id] = (marketShares[to.id] || 0) + movePct;
-          tradeLog.unshift({ html: `Moved ${fmt.n(x, 2)} USDT of ${esc(tok)} from ${esc(C.label(m))} to ${esc(C.label(to))} · APY ${diff >= 0 ? "+" : ""}${diff.toFixed(2)} pt · cost $0.30 — “${esc(why)}” · 7-day realized: pending` });
-        } else {
-          idleUsd += dir === "inc" ? -usd : usd;
-          marketShares[m.id] = Math.max(0, (marketShares[m.id] || 0) + (dir === "inc" ? usd : -usd) / v.tvl * 100);
-          tradeLog.unshift({ html: `<b>${dir === "inc" ? "Added to" : "Reduced"} ${esc(C.label(m))}</b> · ${fmt.n(x, 2)} ${A} — “${esc(why)}”` });
-        }
-        renderLog();
+        idleUsd += dir === "inc" ? -usd : usd;
+        marketShares[m.id] = Math.max(0, (marketShares[m.id] || 0) + (dir === "inc" ? usd : -usd) / v.tvl * 100);
+        tradeLog.unshift({ t: new Date(), m, dir, x, why: $("#t-why").value.trim() });
+        $("#t-log").innerHTML = `<div class="label" style="margin-bottom:8px">Your recent trades · demo</div>` + tradeLog.slice(0, 4).map((e) => `<div class="state-note" style="margin-bottom:8px"><span class="dot" style="background:var(--pos)"></span><span><b>${e.dir === "inc" ? "Added to" : "Reduced"} ${esc(C.label(e.m))}</b> · ${fmt.n(e.x, 2)} ${A} — “${esc(e.why)}”</span></div>`).join("");
         toast("Demo trade signed — no wallet or transaction used");
         $("#t-amt").value = ""; $("#t-why").value = ""; reset();
-        return;
-      }
-      const why = $("#t-why").value.trim();
-      if (dir === "move") {
-        const to = target(), tok = m.tokens[0], diff = C.totalApy(to) - C.totalApy(m), movePct = usd / v.tvl * 100;
-        const fromPct = marketShares[m.id] || 0, toAfter = (marketShares[to.id] || 0) + movePct, capTo = C.allocationCap(ruleFor(to), to.id);
-        const days = diff > 0 ? MOVE_GAS_USD / (usd * diff / 100 / 365) : null;
-        const payback = days != null && days < 1 ? "under a day" : days != null ? `${Math.ceil(days)} days` : "—";
-        const rateLine = diff > 0 ? `APY ${C.pct(C.totalApy(m))} → ${C.pct(C.totalApy(to))} (+${diff.toFixed(2)} pt) · cost ≈ $0.30 gas · pays back in ${payback}` : `No rate gain at today's rates · cost ≈ $0.30 gas`;
-        $("#t-note").innerHTML = `<div class="state-note"><span class="dot" style="background:var(--gold)"></span><span>${rateLine}<br>Via USDT instead: two swaps ≈ $${(usd * 2 * SWAP_COST_PCT / 100).toFixed(2)}</span></div>`;
-        const checks = [
-          [`Public reason · ${why ? `“${why}”` : "required before signing"}`, !!why],
-          ["Both markets are in this vault's rules", true],
-          [`Same token (${tok}) · no swap`, true],
-          [`Available in ${C.label(m)} · ${fromPct.toFixed(2)}% of NAV`, movePct <= fromPct + 1e-9],
-          [`${C.label(to)} after move · ${toAfter.toFixed(2)}% of NAV (max ${C.capTxt(capTo)})`, toAfter <= capTo + 1e-9],
-          [`${C.label(to)} open for new positions`, true],
-          [`Within 24-hour market depth · about ${C.usd(depthOf(to))}`, usd <= depthOf(to)],
-          [`Nothing left outside the rules · the ${tok} withdrawn is deposited in the same transaction`, true],
-          [`24-hour loss so far · ${lossToday.toFixed(2)}% of NAV (pauses at 2%)`, lossToday < 2],
-        ];
-        const ok = checks.every((c) => c[1]);
-        $("#t-checks").innerHTML = checks.map(([t, pass]) => `<li class="${pass ? "ok" : "bad"}"><i></i><span>${esc(t)}</span></li>`).join("");
-        checked = ok;
-        $("#t-go").textContent = ok ? "Sign · Move · demo" : "Fix failed checks";
-        if (!ok) toast("This move would revert — see the failed check");
         return;
       }
       const leverageCap = m.a === "borrow" ? C.effLev(m, rule().lev) : null, lev = parseFloat($("#t-lev").value);
@@ -445,6 +371,7 @@
       const allocationAfter = currentAllocation + (dir === "inc" ? usd : -usd) / v.tvl * 100;
       const idleMinimum = C.minIdleAllocation(v.rules);
       const idleAfter = (dir === "inc" ? idleUsd - usd : idleUsd + usd) / v.tvl * 100;
+      const why = $("#t-why").value.trim();
       const checks = [
         [`Public reason · ${why ? `“${why}”` : "required before signing"}`, !!why],
         [`In this vault's rules · ${C.GROUPS[rule().g].name} · ${C.ACTIONS[rule().a].name}`, true],
@@ -468,8 +395,7 @@
   function drawTerms() {
     const f = v.fees, split = feeBreakdown(f.perf, f.platform);
     $("#terms").innerHTML = `
-      <dt>Accounting currency</dt><dd>${A} <span class="mono muted">${short(ASSETS[A].address)}</span></dd>
-      <dt>Performance fee basis</dt><dd>USDT NAV — BNB price gains count as profit</dd>
+      <dt>Vault currency</dt><dd>${A} <span class="mono muted">${short(ASSETS[A].address)}</span></dd>
       <dt>Share token</dt><dd>${v.symbol}</dd>
       <dt>Managed by</dt><dd>${human ? "A person" : "An AI agent"}</dd>
       <dt>Rules</dt><dd>${rulesLabel(v)}</dd>
@@ -478,12 +404,11 @@
       <dt>Benchmark</dt><dd>${v.benchmark}</dd>
       <dt>Total performance fee</dt><dd>${split.total.toFixed(2)}%</dd>
       <dt>Creator receives</dt><dd>${split.creatorNet.toFixed(2)}% of profit</dd>
-      <dt>Platform receives</dt><dd>${split.platformTotal.toFixed(2)}% of profit (${split.platformBase}% own fee + 15% of creator fee)</dd>
+      <dt>Protocol receives</dt><dd>${split.platformTotal.toFixed(2)}% of profit under the current 10% manager-fee share</dd>
       <dt>Creator management fee</dt><dd>${f.mgmt.toFixed(2)}%</dd>
       <dt>High-water mark</dt><dd>Vault-level</dd>
-      <dt>Adding markets / raising caps</dt><dd>24-hour timelock</dd>
-      <dt>Longest redemption</dt><dd>12 hours</dd>
-      <dt>Deposit cooldown</dt><dd>24 hours</dd>
+      <dt>Changing targets / weights</dt><dd>New vault required in phase one</dd>
+      <dt>Live-strategy redemption</dt><dd>Queued until settlement</dd>
       <dt>Entry / exit fee</dt><dd>None</dd>`;
   }
   const owner = hexAddr(v.slug + "owner");
@@ -645,7 +570,7 @@
 8:X
 f:X
 f:C
-0:{"buildId":"c2JXPEJdATUUZLmMGKtS-","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"bodyClass":"has-mcta","html":"$3","runtimeVersion":"417783b7b940","script":"$4","pageKey":"vault"}],["$L5"],"$L6"]}],"isPartial":"$@7","staleTime":"$8","varyParams":null},{"rsc":"$L9","isPartial":"$@a","staleTime":"$8","varyParams":null},{"rsc":"$Lb","isPartial":"$@c","staleTime":"$8","varyParams":null},{"rsc":"$Ld","isPartial":"$@e","staleTime":"$8","varyParams":"$f"},{"rsc":"$L10","isPartial":"$@11","staleTime":"$8","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@12","rootVaryParams":null,"needsRuntimeRequest":"$@13"}
+0:{"buildId":"0X8npN7BMlTxPjWR0YFdz","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"bodyClass":"has-mcta","html":"$3","runtimeVersion":"2d0b01e4e7b6","script":"$4","pageKey":"vault"}],["$L5"],"$L6"]}],"isPartial":"$@7","staleTime":"$8","varyParams":null},{"rsc":"$L9","isPartial":"$@a","staleTime":"$8","varyParams":null},{"rsc":"$Lb","isPartial":"$@c","staleTime":"$8","varyParams":null},{"rsc":"$Ld","isPartial":"$@e","staleTime":"$8","varyParams":"$f"},{"rsc":"$L10","isPartial":"$@11","staleTime":"$8","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@12","rootVaryParams":null,"needsRuntimeRequest":"$@13"}
 14:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
 15:"$Sreact.suspense"
 17:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]
@@ -653,13 +578,13 @@ f:C
 19:I[27201,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"IconMark"]
 1a:I[39756,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default"]
 1b:I[37457,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default"]
-:HL["/bnb-agent-vaults-site/_next/static/chunks/0kzveem4shzqp.css","style"]
+:HL["/bnb-agent-vaults-site/_next/static/chunks/1yt1cn5fjjyfx.css","style"]
 5:["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js","async":true}]
 6:["$","$L14",null,{"children":["$","$15",null,{"name":"Next.MetadataOutlet","children":"$@16"}]}]
 9:["$","$1","h",{"children":[null,["$","$L17",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","div",null,{"hidden":true,"children":["$","$L18",null,{"children":["$","$15",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"BNB Agent Vaults — Agent-managed funds on BNB Chain"}],["$","meta","1",{"name":"description","content":"Launch and follow non-custodial, policy-bound agent vaults on BNB Chain."}],["$","meta","2",{"name":"codex-preview","content":"development"}],["$","link","3",{"rel":"shortcut icon","href":"/bnb-agent-vaults-site/favicon.svg"}],["$","link","4",{"rel":"icon","href":"/bnb-agent-vaults-site/favicon.svg"}],["$","$L19","5",{}]]}]}]}],null]}]
 b:["$","$1","c",{"children":[null,["$","$L1a",null,{"parallelRouterKey":"children","template":["$","$L1b",null,{}]}]]}]
 d:["$","$1","c",{"children":[null,["$","$L1a",null,{"parallelRouterKey":"children","template":["$","$L1b",null,{}]}]]}]
-10:["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/0kzveem4shzqp.css","precedence":"next"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L1a",null,{"parallelRouterKey":"children","template":["$","$L1b",null,{}],"notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]]}]}]}]]}]
+10:["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/1yt1cn5fjjyfx.css","precedence":"next"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L1a",null,{"parallelRouterKey":"children","template":["$","$L1b",null,{}],"notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]]}]}]}]]}]
 16:null
 13:true
 8:300

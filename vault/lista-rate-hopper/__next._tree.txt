@@ -1,2 +1,0 @@
-:HL["/bnb-agent-vaults-site/_next/static/chunks/0kzveem4shzqp.css","style"]
-0:{"tree":{"name":"","param":null,"prefetchHints":4176,"slots":{"children":{"name":"vault","param":null,"prefetchHints":4192,"slots":{"children":{"name":"slug","param":{"type":"d","key":"lista-rate-hopper","siblings":[]},"prefetchHints":4192,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}}}},"staleTime":300,"buildId":"c2JXPEJdATUUZLmMGKtS-"}
