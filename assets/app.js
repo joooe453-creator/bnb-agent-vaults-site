@@ -2,13 +2,14 @@
 (function () {
   "use strict";
 
-  const TODAY = Date.UTC(2026, 8, 30);
+  const TODAY = Date.UTC(2026, 9, 2);
   const DAY = 864e5;
   const SLOTS = ["var(--c1)", "var(--c2)", "var(--c3)", "var(--c4)"];
   const BASE_PATH = window.__BAV_BASE_PATH__ || "";
   const STATIC_PREVIEW = window.__BAV_STATIC_PREVIEW__ === true ||
     window.location.protocol === "file:" ||
     !document.querySelector("[data-prototype-page]");
+  const assetUrl = (file) => STATIC_PREVIEW ? new URL(String(file), window.location.href).href : `${BASE_PATH}/${String(file).replace(/^\//, "")}`;
   const logoUrl = (file) => STATIC_PREVIEW
     ? `assets/logos/${file}.jpg`
     : `${BASE_PATH}/logos/${file}.jpg`;
@@ -40,6 +41,7 @@
     { id: "pancakeswap", name: "PancakeSwap", logo: "pancakeswap" },
     { id: "lista", name: "Lista DAO", logo: "lista" },
     { id: "venus", name: "Venus", logo: "venus" },
+    { id: "aave", name: "Aave", logo: null },
   ];
 
   // The current contracts give the protocol 10% of manager fees. There is no
@@ -80,10 +82,10 @@
       stocks: { name: "Tokenized stocks", tokens: "bStocks with a DEX pool — NVDAB, TSLAB, SPYB…", noun: "tokenized stocks" },
     };
     const ACTIONS = {
-      lend: { name: "Lend & earn", desc: "Lending vaults, Venus supply markets and BNB staking.", logos: ["lista", "venus"] },
+      lend: { name: "Lend & earn", desc: "Exact ERC-4626 vaults and Venus/Aave supply markets.", logos: ["lista", "venus", "aave"] },
       trade: { name: "Hold & trade", desc: "Hold the token itself, bought and sold on PancakeSwap.", logos: ["pancakeswap"] },
-      lp: { name: "Provide liquidity", desc: "PancakeSwap V3 pools, valued by the oracle, not the pool.", logos: ["pancakeswap"] },
-      borrow: { name: "Borrow & loop", desc: "Post collateral, borrow and loop. You set the leverage cap.", logos: ["venus", "lista"] },
+      lp: { name: "Provide liquidity · upcoming", upcoming: true, desc: "PancakeSwap V3 pools, valued by the oracle, not the pool.", logos: ["pancakeswap"] },
+      borrow: { name: "Borrow & loop · upcoming", upcoming: true, desc: "Post collateral, borrow and loop. You set the leverage cap.", logos: ["venus", "lista"] },
     };
 
     const M = [];
@@ -134,15 +136,16 @@
     // Loop pairs, from Lista (on-chain LLTV + liquidity) and Venus (collateral factors) on 2026-09-30.
     // [id, kind, venue, collateral, loan, liquidation LTV %, pair LTV cap, default, borrow %, LISTA reward %, USD available, sub, collateral yield %, DEX discount %, slisBNB]
     const PAIR_ROWS = [["venus-slisbnb-bnb","corr","venus","slisBNB","BNB",72,65,55,0.39,0,379000000,"",0.834,0.17,1],["venus-asbnb-bnb","corr","venus","asBNB","BNB",60,53,43,0.39,0,379000000,"",null,0.3,0],["lista-slisbnb-bnb-fixed-term","corr","lista","slisBNB","BNB",96.5,90,80,0.5,0,142384587,"fixed-term",0.834,0.17,1],["lista-slisbnb-bnb-lp-bnb-smart-lending","corr","lista","slisBNB-BNB LP","BNB",96.5,90,80,0.5,0,7650810,"Smart Lending",null,0.1,1],["lista-slisbnb-bnb","corr","lista","slisBNB","BNB",96.5,90,80,0.29,0,5772283,"",0.834,0.17,1],["lista-slisbnb-bnb-lp-bnb-smart-lending-1","corr","lista","slisBNB-BNB LP","BNB",91.5,85,75,1.0,0,82038,"Smart Lending",null,0.1,1],["lista-asbnb-bnb","corr","lista","asBNB","BNB",96.5,90,80,0.29,0,8771,"",null,0.3,0],["lista-slisbnb-bnb-1","corr","lista","slisBNB","BNB",91.5,85,75,2.37,0,4474,"",0.834,0.17,1],["venus-susde-usdt","stable","venus","sUSDe","USDT",75,68,58,5.0,0,45800000,"",5.16,0.1,0],["venus-usde-usdt","stable","venus","USDe","USDT",70,63,53,5.0,0,45800000,"",null,0.1,0],["venus-susde-u","stable","venus","sUSDe","U",75,68,58,4.1,0,10200000,"",5.16,0.1,0],["venus-usde-u","stable","venus","USDe","U",70,63,53,4.1,0,10200000,"",null,0.1,0],["venus-susde-usdc","stable","venus","sUSDe","USDC",75,68,58,5.35,0,7900000,"",5.16,0.1,0],["venus-usde-usdc","stable","venus","USDe","USDC",70,63,53,5.35,0,7900000,"",null,0.1,0],["lista-usdt-usdc-lp-usd1-smart-lending","stable","lista","USDT-USDC LP","USD1",96.5,90,80,0.47,0.45,2164988,"Smart Lending",null,0.1,0],["lista-usd1-usdt-lp-u-smart-lending","stable","lista","USD1-USDT LP","U",96.5,90,80,0.03,0,399163,"Smart Lending",null,0.1,0],["lista-lisusd-usdt-lp-u-smart-lending","stable","lista","lisUSD-USDT LP","U",96.5,90,80,0.03,0,384333,"Smart Lending",null,0.1,0],["lista-usd1-usdt-lp-usd1-smart-lending","stable","lista","USD1-USDT LP","USD1",96.5,90,80,0.03,0,292946,"Smart Lending",null,0.1,0],["lista-lisusd-usdt-lp-usd1-smart-lending","stable","lista","lisUSD-USDT LP","USD1",96.5,90,80,0.03,0,271843,"Smart Lending",null,0.1,0],["lista-usdt-usdc-lp-u-smart-lending","stable","lista","USDT-USDC LP","U",96.5,90,80,1.0,0.47,228884,"Smart Lending",null,0.1,0],["lista-asusdf-usd1","stable","lista","asUSDF","USD1",91.5,85,75,0.08,0,205542,"",null,0.3,0],["lista-usdt-usdc-lp-usdc-smart-lending","stable","lista","USDT-USDC LP","USDC",96.5,90,80,1.46,0,100009,"Smart Lending",null,0.1,0],["lista-u-usdt-lp-usdt-smart-lending","stable","lista","U-USDT LP","USDT",96.5,90,80,6.08,0,10567,"Smart Lending",null,0.1,0],["lista-susde-usdt","stable","lista","sUSDe","USDT",91.5,85,75,6.16,0,9992,"",5.16,0.1,0],["lista-u-usdt-lp-usd1-smart-lending","stable","lista","U-USDT LP","USD1",96.5,90,80,1.7,0,2006,"Smart Lending",null,0.1,0],["lista-asusdf-usdt","stable","lista","asUSDF","USDT",91.5,85,75,31.34,0,1089,"",null,0.3,0],["venus-btcb-usdt","long","venus","BTCB","USDT",80,60,45,5.0,0,45800000,"",null,0.04,0],["venus-eth-usdt","long","venus","ETH","USDT",80,60,45,5.0,0,45800000,"",null,0.43,0],["venus-bnb-usdt","long","venus","BNB","USDT",80,60,45,5.0,0,45800000,"",null,0.06,0],["venus-wbeth-usdt","long","venus","wBETH","USDT",80,60,45,5.0,0,45800000,"",null,0.3,0],["venus-solvbtc-usdt","long","venus","SolvBTC","USDT",75,55,40,5.0,0,45800000,"",null,0.2,0],["venus-slisbnb-usdt","long","venus","slisBNB","USDT",72,52,40,5.0,0,45800000,"",0.834,0.17,1],["venus-nvdab-usdt","long","venus","NVDAB","USDT",60,40,30,5.0,0,45800000,"",null,0.3,0],["venus-tslab-usdt","long","venus","TSLAB","USDT",60,40,30,5.0,0,45800000,"",null,0.47,0],["venus-spcxb-usdt","long","venus","SPCXB","USDT",50,30,20,5.0,0,45800000,"",null,0.33,0],["venus-skhyb-usdt","long","venus","SKHYB","USDT",50,30,20,5.0,0,45800000,"",null,0.26,0],["lista-btcb-usd1","long","lista","BTCB","USD1",70.0,50,40,1.69,0,18124562,"",null,0.04,0],["venus-btcb-u","long","venus","BTCB","U",80,60,45,4.1,0,10200000,"",null,0.04,0],["venus-eth-u","long","venus","ETH","U",80,60,45,4.1,0,10200000,"",null,0.43,0],["venus-bnb-u","long","venus","BNB","U",80,60,45,4.1,0,10200000,"",null,0.06,0],["venus-wbeth-u","long","venus","wBETH","U",80,60,45,4.1,0,10200000,"",null,0.3,0],["venus-solvbtc-u","long","venus","SolvBTC","U",75,55,40,4.1,0,10200000,"",null,0.2,0],["venus-slisbnb-u","long","venus","slisBNB","U",72,52,40,4.1,0,10200000,"",0.834,0.17,1],["venus-nvdab-u","long","venus","NVDAB","U",60,40,30,4.1,0,10200000,"",null,0.3,0],["venus-tslab-u","long","venus","TSLAB","U",60,40,30,4.1,0,10200000,"",null,0.47,0],["venus-spcxb-u","long","venus","SPCXB","U",50,30,20,4.1,0,10200000,"",null,0.33,0],["venus-skhyb-u","long","venus","SKHYB","U",50,30,20,4.1,0,10200000,"",null,0.26,0],["venus-btcb-usdc","long","venus","BTCB","USDC",80,60,45,5.35,0,7900000,"",null,0.04,0],["venus-eth-usdc","long","venus","ETH","USDC",80,60,45,5.35,0,7900000,"",null,0.43,0],["venus-bnb-usdc","long","venus","BNB","USDC",80,60,45,5.35,0,7900000,"",null,0.06,0],["venus-wbeth-usdc","long","venus","wBETH","USDC",80,60,45,5.35,0,7900000,"",null,0.3,0],["venus-solvbtc-usdc","long","venus","SolvBTC","USDC",75,55,40,5.35,0,7900000,"",null,0.2,0],["venus-slisbnb-usdc","long","venus","slisBNB","USDC",72,52,40,5.35,0,7900000,"",0.834,0.17,1],["venus-nvdab-usdc","long","venus","NVDAB","USDC",60,40,30,5.35,0,7900000,"",null,0.3,0],["venus-tslab-usdc","long","venus","TSLAB","USDC",60,40,30,5.35,0,7900000,"",null,0.47,0],["venus-spcxb-usdc","long","venus","SPCXB","USDC",50,30,20,5.35,0,7900000,"",null,0.33,0],["venus-skhyb-usdc","long","venus","SKHYB","USDC",50,30,20,5.35,0,7900000,"",null,0.26,0],["lista-btcb-u","long","lista","BTCB","U",86.0,66,50,2.3,0,1893141,"",null,0.04,0],["lista-slisbnb-u","long","lista","slisBNB","U",86.0,66,50,2.28,0,1789181,"",0.834,0.17,1],["lista-btcb-usd1-fixed-term","long","lista","BTCB","USD1",86.0,66,50,1.8,0,794573,"fixed-term",null,0.04,0],["lista-spyb-usd1","long","lista","SPYB","USD1",85.0,65,50,1.49,2.44,358883,"",null,0.05,0],["lista-btcb-usdc","long","lista","BTCB","USDC",80.0,60,45,0.89,0,318961,"",null,0.04,0],["lista-btcb-usdt","long","lista","BTCB","USDT",80.0,60,45,3.5,0,215018,"",null,0.04,0],["lista-slisbnb-usd1-fixed-term","long","lista","slisBNB","USD1",86.0,66,50,2.0,0,202311,"fixed-term",0.834,0.17,1],["lista-slisbnb-usdc","long","lista","slisBNB","USDC",80.0,60,45,0.02,0,140002,"",0.834,0.17,1],["lista-slisbnb-bnb-lp-usd1-smart-lending","long","lista","slisBNB-BNB LP","USD1",75.0,55,40,1.7,0,116577,"Smart Lending",null,0.1,1],["lista-wbnb-usdc","long","lista","WBNB","USDC",80.0,60,45,0.02,0,100004,"",null,0.06,0],["lista-spyb-u","long","lista","SPYB","U",85.0,65,50,0.57,2.43,88877,"",null,0.05,0],["lista-slisbnb-usdt","long","lista","slisBNB","USDT",80.0,60,45,2.22,0,76533,"",0.834,0.17,1],["lista-crclb-u","long","lista","CRCLB","U",60.0,40,30,0.57,2.17,71226,"",null,0.63,0],["lista-crclb-usd1","long","lista","CRCLB","USD1",60.0,40,30,1.49,2.49,59907,"",null,0.63,0],["lista-sndkb-usdc","long","lista","SNDKB","USDC",50.0,30,20,0.02,0,49999,"",null,0.27,0],["lista-mub-usdc","long","lista","MUB","USDC",65.0,45,35,0.02,0,49999,"",null,9.32,0],["lista-tslab-usdc","long","lista","TSLAB","USDC",75.0,55,40,0.03,0,49978,"",null,0.47,0],["lista-qqqb-u","long","lista","QQQB","U",75.0,55,40,0.58,2.34,47776,"",null,0.01,0],["lista-qqqb-usd1","long","lista","QQQB","USD1",75.0,55,40,0.8,2.3,43755,"",null,0.01,0],["lista-googlb-u","long","lista","GOOGLB","U",70.0,50,40,0.55,7.04,38457,"",null,0.51,0],["lista-crclb-usdc","long","lista","CRCLB","USDC",60.0,40,30,0.83,2.4,25635,"",null,0.63,0],["lista-hoodb-usd1","long","lista","HOODB","USD1",60.0,40,30,0.04,0,24987,"",null,0.77,0],["lista-skhyb-usd1","long","lista","SKHYB","USD1",55.0,35,25,0.03,1.82,24783,"",null,0.26,0],["lista-hoodb-u","long","lista","HOODB","U",60.0,40,30,0.03,0,24534,"",null,0.77,0],["lista-nokb-usd1","long","lista","NOKB","USD1",60.0,40,30,0.03,0.43,23919,"",null,4.83,0],["lista-nvdab-usd1","long","lista","NVDAB","USD1",75.0,55,40,0.85,7.16,23902,"",null,0.3,0],["lista-soxlb-u","long","lista","SOXLB","U",50.0,30,20,0.19,0,23522,"",null,5.59,0],["lista-nokb-u","long","lista","NOKB","U",60.0,40,30,0.03,0.23,22938,"",null,4.83,0],["lista-metab-u","long","lista","METAB","U",70.0,50,40,0.13,0,22844,"",null,1.06,0],["lista-babab-usd1","long","lista","BABAB","USD1",65.0,45,35,0.03,0.38,22547,"",null,0.42,0],["lista-skhyb-u","long","lista","SKHYB","U",55.0,35,25,0.04,0.13,21394,"",null,0.26,0],["lista-soxlb-usd1","long","lista","SOXLB","USD1",50.0,30,20,0.04,13.84,20795,"",null,5.59,0],["lista-babab-u","long","lista","BABAB","U",65.0,45,35,0.04,0.38,20091,"",null,0.42,0],["lista-nvdab-usdc","long","lista","NVDAB","USDC",75.0,55,40,0.02,0,20000,"",null,0.3,0],["lista-wbeth-usdt","long","lista","wBETH","USDT",80.0,60,45,3.44,0,17174,"",null,0.3,0],["lista-spcxb-usdc","long","lista","SPCXB","USDC",50.0,30,20,0.92,0.43,11137,"",null,0.33,0],["lista-slisbnb-bnb-lp-usdc-smart-lending","long","lista","slisBNB-BNB LP","USDC",80.0,60,45,1.61,0,10000,"Smart Lending",null,0.1,1],["lista-tslab-usd1","long","lista","TSLAB","USD1",75.0,55,40,0.22,0.03,7546,"",null,0.47,0],["lista-mub-usd1","long","lista","MUB","USD1",65.0,45,35,0.41,1.47,6876,"",null,9.32,0],["lista-nvdab-u","long","lista","NVDAB","U",75.0,55,40,2.16,4.87,6036,"",null,0.3,0],["lista-wbeth-usd1","long","lista","wBETH","USD1",80.0,60,45,1.09,0,5875,"",null,0.3,0],["lista-tslab-u","long","lista","TSLAB","U",75.0,55,40,0.27,0.03,5738,"",null,0.47,0],["lista-msftb-usd1","long","lista","MSFTB","USD1",75.0,55,40,1.52,0.29,5581,"",null,0.56,0],["lista-slisbnb-usd1","long","lista","slisBNB","USD1",70.0,50,40,10.8,0,4865,"",0.834,0.17,1],["lista-googlb-usd1","long","lista","GOOGLB","USD1",70.0,50,40,2.28,6.7,4110,"",null,0.51,0],["lista-spcxb-u","long","lista","SPCXB","U",50.0,30,20,2.21,0.87,3872,"",null,0.33,0],["lista-tsmb-usd1","long","lista","TSMB","USD1",65.0,45,35,0.82,0.15,3117,"",null,1.11,0],["lista-tsmb-u","long","lista","TSMB","U",65.0,45,35,2.22,0.15,2598,"",null,1.11,0],["lista-bnb-usd1","long","lista","BNB","USD1",70.0,50,40,1.7,0,2417,"",null,0.06,0],["lista-eth-usd1","long","lista","ETH","USD1",70.0,50,40,1.7,0,1340,"",null,0.43,0]];
-    const VNAME = { lista: "Lista", venus: "Venus", pancakeswap: "PancakeSwap" };
+    const VNAME = { lista: "Lista", venus: "Venus", pancakeswap: "PancakeSwap", aave: "Aave" };
     PAIR_ROWS.forEach(([id, kind, venue, coll, loan, lltv, cap, def, borrow, rew, liq, sub, yld, disc, stake]) => M.push({
       id, g: groupOf(coll), a: "borrow", venue, kind: "Loop", name: `${coll} / ${loan}`, tokens: [coll, loan],
       loop: { kind, coll, loan, lltv, cap, def, borrow, rew, liq, sub, yld, stake: !!stake, max: 1 / (1 - cap / 100), dflt: 1 / (1 - def / 100) },
     }));
+    M.forEach((m) => { if (["borrow", "lp"].includes(m.a) || m.kind === "Staking") m.upcoming = true; });
     const byId = Object.fromEntries(M.map((m) => [m.id, m]));
     const denomFam = (asset) => (asset === "BNB" ? "bnb" : "stable");
     // Holding the vault's own asset is not a market.
-    const marketsFor = (g, a, asset) => M.filter((m) => m.g === g && m.a === a && !(a === "trade" && m.name === (asset === "BNB" ? "BNB" : "USDT")));
+    const marketsFor = (g, a, asset) => M.filter((m) => !m.upcoming && m.g === g && m.a === a && !(a === "trade" && m.name === (asset === "BNB" ? "BNB" : "USDT")));
     const ruleMarkets = (r) => [...r.m].map((id) => byId[id]).filter(Boolean);
     const allocationCap = (r, marketId) => Math.max(0, Number(r.caps && r.caps[marketId]) || 0);
     const totalAllocation = (rules) => rules.reduce((sum, r) => sum + ruleMarkets(r).reduce((n, m) => n + allocationCap(r, m.id), 0), 0);
@@ -211,6 +214,17 @@
   /* Vaults (simulated)                                                  */
   /* ------------------------------------------------------------------ */
   const VAULTS = [
+    {
+      slug: "sherwood-usdt", name: "Sherwood USDT", manager: "Sherwood", agentId: 1611, agentVaults: 1, symbol: "avSUS", asset: "USDT", benchmark: "Idle USDT", managerType: "agent", official: true, continuous: true,
+      rules: [{ g: "stable", a: "lend", m: ["venus-supply-usdt"], caps: { "venus-supply-usdt": 70 } }],
+      strategy: "Supply USDT to Venus, up to 70% of NAV. Keep the rest idle. No borrowing.",
+      runtimeDays: 90, returns: { "7D": 0.06, "30D": 0.26, "90D": 0.8, ALL: 0.8 }, maxDrawdown: { "7D": 0, "30D": 0, "90D": -0.02, ALL: -0.02 },
+      tvl: 10080, followers: 10, status: "Simulated", sharePrice: 1.008, fees: { perf: 20, mgmt: 0, platform: 0 }, cap: null, exitCost: "Quote required",
+      positions: [
+        { p: "Venus", loc: "vUSDT supply receipts", w: 70, by: "Underlying / receipt exchange rate", st: "Simulated" },
+        { p: "Idle", loc: "USDT in vault", w: 30, by: "Token balance", st: "Simulated reserve" },
+      ],
+    },
     {
       slug: "sherwood-crypto-core", name: "Sherwood Crypto Core", manager: "Sherwood", agentId: 1611, agentVaults: 4, symbol: "avSCC", asset: "USDT", benchmark: "Equal-weight BNB / BTCB / ETH", managerType: "agent", official: true, buyPlan: "Buy once",
       rules: [{ g: "bnb", a: "trade", m: ["pcs-hold-bnb"], caps: { "pcs-hold-bnb": 32 } }, { g: "majors", a: "trade", m: ["pcs-hold-btcb", "pcs-hold-eth"], caps: { "pcs-hold-btcb": 32, "pcs-hold-eth": 31 } }],
@@ -288,10 +302,11 @@
   /* Local demo ledger — no wallet, signature or transaction required.  */
   /* ------------------------------------------------------------------ */
   const DEMO_OWNER = "0x7a3F5b2E9d41C8a06f3B7e2D19c4A8b5E0d2c91E";
-  const DEMO_KEY = "bnb-agent-vaults:demo-ledger:v1";
+  const DEMO_KEY = "bnb-agent-vaults:readonly-example:v2";
   const freshDemoState = () => ({
     balances: { USDT: 24850, BNB: 18.42 },
     holdings: {
+      "sherwood-usdt": { shares: 1000, cost: 1 },
       "sherwood-crypto-core": { shares: 20000, cost: 1 },
       "sherwood-crypto-accumulator": { shares: 3200, cost: 1.0625 },
       "sherwood-bstock-core": { shares: 4600, cost: 1.0214 },
@@ -318,39 +333,6 @@
     state: readDemoState,
     balance(asset) { return Number(readDemoState().balances[asset] || 0); },
     shares(slug) { return Number(readDemoState().holdings[slug]?.shares || 0); },
-    deposit(slug, amount) {
-      const v = VAULTS.find((x) => x.slug === slug), n = Number(amount), state = readDemoState();
-      if (!v || !isFinite(n) || n <= 0) return { ok: false, error: "Enter an amount greater than zero." };
-      if (n > Number(state.balances[v.asset] || 0)) return { ok: false, error: "Demo balance is too low for this deposit." };
-      const issued = n / v.sharePrice, old = state.holdings[slug] || { shares: 0, cost: v.sharePrice };
-      const basis = old.shares * old.cost + n;
-      state.balances[v.asset] -= n;
-      state.holdings[slug] = { shares: old.shares + issued, cost: basis / (old.shares + issued) };
-      state.activities.unshift({ at: Date.now(), event: "Demo deposit", vault: v.name, amount: `${n.toFixed(2)} ${v.asset} → ${issued.toFixed(2)} ${v.symbol}`, ref: "LOCAL" });
-      writeDemoState(state);
-      return { ok: true, shares: issued, balance: state.balances[v.asset] };
-    },
-    redeem(slug, shares) {
-      const v = VAULTS.find((x) => x.slug === slug), n = Number(shares), state = readDemoState();
-      const held = Number(state.holdings[slug]?.shares || 0);
-      if (!v || !isFinite(n) || n <= 0) return { ok: false, error: "Enter an amount greater than zero." };
-      if (n > held) return { ok: false, error: `You only hold ${held.toFixed(2)} demo shares.` };
-      const received = n * v.sharePrice;
-      state.holdings[slug].shares = held - n;
-      if (state.holdings[slug].shares < 0.000001) delete state.holdings[slug];
-      state.balances[v.asset] = Number(state.balances[v.asset] || 0) + received;
-      state.activities.unshift({ at: Date.now(), event: "Demo redemption", vault: v.name, amount: `${n.toFixed(2)} ${v.symbol} → ${received.toFixed(2)} ${v.asset}`, ref: "LOCAL" });
-      writeDemoState(state);
-      return { ok: true, received, balance: state.balances[v.asset] };
-    },
-    launch(manifest) {
-      const state = readDemoState();
-      const id = `demo-${Date.now().toString(36)}`;
-      state.launchedVaults.unshift({ id, at: Date.now(), manifest });
-      state.activities.unshift({ at: Date.now(), event: "Demo vault launched", vault: manifest.identity.name, amount: `${manifest.seed.amount} ${manifest.seed.asset} seed`, ref: id.toUpperCase() });
-      writeDemoState(state);
-      return { id };
-    },
     reset() { return writeDemoState(freshDemoState()); },
   };
 
@@ -449,6 +431,7 @@
 
   function logo(key, cls = "") {
     const v = VENUES.find((x) => x.id === key || x.name === key);
+    if (v?.id === "aave") return `<span class="protocol-monogram ${cls}" aria-label="Aave">A</span>`;
     const file = v ? v.logo : key === "bnb" ? "bnbchain" : null;
     if (!file) return "";
     return `<img class="logo ${cls}" src="${logoUrl(file)}" alt="${esc(v ? v.name : "BNB Chain")}">`;
@@ -675,17 +658,17 @@
   /* Shell: notice strip, masthead, footer                               */
   /* ------------------------------------------------------------------ */
   function shell(active) {
-    const nav = [["vaults.html", "Vaults"], ["portfolio.html", "Portfolio"], ["create.html", "Launch a Vault"]];
+    const nav = [["vaults.html", "Vaults"], ["portfolio.html", "Portfolio"], ["create.html", "Open a vault"]];
     const top = document.createElement("div");
     top.innerHTML = `
-      <div class="notice" data-bav-shell><span><b>Demo mode</b></span><span>No wallet required</span><span>Simulated performance</span><span>No transactions</span></div>
+      <div class="notice" data-bav-shell><span><b>Prototype</b></span><span>Simulated examples</span><span>Unaudited contracts</span><span>Deployment required for transactions</span></div>
       <header class="masthead" data-bav-shell>
         <div class="wrap">
           <a class="brand" href="${route()}">${SEAL}<span class="brand-name">BNB Agent Vaults</span></a>
           <nav class="nav">${nav.map(([h, l]) => `<a href="${route(h.replace(".html", ""))}" class="${active === h ? "active" : ""}">${l}</a>`).join("")}</nav>
           <div class="head-right">
-            <span class="chain"><img class="logo" src="${logoUrl("bnbchain")}" alt="">BNB Smart Chain · 56</span>
-            <button class="btn sm ghost" data-demo><span class="full">Demo Mode</span><span class="short">Demo</span></button>
+            <span class="chain"><img class="logo" src="${logoUrl("bnbchain")}" alt="">BNB Chain · prototype</span>
+            <button class="btn sm ghost" data-demo><span class="full">Not deployed</span><span class="short">Prototype</span></button>
             <button class="menu-btn" aria-label="Menu"><span></span></button>
           </div>
         </div>
@@ -702,7 +685,7 @@
       <div class="foot-grid">
         <div><a class="brand" href="${route()}">${SEAL}<span class="brand-name">BNB Agent Vaults</span></a>
           <p>Non-custodial ERC-4626 vaults on BNB Chain, operated by AI agents inside a pre-committed mandate.</p></div>
-        <div><h5>Product</h5><a href="${route("vaults")}">Vault directory</a><a href="${route("create")}">Launch a vault</a><a href="${route("portfolio")}">Portfolio</a></div>
+        <div><h5>Product</h5><a href="${route("vaults")}">Vault directory</a><a href="${route("create")}">Open a vault</a><a href="${route("portfolio")}">Portfolio</a></div>
         <div><h5>Developers</h5><a href="${route("create")}">Vault Manifest</a><a href="${route("#terms")}">MCP + skills</a><a href="${route("#terms")}">Contracts (pending audit)</a></div>
         <div><h5>Protocol</h5><a href="${route("#terms")}">Fee caps</a><a href="${route("#terms")}">Timelocks</a><a href="${route("#terms")}">Risk council</a><a href="${route("#terms")}">Security model</a></div>
       </div>
@@ -713,7 +696,7 @@
           <p>Mandate limits reduce, but do not eliminate, risk. Depositors remain exposed to market, liquidation, oracle, smart-contract, counterparty and liquidity risk, and may lose some or all of their capital. Annualized figures are a mathematical restatement of past returns, not a forecast or APY. Nothing on this site is investment advice or an offer to sell any security.</p>
         </div>
       </div>
-      <div class="foot-base"><span>© 2026 BNB Agent Vaults — design prototype</span><span>Chain ID 56 · ERC-4626 · ERC-8004</span></div>
+      <div class="foot-base"><span>© 2026 BNB Agent Vaults — design prototype</span><span>BNB Chain · ERC-4626 · ERC-8004</span></div>
     </div></footer>`;
   }
 
@@ -724,7 +707,7 @@
     if (mb) mb.addEventListener("click", () => setMenu(!mh.classList.contains("open")));
     $$(".nav a", mh).forEach((a) => a.addEventListener("click", () => setMenu(false)));
     window.addEventListener("resize", () => { if (window.innerWidth > 960) setMenu(false); });
-    $$("[data-demo]").forEach((b) => b.addEventListener("click", () => toast("Demo mode is active — no wallet or transaction is required")));
+    $$("[data-demo]").forEach((b) => b.addEventListener("click", () => toast("Prototype examples are simulated. Signing is disabled until a verified deployment is configured.")));
     stackTables();
   }
 
@@ -773,7 +756,7 @@
     platformFeeForRisk, feeBreakdown,
     $, $$, esc, fmt, perf, periodDays, historyTag, riskMeter, statusTag,
     rng, hexAddr, short, navSeries, sparkline, lineChart, logo, agentCanvas, stackTables,
-    shell, footerHTML, wireShell, toast, SEAL, route, DEMO_OWNER, demo,
+    shell, footerHTML, wireShell, toast, SEAL, route, assetUrl, DEMO_OWNER, demo,
     vault: (slug) => VAULTS.find((v) => v.slug === slug),
   };
 })();

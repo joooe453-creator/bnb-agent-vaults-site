@@ -1,13 +1,13 @@
 1:"$Sreact.fragment"
 2:I[81384,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js"],"PrototypePage"]
-3:Tb41,
+3:Tbcf,
 
 <section class="page-head">
   <div class="wrap">
     <div class="row">
       <div>
-        <h1>Agent-managed vaults</h1>
-        <p class="lede">Compare simulated prototype mandates, allocation caps and performance. Production on-chain basket NAV is not implemented yet.</p>
+        <h1>Read the mandate. Choose the agent.</h1>
+        <p class="lede">Every vault can only use its named markets. Compare its mandate, NAV and exit path before depositing. The directory below is simulated; real transactions require a verified deployment.</p>
       </div>
       <div class="summary" id="summary"></div>
     </div>
@@ -27,6 +27,7 @@
       <div class="seg" id="f-period"><button data-v="7D">7D</button><button class="on" data-v="30D">30D</button><button data-v="90D">90D</button><button data-v="ALL">All</button></div>
       <div class="seg" id="f-mode"><button class="on" data-v="return">Return</button><button data-v="annualized">Annualized</button></div>
       <select class="select" id="f-sort">
+        <option value="mandate">Sort: Simple mandate first</option>
         <option value="ra">Sort: Return per drawdown</option>
         <option value="perf">Sort: Return</option>
         <option value="tvl">Sort: AUM</option>
@@ -65,12 +66,12 @@
 
 
 
-4:T1121,
+4:T11cc,
 (function () {
   const { $, $$, VAULTS, fmt, perf, riskMeter, statusTag, historyTag, navSeries, sparkline, managerLabel, rulesLabel, vaultRisk, vaultVenues } = BAV;
   BAV.shell("vaults.html");
 
-  const st = { asset: "USDT", filter: "all", q: "", period: "30D", mode: "return", sort: "ra" };
+  const st = { asset: "USDT", filter: "all", q: "", period: "30D", mode: "return", sort: "mandate" };
 
   const tot = VAULTS.reduce((a, v) => a + v.tvl, 0);
   const dep = VAULTS.reduce((a, v) => a + v.followers, 0);
@@ -110,6 +111,7 @@
       return true;
     });
     const key = {
+      mandate: (v) => v.continuous ? 1 : 0,
       ra: (v) => { const r = v.returns[p], d = v.maxDrawdown[p]; return r == null ? -Infinity : r / Math.max(Math.abs(d || 0), 0.25); },
       tvl: (v) => v.tvl,
       perf: (v) => perf(v, p, st.mode) ?? -Infinity,
@@ -123,7 +125,7 @@
       const copy = v.copyOf ? BAV.vault(v.copyOf.slug) : null;
       const reason = r == null ? (st.mode === "annualized" && v.returns[p] != null ? "Under 30 days" : "Insufficient history") : "";
       return `<tr data-slug="${v.slug}">
-        <td><div class="vname"><span class="n">${v.name}</span><span class="m">${managerLabel(v)} · ${v.asset}</span>
+        <td><div class="vname"><a class="n" href="${BAV.route("vault/" + v.slug)}">${v.name}</a><span class="m">${managerLabel(v)} · ${v.asset}</span>
           <span class="tags">${statusTag(v)}${ht ? `<span class="tag">${ht}</span>` : ""}${copy ? `<span class="tag warn">Follows ${copy.name} · ${v.copyOf.lag} later</span>` : ""}</span></div></td>
         <td><div style="font-size:14px">${rulesLabel(v)}</div>${riskMeter(vaultRisk(v))}</td>
         <td><span class="logo-stack">${vaultVenues(v).map((id) => BAV.logo(id, "md")).join("")}</span></td>
@@ -137,14 +139,14 @@
       </tr>`;
     }).join("") || `<tr><td colspan="10" class="muted" style="padding:40px 0;text-align:center">No vaults match these filters.</td></tr>`;
     $$("#dir tbody tr[data-slug]").forEach((tr) => tr.addEventListener("click", () => (location.href = BAV.route("vault/" + tr.dataset.slug))));
-    $("#count").textContent = `Showing ${rows.length} of ${VAULTS.filter((v) => v.asset === st.asset).length} ${st.asset}-currency vaults. Exit cost is today's estimate of the slippage a redeemer pays; it is paid by the person leaving, not by the vault.`;
+    $("#count").textContent = `Showing ${rows.length} of ${VAULTS.filter((v) => v.asset === st.asset).length} ${st.asset}-currency vaults. The simulated figures are illustrations. Cash exits require an actual minimum-proceeds preview; in-kind exits return a proportional token and receipt slice. Unwind cost is paid from the redeemer's slice.`;
   }
   render();
 })();
 8:X
 d:X
 d:C
-0:{"buildId":"2A03bJnrvDrUmF3SwYB9a","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"bodyClass":"","html":"$3","runtimeVersion":"db09e1a4c069","script":"$4","pageKey":"vaults"}],["$L5"],"$L6"]}],"isPartial":"$@7","staleTime":"$8","varyParams":null},{"rsc":"$L9","isPartial":"$@a","staleTime":"$8","varyParams":null},{"rsc":"$Lb","isPartial":"$@c","staleTime":"$8","varyParams":"$d"},{"rsc":"$Le","isPartial":"$@f","staleTime":"$8","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@10","rootVaryParams":null,"needsRuntimeRequest":"$@11"}
+0:{"buildId":"NYv6ZEOK3hWuwG-4LxTDz","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"bodyClass":"","html":"$3","runtimeVersion":"6228e54510c4","script":"$4","pageKey":"vaults"}],["$L5"],"$L6"]}],"isPartial":"$@7","staleTime":"$8","varyParams":null},{"rsc":"$L9","isPartial":"$@a","staleTime":"$8","varyParams":null},{"rsc":"$Lb","isPartial":"$@c","staleTime":"$8","varyParams":"$d"},{"rsc":"$Le","isPartial":"$@f","staleTime":"$8","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@10","rootVaryParams":null,"needsRuntimeRequest":"$@11"}
 12:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
 13:"$Sreact.suspense"
 15:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]
@@ -152,12 +154,12 @@ d:C
 17:I[27201,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"IconMark"]
 18:I[39756,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default"]
 19:I[37457,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default"]
-:HL["/bnb-agent-vaults-site/_next/static/chunks/3qxppyfa540o1.css","style"]
+:HL["/bnb-agent-vaults-site/_next/static/chunks/0fymx09srs7yc.css","style"]
 5:["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js","async":true}]
 6:["$","$L12",null,{"children":["$","$13",null,{"name":"Next.MetadataOutlet","children":"$@14"}]}]
 9:["$","$1","h",{"children":[null,["$","$L15",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","div",null,{"hidden":true,"children":["$","$L16",null,{"children":["$","$13",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"BNB Agent Vaults — Agent-managed funds on BNB Chain"}],["$","meta","1",{"name":"description","content":"Launch and follow non-custodial, policy-bound agent vaults on BNB Chain."}],["$","meta","2",{"name":"codex-preview","content":"development"}],["$","link","3",{"rel":"shortcut icon","href":"/bnb-agent-vaults-site/favicon.svg"}],["$","link","4",{"rel":"icon","href":"/bnb-agent-vaults-site/favicon.svg"}],["$","$L17","5",{}]]}]}]}],null]}]
 b:["$","$1","c",{"children":[null,["$","$L18",null,{"parallelRouterKey":"children","template":["$","$L19",null,{}]}]]}]
-e:["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/3qxppyfa540o1.css","precedence":"next"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L18",null,{"parallelRouterKey":"children","template":["$","$L19",null,{}],"notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]]}]}]}]]}]
+e:["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/0fymx09srs7yc.css","precedence":"next"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L18",null,{"parallelRouterKey":"children","template":["$","$L19",null,{}],"notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]]}]}]}]]}]
 14:null
 11:true
 8:300

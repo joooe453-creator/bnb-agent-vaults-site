@@ -1,68 +1,79 @@
-# BNB Agent Vaults — Phase 1
+---
+name: bnb-agent-vaults
+description: Design, inspect, and prepare bounded BNB Chain mandate vault creation, deposits, pro-rata redemptions, and PancakeSwap/Venus/Lista/Aave execution through the Sherwood MCP. Use for a continuous mandate vault or its agent operator; existing basket/schedule manifests remain reference plans.
+---
 
-Use this integration to design and validate a phase-one basket vault on BNB Smart Chain. This endpoint does not
-deploy a vault or submit transactions.
+# BNB Agent Vaults
 
-## Product boundary
+Use the continuous `bnb-agent-vaults/mandate@1.0` contracts (`MandateVault` and `MandatePortfolio`). A creator selects
+exact markets and NAV caps; the operator has no privilege to redeem other people's shares or redirect execution proceeds.
+Transactions remain unsigned until the user's wallet or their already-authorized agent signer reviews and signs them.
+Never request a private key or silently expand a signer's authority.
 
-A vault has exactly one buying plan:
+## Discovery and creation
 
-1. `lump-sum`: buy the declared bStock/crypto basket once for each settled contribution batch.
-2. `accumulate`: buy fixed tranches on a schedule, after a basket drawdown, or when either trigger fires.
+Call `get_execution_deployment`. An `undeployed` record is a hard execution gate: design a mandate, but never invent
+contract addresses, claim a fork pass, or treat a mainnet registry as testnet configuration. Choose an exact returned
+template and verify its chain, asset, receipts, pools, feeds and configuration hash. For schema and tool arguments, read
+[execution.md](references/execution.md).
 
-Post-purchase handling is optional for every target:
+For creation, use separate creator, dedicated agent and risk-council keys. Set one cap for each template leg; caps total
+at most 9,500 bps. Seed exactly 100 accounting-asset units and disclose its 90-day share lock. The launch transaction
+creates both contracts and seeds the creator atomically; token approval may require a separate transaction. Total
+performance fee is fixed at creation (0–3,000 bps), charged as shares above the post-fee watermark. Of those fee shares,
+90% goes to the fixed creator recipient and 10% to the fixed protocol recipient; a 20% total means approximately18%/2%
+of new marked profit, with share rounding. Management fees are absent in this version. Validate with `validate_mandate`, prepare with `prepare_mandate_creation`, then verify factory
+approval and call `simulate_mandate_creation` after approval. A mined `VaultCreated` event and `factory.isVault` identify the actual result.
 
-- `hold`: retain the purchased token in the vault.
-- `yield-market`: deposit only into the exact compatible Aave, Venus, or Lista market returned by
-  `list_phase1_markets`.
+## Operating a vault
 
-Do not invent token, pool, vToken, Aave provider/aToken, or Lista vault addresses. If the registry has no yield market for a target, use
-`hold`. Borrowing, leverage, loops, LP positions, arbitrary calls, and stablecoin yield rotation are outside phase one.
+Read `get_execution_health` and `get_vault_state` before acting; do not use a simulated website chart as NAV or spending authority. Only these
+operations execute: a pinned direct PancakeSwap V3 exact-input swap (forward or reverse), holding its target,
+Venus supply/redeem, Lista ERC-4626 deposit/redeem, and Aave V3 supply/withdraw. Borrowing, LP, leverage, Aster and
+scheduled/drawdown basket automation are outside this execution contract. One underlying can use one venue per vault.
 
-## Safe workflow
+Use `prepare_vault_action`, then `simulate_vault_action` for the same arguments. All MCP amounts are raw decimal integer
+strings, never floating-point numbers. Bind chain and account, use a short deadline and meaningful minimum output.
+Current market listing, pause/capacity, receipt binding and oracle freshness are checked onchain. Swaps have an immutable
+oracle-derived minimum, at most 1% below fair value; lending receipts have their own tight balance-delta checks.
+A failed supply reverts the whole purchase rather than choosing a different destination. Allowances are bounded and cleared.
 
-1. Call `list_phase1_markets` immediately before building a manifest.
-2. Select 1–10 targets and make integer `weightBps` total exactly `10000`.
-3. Copy each target's token address, PancakeSwap V3 pool, and fee exactly from the registry.
-4. Add a yield market only when its `targetId` equals the selected target's id. Set
-   `revalidateBeforeEveryDeposit: true` and `fallback: "hold"`.
-5. Use `build_vault_manifest` to inspect the current schema and fixed limits.
-6. Call `validate_vault_manifest`. Do not present a vault as deployable unless every check passes and a BSC fork
-   dry-run has passed.
+Create/deposit/execute require reviewed external provenance: runtime and proxy targets, full Venus Diamond dispatch,
+Aave Pool/DataProvider/libraries, Pancake LM hook, and Lista underlying market/queue/cap/admission/fee/authority evidence.
+Drift or unavailable required reads stops adding risk. This is an SDK/MCP gate, not an onchain veto over external governance;
+never refresh its baseline automatically to unblock a trade. External Lista governance can change its underlying markets
+and charge a separate yield fee. Receipt transfers may be paused by the external protocol.
 
-## Accumulation and rebalancing semantics
+A deploy call can return `false` and persist a loss pause without trading. Simulation reports `executionBlocked` and
+`wouldPause`; an `eth_call` never persists that pause. Verify the mined vault's matching `Execution` or `ExecutionBlocked`
+event (`minedExecutionOutcome` in the SDK); a successful receipt alone is not evidence of an executed trade. A daily loss checkpoint uses UTC contract days,
+not a rolling 24-hour window. `checkRisk()` is permissionless; operators should call it when monitoring detects a loss.
 
-- `trancheBps` is 1–25% of available cash.
-- A schedule declares its cadence, future start date/time, IANA time zone and end condition. Supported intervals are
-  up to 365 days, 52 weeks, or 12 months.
-- Missed and failed scheduled orders are skipped without catch-up; edits apply from the next cycle.
-- Calendar schedules preserve local clock time across daylight-saving changes and use the last valid day in short months.
-- Drawdown is 1–30% and is measured from `last-executed-basket-index`.
-- Schedule and drawdown triggers share a minimum 24-hour cooldown. If both fire, execute only one tranche.
-- A failed purchase does not move the basket reference or consume the cooldown.
-- Total deployment is capped at 95%, leaving at least 5% idle.
-- Rebalancing is optional and cashflow-only by default. It requires an absolute weight-drift floor, a 24-hour
-  cooldown, an event turnover cap, a minimum trade, and preflight of every leg.
-- Full buy/sell rebalancing is unavailable while any target is deposited in an Aave, Venus, or Lista destination.
-- A portfolio drawdown control may pause new automated orders, but never auto-liquidates and requires manual resume.
+After broadcast, persist the plan, nonce and tx hash; call `verify_operation_receipt` with `{plan, hash}`. Keep unknown,
+pending, orphaned, reverted, mined and finalized distinct. An RPC timeout is not authorization to submit again. Unsupported
+`finalized` stays unknown; fixed confirmation counts are not the finality signal. The intent `operationId` is not exactly-once
+enforcement. Read [execution.md](references/execution.md) for reconciliation and provenance scope.
 
-## Market checks
+## Depositing and leaving
 
-Registry inclusion is not proof that a future deposit will succeed. Before every Venus deposit, verify the exact
-underlying, comptroller, listing state, mint pause and supply-cap headroom. Before every Lista/ERC-4626 deposit,
-verify the exact `asset()`, `maxDeposit` and `previewDeposit`. Before every Aave deposit, verify the official provider,
-exact aToken, reserve active/frozen/paused flags and supply-cap headroom. If a check fails, keep the purchased asset
-in the vault; never silently route it to a different market.
+Deposits require both an exact token allowance and `depositWithMin` with positive minimum shares. Pricing accrues Venus
+interest and performance fees before issuance. Cash redemption uses `redeemWithMin`: burn the holder's shares and withdraw
+only their proportional inventories; liquidation costs are charged to that slice. Never replace it with full fund liquidation.
+`estimatedRedeemAssets` is marked NAV. ERC-4626 `previewRedeem` deliberately quotes only the guaranteed idle share while
+positions exist. Use the simulated redeem return for an executable estimate and explain state can change before inclusion.
 
-## MCP tools
+If feeds or protocol liquidity prevent a cash exit, explain `redeemInKind`: the holder receives a proportional share of idle
+cash, held assets, and fixed receipt tokens. It needs no swap/withdraw liquidity and does not promise those receipt tokens
+can themselves be converted immediately. If NAV is unavailable, this emergency path waives an unpriceable accrued fee.
+Best-effort pricing has a gas budget, with gas reserved for receipt transfers. Use gas estimation rather than a low fixed
+gas limit; one leg requires about2.4m gas available, ten legs20.4m, although actual consumption can be lower.
 
-| Tool | Purpose |
-| --- | --- |
-| `list_phase1_markets` | Exact buy targets, PancakeSwap pools and compatible Aave/Venus/Lista markets |
-| `build_vault_manifest` | Current schema, required fields and fixed risk rules |
-| `validate_vault_manifest` | Deterministic manifest validation; does not submit a transaction |
-| `list_integrations` | Integration and tracking metadata |
-| `get_protocol_operations` | Read-only protocol capability details |
+Rules can tighten immediately; raising caps requires 24 hours and the exact scheduled commitment. Markets are immutable:
+adding a market requires a new vault. Pausing or tightening caps must never be presented as disabling holder exits.
+The seed owner can redeem only unlocked shares; the agent can redeem only shares it owns or has an actual ERC20 allowance for.
 
-The contracts and site are an unaudited prototype and are not deployed to mainnet. Do not describe simulated
-performance as actual returns or imply that a market's future yield or capacity is guaranteed.
+## Review boundaries
+
+Read [manifest-schema.md](references/manifest-schema.md) only for an old basket/schedule `manifest@0.8` reference plan.
+That schema does not deploy this vault and its schedule/rebalance fields are not onchain enforcement. Internal SMT claims
+verify abstract accounting under stated assumptions; they are not a whole-bytecode proof or an independent audit.
