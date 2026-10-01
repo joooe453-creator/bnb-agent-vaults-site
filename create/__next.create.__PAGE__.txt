@@ -1,14 +1,14 @@
 1:"$Sreact.fragment"
 2:I[81384,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js"],"PrototypePage"]
-3:T1e0f,
+3:T1f99,
 
 <section class="page-head">
   <div class="wrap wide">
     <div class="row">
-      <div><h1>Launch a phase-one vault</h1><p class="lede">Pick one buying plan, then choose a bStock and crypto basket. Yield markets are optional.</p></div>
+      <div><h1>Launch a phase-one vault</h1><p class="lede">Choose a bStock and crypto basket first, then decide how to buy it. Yield markets are optional.</p></div>
       <div class="summary three" style="grid-template-columns:repeat(3,minmax(120px,1fr))">
-        <div><div class="label">Plan</div><div class="v" id="s-plan">—</div></div>
         <div><div class="label">Targets</div><div class="v" id="s-targets">—</div></div>
+        <div><div class="label">Plan</div><div class="v" id="s-plan">—</div></div>
         <div><div class="label">Yield markets</div><div class="v" id="s-markets">—</div></div>
       </div>
     </div>
@@ -18,14 +18,28 @@
 <div class="wrap wide">
   <div class="create-grid">
     <nav class="toc" id="toc">
-      <a href="#s-1"><span class="rn">01</span>Buy plan<span class="ck"></span></a>
-      <a href="#s-2"><span class="rn">02</span>Portfolio<span class="ck"></span></a>
+      <a href="#s-1"><span class="rn">01</span>Targets<span class="ck"></span></a>
+      <a href="#s-2"><span class="rn">02</span>Operations<span class="ck"></span></a>
       <a href="#s-3"><span class="rn">03</span>Launch<span class="ck"></span></a>
     </nav>
 
     <form id="f" autocomplete="off" onsubmit="return false">
       <section class="article" id="s-1">
-        <header><span class="rn">01</span><h2>Choose how to buy</h2><p>There are only two core strategies. Everything after the purchase is optional.</p></header>
+        <header><span class="rn">01</span><h2>Build the basket</h2><p>Choose the assets and weights first. Only phase-one bStocks and crypto with a verified purchase route are listed.</p></header>
+        <div class="body">
+          <div class="fields">
+            <label class="field"><span>Find a target</span><input id="search" placeholder="BTCB, NVDA, AAPL…"></label>
+            <div class="field"><span>Asset type</span><div class="radio-row"><label><input type="radio" name="filter" value="all" checked>All</label><label><input type="radio" name="filter" value="crypto">Crypto</label><label><input type="radio" name="filter" value="bstock">bStocks</label></div></div>
+          </div>
+          <div class="mkt-list" id="target-list" style="margin-top:18px"><div class="allocation-empty">Loading verified targets…</div></div>
+          <div class="sub-h" style="margin-top:28px"><span>Selected basket</span><em id="weight-total">0% / 100%</em></div>
+          <div class="allocation-inputs" id="selected-list"></div>
+          <p class="fine" style="margin-top:14px">Each target uses its registry-pinned PancakeSwap V3 route. Basket weights must total 100% before launch.</p>
+        </div>
+      </section>
+
+      <section class="article" id="s-2">
+        <header><span class="rn">02</span><h2>Choose the operations</h2><p>Choose one buying plan, then optionally place each purchased asset into an exact-match Venus or Lista market.</p></header>
         <div class="body">
           <div class="choice-chips" id="mode-choices">
             <button type="button" class="choice-card on" data-mode="lump-sum"><b>Buy once</b><small>Deploy each settled contribution batch once, using the basket weights below.</small></button>
@@ -51,19 +65,8 @@
             <div><b>1%</b><span>maximum execution slippage</span></div>
             <div><b>5%</b><span>minimum idle reserve</span></div>
           </div>
-        </div>
-      </section>
-
-      <section class="article" id="s-2">
-        <header><span class="rn">02</span><h2>Build the basket</h2><p>Buy any listed phase-one target. Venus and Lista appear only when that exact asset is supported.</p></header>
-        <div class="body">
-          <div class="fields">
-            <label class="field"><span>Find a target</span><input id="search" placeholder="BTCB, NVDA, AAPL…"></label>
-            <div class="field"><span>Asset type</span><div class="radio-row"><label><input type="radio" name="filter" value="all" checked>All</label><label><input type="radio" name="filter" value="crypto">Crypto</label><label><input type="radio" name="filter" value="bstock">bStocks</label></div></div>
-          </div>
-          <div class="mkt-list" id="target-list" style="margin-top:18px"><div class="allocation-empty">Loading verified markets…</div></div>
-          <div class="sub-h" style="margin-top:28px"><span>Selected basket</span><em id="weight-total">0% / 100%</em></div>
-          <div class="allocation-inputs" id="selected-list"></div>
+          <div class="sub-h" style="margin-top:28px"><span>After purchase <em>optional</em></span></div>
+          <div class="allocation-inputs" id="post-purchase-list"></div>
           <p class="fine" style="margin-top:14px">“Hold only” is intentional: if an exact token is not supported by Venus or a Lista ERC-4626 vault, no yield option is offered. Every enabled market is rechecked immediately before each deposit; if it is paused, delisted, full, or mismatched, the asset remains held.</p>
         </div>
       </section>
@@ -111,7 +114,7 @@
 
 
 
-4:T3a54,
+4:T3cad,
 (function () {
   "use strict";
   const { $, $$, esc, toast, DEMO_OWNER, hexAddr } = BAV;
@@ -179,9 +182,7 @@
     });
     $("#target-list").innerHTML = targets.map((target) => {
       const checked = S.selected.has(target.id);
-      const markets = compatibleMarkets(target.id);
-      const marketLabel = markets.length ? `${markets.length} verified yield option${markets.length === 1 ? "" : "s"}` : "Hold only";
-      return `<label class="mkt ${checked ? "" : "off"}"><input type="checkbox" data-target="${esc(target.id)}" ${checked ? "checked" : ""}><span class="logo-stack">${target.category === "crypto" ? "◈" : "▦"}</span><span class="t">${esc(target.symbol)}<small>${target.category === "bstock" ? `${esc(target.ticker)} · tokenized stock` : "Crypto"} · PancakeSwap V3</small></span><span class="apy"><b>${esc(marketLabel)}</b><em>USDT pool · ${target.swap.fee / 10000}% fee</em></span></label>`;
+      return `<label class="mkt ${checked ? "" : "off"}"><input type="checkbox" data-target="${esc(target.id)}" ${checked ? "checked" : ""}><span class="logo-stack">${target.category === "crypto" ? "◈" : "▦"}</span><span class="t">${esc(target.symbol)}<small>${target.category === "bstock" ? `${esc(target.ticker)} · tokenized stock` : "Crypto"} · PancakeSwap V3</small></span><span class="apy"><b>Buyable</b><em>USDT pool · ${target.swap.fee / 10000}% fee</em></span></label>`;
     }).join("") || `<div class="allocation-empty">No target matches this filter.</div>`;
     $$('[data-target]').forEach((input) => input.addEventListener("change", () => {
       if (input.checked) {
@@ -205,22 +206,11 @@
     if (!S.registry) return;
     const rows = [...S.selected.entries()].map(([id, selected]) => {
       const target = S.registry.targets.find((candidate) => candidate.id === id);
-      const markets = compatibleMarkets(id);
-      const options = [`<option value="">Hold in vault</option>`]
-        .concat(markets.map((market) => `<option value="${esc(market.id)}" ${selected.marketId === market.id ? "selected" : ""}>${esc(market.label)}</option>`));
-      const support = markets.length
-        ? `${markets.map((market) => market.protocol).join(" / ")} support verified; live capacity is not guaranteed.`
-        : "No matching Venus or Lista market. Hold only.";
-      return `<div class="leg" data-selected="${esc(id)}"><div class="leg-h"><b>${esc(target.symbol)}</b><span class="tag">${esc(target.category)}</span><button type="button" class="rm" data-remove="${esc(id)}">Remove</button></div><div class="fields"><label class="field"><span>Basket weight</span><div class="suffix"><input data-weight="${esc(id)}" value="${selected.weightBps / 100}" inputmode="decimal"><b>%</b></div></label><label class="field"><span>After purchase <em>optional</em></span><select data-market="${esc(id)}">${options.join("")}</select></label><div class="field full"><span>Eligibility</span><div class="locked"><span>${esc(support)}</span><span class="label">Exact asset</span></div></div></div></div>`;
+      return `<div class="leg" data-selected="${esc(id)}"><div class="leg-h"><b>${esc(target.symbol)}</b><span class="tag">${esc(target.category)}</span><button type="button" class="rm" data-remove="${esc(id)}">Remove</button></div><div class="fields"><label class="field"><span>Basket weight</span><div class="suffix"><input data-weight="${esc(id)}" value="${selected.weightBps / 100}" inputmode="decimal"><b>%</b></div></label><div class="field"><span>Purchase route</span><div class="locked"><span>PancakeSwap V3 · USDT</span><span class="label">Registry pinned</span></div></div></div></div>`;
     });
     $("#selected-list").innerHTML = rows.join("") || `<div class="allocation-empty">Select at least one crypto or bStock target.</div>`;
     $$('[data-weight]').forEach((input) => input.addEventListener("input", () => {
       S.selected.get(input.dataset.weight).weightBps = Math.round(num(input.value) * 100);
-      S.forkPassed = false;
-      refresh();
-    }));
-    $$('[data-market]').forEach((select) => select.addEventListener("change", () => {
-      S.selected.get(select.dataset.market).marketId = select.value;
       S.forkPassed = false;
       refresh();
     }));
@@ -229,6 +219,26 @@
       equalize();
       S.forkPassed = false;
       draw();
+    }));
+  }
+
+  function drawPostPurchase() {
+    if (!S.registry) return;
+    const rows = [...S.selected.entries()].map(([id, selected]) => {
+      const target = S.registry.targets.find((candidate) => candidate.id === id);
+      const markets = compatibleMarkets(id);
+      const options = [`<option value="">Hold in vault</option>`]
+        .concat(markets.map((market) => `<option value="${esc(market.id)}" ${selected.marketId === market.id ? "selected" : ""}>${esc(market.label)}</option>`));
+      const support = markets.length
+        ? `${markets.map((market) => market.protocol).join(" / ")} support verified; live capacity is not guaranteed.`
+        : "No matching Venus or Lista market. Hold only.";
+      return `<div class="leg" data-post-purchase="${esc(id)}"><div class="leg-h"><b>${esc(target.symbol)}</b><span class="tag">${esc(target.category)}</span></div><div class="fields"><label class="field"><span>After purchase <em>optional</em></span><select data-market="${esc(id)}" ${markets.length ? "" : "disabled"}>${options.join("")}</select></label><div class="field"><span>Eligibility</span><div class="locked"><span>${esc(support)}</span><span class="label">Exact asset</span></div></div></div></div>`;
+    });
+    $("#post-purchase-list").innerHTML = rows.join("") || `<div class="allocation-empty">Choose targets in step 1 before configuring post-purchase handling.</div>`;
+    $$('[data-market]').forEach((select) => select.addEventListener("change", () => {
+      S.selected.get(select.dataset.market).marketId = select.value;
+      S.forkPassed = false;
+      refresh();
     }));
   }
 
@@ -285,16 +295,16 @@
 
   function problems() {
     const out = [];
-    if (!S.registry) out.push(["s-2", "Verified market registry is unavailable."]);
-    if (!S.selected.size) out.push(["s-2", "Select at least one target."]);
+    if (!S.registry) out.push(["s-1", "Verified market registry is unavailable."]);
+    if (!S.selected.size) out.push(["s-1", "Select at least one target."]);
     const total = [...S.selected.values()].reduce((sum, row) => sum + row.weightBps, 0);
-    if (total !== 10000) out.push(["s-2", `Basket weights must total 100% (currently ${(total / 100).toFixed(2)}%).`]);
-    if ([...S.selected.values()].some((row) => !(row.weightBps > 0))) out.push(["s-2", "Every selected target needs a positive weight."]);
+    if (total !== 10000) out.push(["s-1", `Basket weights must total 100% (currently ${(total / 100).toFixed(2)}%).`]);
+    if ([...S.selected.values()].some((row) => !(row.weightBps > 0))) out.push(["s-1", "Every selected target needs a positive weight."]);
     if (S.mode === "accumulate") {
-      if (!$("#schedule-on").checked && !$("#dip-on").checked) out.push(["s-1", "Enable a schedule, a drawdown trigger, or both."]);
-      if ($("#schedule-on").checked && !(num($("#interval").value) >= 1 && num($("#interval").value) <= 90)) out.push(["s-1", "Schedule must be between 1 and 90 days."]);
-      if ($("#dip-on").checked && !(num($("#dip").value) >= 1 && num($("#dip").value) <= 30)) out.push(["s-1", "Drawdown trigger must be between 1% and 30%."]);
-      if (!(num($("#tranche").value) >= 1 && num($("#tranche").value) <= 25)) out.push(["s-1", "Tranche size must be between 1% and 25%."]);
+      if (!$("#schedule-on").checked && !$("#dip-on").checked) out.push(["s-2", "Enable a schedule, a drawdown trigger, or both."]);
+      if ($("#schedule-on").checked && !(num($("#interval").value) >= 1 && num($("#interval").value) <= 90)) out.push(["s-2", "Schedule must be between 1 and 90 days."]);
+      if ($("#dip-on").checked && !(num($("#dip").value) >= 1 && num($("#dip").value) <= 30)) out.push(["s-2", "Drawdown trigger must be between 1% and 30%."]);
+      if (!(num($("#tranche").value) >= 1 && num($("#tranche").value) <= 25)) out.push(["s-2", "Tranche size must be between 1% and 25%."]);
     }
     if (!$("#name").value.trim()) out.push(["s-3", "Name the vault."]);
     if (!(num($("#pf").value) >= 0 && num($("#pf").value) <= 30)) out.push(["s-3", "Performance fee must be 0–30%."]);
@@ -336,6 +346,7 @@
   function draw() {
     drawTargets();
     drawSelected();
+    drawPostPurchase();
     refresh();
   }
 
@@ -379,7 +390,7 @@
 8:X
 d:X
 d:C
-0:{"buildId":"0X8npN7BMlTxPjWR0YFdz","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"bodyClass":"has-mcta","html":"$3","runtimeVersion":"2d0b01e4e7b6","script":"$4","pageKey":"create"}],["$L5"],"$L6"]}],"isPartial":"$@7","staleTime":"$8","varyParams":null},{"rsc":"$L9","isPartial":"$@a","staleTime":"$8","varyParams":null},{"rsc":"$Lb","isPartial":"$@c","staleTime":"$8","varyParams":"$d"},{"rsc":"$Le","isPartial":"$@f","staleTime":"$8","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@10","rootVaryParams":null,"needsRuntimeRequest":"$@11"}
+0:{"buildId":"mWC-ehP3RUvaprNBN-tex","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"bodyClass":"has-mcta","html":"$3","runtimeVersion":"2d0b01e4e7b6","script":"$4","pageKey":"create"}],["$L5"],"$L6"]}],"isPartial":"$@7","staleTime":"$8","varyParams":null},{"rsc":"$L9","isPartial":"$@a","staleTime":"$8","varyParams":null},{"rsc":"$Lb","isPartial":"$@c","staleTime":"$8","varyParams":"$d"},{"rsc":"$Le","isPartial":"$@f","staleTime":"$8","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@10","rootVaryParams":null,"needsRuntimeRequest":"$@11"}
 12:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
 13:"$Sreact.suspense"
 15:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]
