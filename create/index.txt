@@ -3,8 +3,8 @@
 3:I[37457,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default"]
 4:I[81384,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js"],"PrototypePage"]
 b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default",1]
-:HL["/bnb-agent-vaults-site/_next/static/chunks/2x0poba04p9_2.css","style"]
-5:T1cb3,
+:HL["/bnb-agent-vaults-site/_next/static/chunks/2xc67r4mlzs7s.css","style"]
+5:T1d99,
 
 <section class="page-head">
   <div class="wrap wide">
@@ -32,9 +32,10 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
         <header><span class="rn">01</span><h2>Build the basket</h2><p>Only assets with verified USDT routes are shown.</p></header>
         <div class="body">
           <div class="fields">
-            <label class="field"><span>Find a target</span><input id="search" placeholder="BTCB, NVDA, AAPL…"></label>
+            <label class="field"><span>Find a target</span><div class="target-search"><input id="search" placeholder="BTC, BNB, NVDA or BSC contract"><button type="button" class="btn" id="find-ca">Find CA</button></div></label>
             <div class="field"><span>Asset type</span><div class="radio-row"><label><input type="radio" name="filter" value="all" checked>All</label><label><input type="radio" name="filter" value="crypto">Crypto</label><label><input type="radio" name="filter" value="bstock">bStocks</label></div></div>
           </div>
+          <div id="ca-status" class="hide" aria-live="polite"></div>
           <div class="mkt-list" id="target-list" style="margin-top:18px"><div class="allocation-empty">Loading verified targets…</div></div>
           <div class="sub-h" style="margin-top:28px"><span>Selected basket</span><em id="weight-total">0% / 100%</em></div>
           <div class="allocation-inputs" id="selected-list"></div>
@@ -66,6 +67,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
           <div class="guardrails" style="margin-top:24px">
             <span><b>95%</b> max invested</span>
             <span><b>1%</b> slippage cap</span>
+            <span><b>0.1%</b> pool TVL / order</span>
             <span><b>5%</b> cash reserve</span>
           </div>
           <div class="sub-h" style="margin-top:28px"><span>Optional destination</span><em>Supply market and Vault are different products</em></div>
@@ -116,7 +118,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
 
 
 
-6:T3f4b,
+6:T7f12,
 (function () {
   "use strict";
   const { $, $$, esc, toast, DEMO_OWNER, hexAddr } = BAV;
@@ -142,6 +144,183 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
   const registryUrl = location.protocol === "file:"
     ? "phase1-registry.json"
     : `${window.__BAV_BASE_PATH__ || ""}/phase1-registry.json`;
+  const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
+  const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+  const Q192 = 2n ** 192n;
+  const PRICE_SCALE = 10n ** 30n;
+  let rpcId = 1;
+
+  const addressWord = (address) => address.toLowerCase().slice(2).padStart(64, "0");
+  const uintWord = (value) => BigInt(value).toString(16).padStart(64, "0");
+  const decodeAddress = (hex) => "0x" + String(hex).slice(-40).toLowerCase();
+  const pow10 = (decimals) => 10n ** BigInt(decimals);
+  const toTokenNumber = (raw, decimals) => {
+    const scale = pow10(decimals);
+    return Number(raw / scale) + Number(raw % scale) / (10 ** decimals);
+  };
+  const decodeText = (hex) => {
+    const raw = String(hex || "").replace(/^0x/, "");
+    let bytes = "";
+    try {
+      if (raw.length >= 128) {
+        const offset = Number(BigInt("0x" + raw.slice(0, 64))) * 2;
+        const length = Number(BigInt("0x" + raw.slice(offset, offset + 64)));
+        if (length > 0 && length <= 64 && raw.length >= offset + 64 + length * 2) bytes = raw.slice(offset + 64, offset + 64 + length * 2);
+      }
+      if (!bytes && raw.length >= 64) bytes = raw.slice(0, 64).replace(/(?:00)+$/, "");
+      const values = bytes.match(/.{2}/g)?.map((value) => parseInt(value, 16)) || [];
+      return new TextDecoder().decode(new Uint8Array(values)).replace(/[\u0000-\u001f\u007f]/g, "").trim().slice(0, 16);
+    } catch {
+      return "";
+    }
+  };
+
+  async function rpc(method, params) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 12000);
+    try {
+      const response = await fetch(S.registry.discovery.rpcUrl, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ jsonrpc: "2.0", id: rpcId++, method, params: params || [] }),
+        signal: controller.signal,
+      });
+      if (!response.ok) throw new Error("BSC RPC returned " + response.status);
+      const body = await response.json();
+      if (body.error) throw new Error(body.error.message || "BSC RPC error");
+      return body.result;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  const ethCall = (to, data, blockTag) => rpc("eth_call", [{ to, data }, blockTag]);
+
+  async function inspectV3Pool(target, quote, quoteUsdPrice, poolAddress, fee, blockTag) {
+    const [code, token0Hex, token1Hex, slot0Hex, targetBalanceHex, quoteBalanceHex] = await Promise.all([
+      rpc("eth_getCode", [poolAddress, blockTag]),
+      ethCall(poolAddress, "0x0dfe1681", blockTag),
+      ethCall(poolAddress, "0xd21220a7", blockTag),
+      ethCall(poolAddress, "0x3850c7bd", blockTag),
+      ethCall(target.address, "0x70a08231" + addressWord(poolAddress), blockTag),
+      ethCall(quote.address, "0x70a08231" + addressWord(poolAddress), blockTag),
+    ]);
+    if (!code || code === "0x") throw new Error("Pool has no contract code");
+    const token0 = decodeAddress(token0Hex);
+    const token1 = decodeAddress(token1Hex);
+    const targetAddress = target.address.toLowerCase();
+    const quoteAddress = quote.address.toLowerCase();
+    if (!([token0, token1].includes(targetAddress) && [token0, token1].includes(quoteAddress))) throw new Error("Factory pool token mismatch");
+    const sqrtPriceX96 = BigInt("0x" + slot0Hex.slice(2, 66));
+    if (sqrtPriceX96 === 0n) throw new Error("Pool is not initialized");
+    const decimals0 = token0 === targetAddress ? target.decimals : quote.decimals;
+    const decimals1 = token1 === targetAddress ? target.decimals : quote.decimals;
+    const ratio = sqrtPriceX96 * sqrtPriceX96 * pow10(decimals0) * PRICE_SCALE / (Q192 * pow10(decimals1));
+    const token1PerToken0 = Number(ratio) / Number(PRICE_SCALE);
+    const spotPriceQuote = token0 === targetAddress ? token1PerToken0 : 1 / token1PerToken0;
+    const spotPriceUsd = spotPriceQuote * quoteUsdPrice;
+    const targetBalance = toTokenNumber(BigInt(targetBalanceHex), target.decimals);
+    const quoteBalance = toTokenNumber(BigInt(quoteBalanceHex), quote.decimals);
+    const liquidityUsd = targetBalance * spotPriceUsd + quoteBalance * quoteUsdPrice;
+    if (!(Number.isFinite(liquidityUsd) && liquidityUsd > 0 && Number.isFinite(spotPriceUsd) && spotPriceUsd > 0)) throw new Error("Pool has no usable liquidity");
+    return { protocol: "v3", venue: "PancakeSwap V3", poolAddress, fee, liquidityUsd, spotPriceUsd };
+  }
+
+  async function inspectV2Pool(target, quote, quoteUsdPrice, poolAddress, blockTag) {
+    const [code, token0Hex, token1Hex, reservesHex] = await Promise.all([
+      rpc("eth_getCode", [poolAddress, blockTag]),
+      ethCall(poolAddress, "0x0dfe1681", blockTag),
+      ethCall(poolAddress, "0xd21220a7", blockTag),
+      ethCall(poolAddress, "0x0902f1ac", blockTag),
+    ]);
+    if (!code || code === "0x") throw new Error("Pair has no contract code");
+    const token0 = decodeAddress(token0Hex);
+    const token1 = decodeAddress(token1Hex);
+    const targetAddress = target.address.toLowerCase();
+    const quoteAddress = quote.address.toLowerCase();
+    if (!([token0, token1].includes(targetAddress) && [token0, token1].includes(quoteAddress))) throw new Error("Factory pair token mismatch");
+    const raw = reservesHex.slice(2);
+    const reserve0 = BigInt("0x" + raw.slice(0, 64));
+    const reserve1 = BigInt("0x" + raw.slice(64, 128));
+    const targetReserve = toTokenNumber(token0 === targetAddress ? reserve0 : reserve1, target.decimals);
+    const quoteReserve = toTokenNumber(token0 === quoteAddress ? reserve0 : reserve1, quote.decimals);
+    const spotPriceUsd = quoteReserve / targetReserve * quoteUsdPrice;
+    const liquidityUsd = quoteReserve * quoteUsdPrice * 2;
+    if (!(Number.isFinite(liquidityUsd) && liquidityUsd > 0 && Number.isFinite(spotPriceUsd) && spotPriceUsd > 0)) throw new Error("Pair has no usable liquidity");
+    return { protocol: "v2", venue: "PancakeSwap V2", poolAddress, fee: 2500, liquidityUsd, spotPriceUsd };
+  }
+
+  async function discoverContractTarget(address, skipKnown) {
+    const normalized = address.toLowerCase();
+    const known = S.registry.targets.find((target) => target.address.toLowerCase() === normalized);
+    if (known && !skipKnown) return known;
+    if (normalized === S.registry.quoteAsset.address.toLowerCase()) throw new Error("USDT is the accounting asset, not a basket target.");
+    const chainId = await rpc("eth_chainId");
+    if (Number(BigInt(chainId)) !== 56) throw new Error("RPC is not connected to BNB Chain.");
+    const blockTag = await rpc("eth_blockNumber");
+    const [code, symbolHex, decimalsHex] = await Promise.all([
+      rpc("eth_getCode", [normalized, blockTag]),
+      ethCall(normalized, "0x95d89b41", blockTag).catch(() => "0x"),
+      ethCall(normalized, "0x313ce567", blockTag),
+    ]);
+    if (!code || code === "0x") throw new Error("No token contract exists at this address.");
+    const decimals = Number(BigInt(decimalsHex));
+    if (!Number.isInteger(decimals) || decimals < 0 || decimals > 36) throw new Error("Unsupported token decimals.");
+    const symbol = decodeText(symbolHex).replace(/[^A-Za-z0-9._-]/g, "").slice(0, 16) || ("TOKEN-" + normalized.slice(-4));
+    const target = { address: normalized, decimals };
+    const discovery = S.registry.discovery;
+    const wrappedNative = S.registry.targets.find((candidate) => candidate.id === "crypto:WBNB");
+    if (!wrappedNative?.liquidity?.spotPriceUsd) throw new Error("BNB bridge price is unavailable.");
+    const quotes = [
+      { symbol: "USDT", address: discovery.quoteAddress, decimals: discovery.quoteDecimals, usdPrice: 1, bridge: null },
+      { symbol: "WBNB", address: wrappedNative.address, decimals: wrappedNative.decimals, usdPrice: wrappedNative.liquidity.spotPriceUsd, bridge: wrappedNative.swap },
+    ].filter((quote) => quote.address.toLowerCase() !== normalized);
+    const checks = [];
+    for (const quote of quotes) {
+      const v3Addresses = await Promise.all(discovery.v3FeeTiers.map(async (fee) => {
+        const data = "0x1698ee82" + addressWord(normalized) + addressWord(quote.address) + uintWord(fee);
+        return { fee, poolAddress: decodeAddress(await ethCall(discovery.pancakeV3Factory, data, blockTag)) };
+      }));
+      const v2Data = "0xe6a43905" + addressWord(normalized) + addressWord(quote.address);
+      const v2Address = decodeAddress(await ethCall(discovery.pancakeV2Factory, v2Data, blockTag));
+      const decorate = async (promise) => {
+        const route = await promise;
+        const firstHop = { tokenIn: normalized, tokenOut: quote.address, protocol: route.protocol, poolAddress: route.poolAddress, fee: route.fee };
+        route.path = quote.bridge ? [firstHop, ...quote.bridge.path] : [firstHop];
+        route.liquidityUsd = quote.bridge ? Math.min(route.liquidityUsd, wrappedNative.liquidity.usd) : route.liquidityUsd;
+        route.venue = quote.bridge ? "PancakeSwap via BNB" : route.venue;
+        route.protocol = quote.bridge ? "multi-hop" : route.protocol;
+        return route;
+      };
+      v3Addresses.filter((candidate) => candidate.poolAddress !== ZERO_ADDRESS).forEach((candidate) => {
+        checks.push(decorate(inspectV3Pool(target, quote, quote.usdPrice, candidate.poolAddress, candidate.fee, blockTag)));
+      });
+      if (v2Address !== ZERO_ADDRESS) checks.push(decorate(inspectV2Pool(target, quote, quote.usdPrice, v2Address, blockTag)));
+    }
+    const inspected = await Promise.allSettled(checks);
+    const routes = inspected.filter((result) => result.status === "fulfilled").map((result) => result.value);
+    if (!routes.length) throw new Error("No initialized Pancake V2/V3 pool to USDT or BNB found.");
+    routes.sort((left, right) => right.liquidityUsd - left.liquidityUsd);
+    const route = routes[0];
+    return {
+      id: "crypto:custom:" + normalized,
+      category: "crypto",
+      symbol,
+      displaySymbol: symbol,
+      ticker: symbol,
+      address: normalized,
+      decimals,
+      dynamic: true,
+      swap: { venue: route.venue, protocol: route.protocol, quoteSymbol: "USDT", poolAddress: route.poolAddress, fee: route.fee, path: route.path },
+      liquidity: {
+        usd: Number(route.liquidityUsd.toFixed(2)),
+        verifiedAt: new Date().toISOString(),
+        verifiedAtBlock: Number(BigInt(blockTag)),
+        methodology: "Every route hop was checked against a Pancake factory on BNB Chain; effective TVL uses the route bottleneck and is not guaranteed execution depth.",
+      },
+      discovery: { source: "BSC JSON-RPC + Pancake factory", exactPair: true, customToken: true, verifiedAtBlock: Number(BigInt(blockTag)) },
+    };
+  }
 
   fetch(registryUrl)
     .then((response) => {
@@ -154,7 +333,12 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
         && registry.targets.every((target) => Number.isFinite(target.liquidity?.usd) && target.liquidity.usd > 0);
       const destinationKindsValid = Array.isArray(registry.yieldMarkets)
         && registry.yieldMarkets.every((market) => ["supply-market", "vault"].includes(market.kind));
-      if (registry.schema !== "bnb-agent-vaults/phase1-market-registry@1" || registry.chainId !== 56 || !liquidityValid || !destinationKindsValid) {
+      const discoveryValid = registry.discovery?.scope === "direct-USDT-or-via-BNB-v2-v3"
+        && ADDRESS_RE.test(registry.discovery.pancakeV3Factory)
+        && ADDRESS_RE.test(registry.discovery.pancakeV2Factory)
+        && ADDRESS_RE.test(registry.discovery.wrappedNativeAddress)
+        && registry.discovery.quoteAddress?.toLowerCase() === registry.quoteAsset?.address?.toLowerCase();
+      if (registry.schema !== "bnb-agent-vaults/phase1-market-registry@1" || registry.chainId !== 56 || !liquidityValid || !destinationKindsValid || !discoveryValid) {
         throw new Error("Unexpected market registry");
       }
       S.registry = registry;
@@ -174,6 +358,9 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     return S.registry ? S.registry.yieldMarkets.filter((market) => market.targetId === targetId) : [];
   }
 
+  const displayName = (target) => target.displaySymbol || target.symbol;
+  const routeName = (target) => target.swap.protocol === "multi-hop" ? "Pancake via BNB" : (target.swap.protocol === "v2" ? "Pancake V2" : "Pancake V3");
+
   function equalize() {
     const ids = [...S.selected.keys()];
     if (!ids.length) return;
@@ -190,12 +377,17 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     const query = S.search.toLowerCase();
     const targets = S.registry.targets.filter((target) => {
       const typeMatch = S.filter === "all" || target.category === S.filter;
-      const textMatch = !query || `${target.symbol} ${target.ticker}`.toLowerCase().includes(query);
+      const textMatch = !query || `${displayName(target)} ${target.symbol} ${target.ticker} ${target.address}`.toLowerCase().includes(query);
       return typeMatch && textMatch;
     });
     $("#target-list").innerHTML = targets.map((target) => {
       const checked = S.selected.has(target.id);
-      return `<label class="mkt ${checked ? "" : "off"}"><input type="checkbox" data-target="${esc(target.id)}" ${checked ? "checked" : ""}><span class="logo-stack">${target.category === "crypto" ? "◈" : "▦"}</span><span class="t">${esc(target.symbol)}<small>${target.category === "bstock" ? esc(target.ticker) : "Crypto"}</small></span><span class="apy"><b>${formatUsd(target.liquidity?.usd)}</b><em>Pool TVL · ${target.swap.fee / 10000}% fee</em></span></label>`;
+      const detail = target.category === "bstock"
+        ? target.ticker
+        : (target.dynamic ? `Custom CA · ${target.address.slice(0, 6)}…${target.address.slice(-4)}` : `MC #${target.marketCapRank}${target.nativeWrap ? " · WBNB route" : ""}`);
+      const liquidityLabel = target.liquidity?.usd < 50000 ? "Low TVL" : "Pool TVL";
+      const routeDetail = target.swap.path?.length > 1 ? `${target.swap.path.length} pools` : `${target.swap.fee / 10000}% fee`;
+      return `<label class="mkt ${checked ? "" : "off"}"><input type="checkbox" data-target="${esc(target.id)}" ${checked ? "checked" : ""}><span class="logo-stack">${target.category === "crypto" ? "◈" : "▦"}</span><span class="t">${esc(displayName(target))}<small>${esc(detail)}</small></span><span class="apy"><b>${formatUsd(target.liquidity?.usd)}</b><em>${liquidityLabel} · ${routeName(target)} · ${routeDetail}</em></span></label>`;
     }).join("") || `<div class="allocation-empty">No target matches this filter.</div>`;
     $$('[data-target]').forEach((input) => input.addEventListener("change", () => {
       if (input.checked) {
@@ -219,7 +411,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     if (!S.registry) return;
     const rows = [...S.selected.entries()].map(([id, selected]) => {
       const target = S.registry.targets.find((candidate) => candidate.id === id);
-      return `<div class="launch-leg" data-selected="${esc(id)}"><div class="launch-leg-h"><b>${esc(target.symbol)}</b><span class="tag">${esc(target.category)}</span><span class="route">USDT · Pancake V3</span><button type="button" class="rm" data-remove="${esc(id)}">Remove</button></div><div class="fields"><label class="field"><span>Basket weight</span><div class="suffix"><input data-weight="${esc(id)}" value="${selected.weightBps / 100}" inputmode="decimal"><b>%</b></div></label></div></div>`;
+      return `<div class="launch-leg" data-selected="${esc(id)}"><div class="launch-leg-h"><b>${esc(displayName(target))}</b><span class="tag">${esc(target.category)}</span><span class="route">USDT · ${routeName(target)}</span><button type="button" class="rm" data-remove="${esc(id)}">Remove</button></div><div class="fields"><label class="field"><span>Basket weight</span><div class="suffix"><input data-weight="${esc(id)}" value="${selected.weightBps / 100}" inputmode="decimal"><b>%</b></div></label></div></div>`;
     });
     $("#selected-list").innerHTML = rows.join("") || `<div class="allocation-empty">Select at least one crypto or bStock target.</div>`;
     $$('[data-weight]').forEach((input) => input.addEventListener("input", () => {
@@ -248,7 +440,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
       const note = id === "bstock:SPCXB"
         ? `<p class="market-note">Lista has no SPCXB deposit vault. SPCXB is collateral in other Lista markets, not the supplied asset.</p>`
         : (!markets.length ? `<p class="market-note">No exact-asset Venus supply market or Lista vault.</p>` : "");
-      return `<div class="launch-leg" data-post-purchase="${esc(id)}"><div class="launch-leg-h"><b>${esc(target.symbol)}</b><span class="tag">${esc(target.category)}</span></div><div class="fields"><label class="field"><span>Destination</span><select data-market="${esc(id)}">${options.join("")}</select></label></div>${note}</div>`;
+      return `<div class="launch-leg" data-post-purchase="${esc(id)}"><div class="launch-leg-h"><b>${esc(displayName(target))}</b><span class="tag">${esc(target.category)}</span></div><div class="fields"><label class="field"><span>Destination</span><select data-market="${esc(id)}">${options.join("")}</select></label></div>${note}</div>`;
     });
     $("#post-purchase-list").innerHTML = rows.join("") || `<div class="allocation-empty">Choose targets in step 1 before configuring post-purchase handling.</div>`;
     $$('[data-market]').forEach((select) => select.addEventListener("change", () => {
@@ -268,10 +460,12 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
       return {
         targetId: target.id,
         symbol: target.symbol,
+        displaySymbol: displayName(target),
         category: target.category,
         tokenAddress: target.address,
         weightBps: selected.weightBps,
         swap: target.swap,
+        discovery: target.discovery || null,
         postPurchase: market ? {
           mode: "yield-market",
           marketId: market.id,
@@ -305,7 +499,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
       portfolio: { targets },
       fees: { creatorPerformancePct: num($("#pf").value), creatorManagementPct: num($("#mf").value), highWaterMark: "vault-level", entryFeePct: 0, exitFeePct: 0 },
       seed: { amount: num($("#seed").value), asset: "USDT", lockedUntilClose: true },
-      riskControls: { minIdleBps: 500, maxSlippageBps: 100, bstockOracleMaxAgeSeconds: 3900, maxOracleDeviationBps: 200, marketRevalidation: "before-every-deposit", arbitraryCalls: false },
+      riskControls: { minIdleBps: 500, maxSlippageBps: 100, maxTradePoolTvlBps: 10, bstockOracleMaxAgeSeconds: 3900, maxOracleDeviationBps: 200, marketRevalidation: "before-every-deposit", arbitraryCalls: false },
       forkDryRun: S.forkPassed ? "passed (simulated)" : "not run",
     };
   }
@@ -314,9 +508,25 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     const out = [];
     if (!S.registry) out.push(["s-1", "Verified market registry is unavailable."]);
     if (!S.selected.size) out.push(["s-1", "Select at least one target."]);
+    if (S.registry && [...S.selected.keys()].some((id) => !S.registry.targets.some((target) => target.id === id))) out.push(["s-1", "A selected target is no longer available."]);
+    if (S.registry && [...S.selected.keys()].some((id) => {
+      const target = S.registry.targets.find((candidate) => candidate.id === id);
+      return target?.dynamic && !(target.discovery?.exactPair && target.swap?.path?.length && target.liquidity?.usd > 0);
+    })) out.push(["s-1", "A custom token route has not passed the on-chain pool checks."]);
     const total = [...S.selected.values()].reduce((sum, row) => sum + row.weightBps, 0);
     if (total !== 10000) out.push(["s-1", `Basket weights must total 100% (currently ${(total / 100).toFixed(2)}%).`]);
     if ([...S.selected.values()].some((row) => !(row.weightBps > 0))) out.push(["s-1", "Every selected target needs a positive weight."]);
+    if (S.registry && num($("#seed").value) > 0) {
+      const deploymentBps = S.mode === "lump-sum" ? 9500 : Math.round(num($("#tranche").value) * 100);
+      for (const [id, row] of S.selected.entries()) {
+        const target = S.registry.targets.find((candidate) => candidate.id === id);
+        const initialOrderUsd = num($("#seed").value) * deploymentBps / 10000 * row.weightBps / 10000;
+        const capacityUsd = target?.liquidity?.usd * 0.001;
+        if (Number.isFinite(capacityUsd) && initialOrderUsd > capacityUsd) {
+          out.push(["s-1", `${displayName(target)} initial order exceeds the 0.1% pool-TVL limit.`]);
+        }
+      }
+    }
     if (S.mode === "accumulate") {
       if (!$("#schedule-on").checked && !$("#dip-on").checked) out.push(["s-2", "Enable a schedule, a drawdown trigger, or both."]);
       if ($("#schedule-on").checked && !(num($("#interval").value) >= 1 && num($("#interval").value) <= 90)) out.push(["s-2", "Schedule must be between 1 and 90 days."]);
@@ -347,7 +557,10 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     $("#sign").textContent = S.launched ? "Demo vault launched" : "Run checks & launch demo";
     $("#mc-state").innerHTML = errors.length ? `<b>${errors.length} to fix</b>${esc(errors[0][1])}` : `<b>${esc(name || "New vault")}</b>Ready for checks`;
     $$("#toc .ck").forEach((check, index) => check.classList.toggle("ok", !errors.some(([section]) => section === `s-${index + 1}`)));
-    const targetNames = S.registry ? [...S.selected.keys()].map((id) => S.registry.targets.find((target) => target.id === id)?.symbol).filter(Boolean) : [];
+    const targetNames = S.registry ? [...S.selected.keys()].map((id) => {
+      const target = S.registry.targets.find((candidate) => candidate.id === id);
+      return target ? displayName(target) : null;
+    }).filter(Boolean) : [];
     $("#sentence").textContent = targetNames.length
       ? `${name || "This vault"} ${S.mode === "lump-sum" ? "buys once" : "accumulates in fixed tranches"} across ${targetNames.join(", ")}. Unavailable destinations fall back to holding the asset.`
       : "Select a portfolio to generate the phase-one manifest.";
@@ -367,6 +580,43 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     refresh();
   }
 
+  function showCaStatus(message, isError) {
+    const node = $("#ca-status");
+    node.className = `state-note ${isError ? "error-note" : ""}`;
+    node.innerHTML = `<span class="dot"></span><span>${esc(message)}</span>`;
+  }
+
+  async function findContractPool() {
+    const address = $("#search").value.trim();
+    if (!S.registry) return showCaStatus("Market registry is still loading.", true);
+    if (!ADDRESS_RE.test(address)) return showCaStatus("Enter a valid BSC contract address.", true);
+    const button = $("#find-ca");
+    button.disabled = true;
+    button.textContent = "Checking…";
+    showCaStatus("Checking the token and Pancake routes on BNB Chain.", false);
+    try {
+      const target = await discoverContractTarget(address, false);
+      if (!S.registry.targets.some((candidate) => candidate.id === target.id)) S.registry.targets.unshift(target);
+      if (!S.selected.has(target.id)) {
+        if (S.selected.size >= S.registry.policy.maxTargets) throw new Error(`Maximum ${S.registry.policy.maxTargets} targets.`);
+        S.selected.set(target.id, { weightBps: 0, marketId: "" });
+        equalize();
+      }
+      S.filter = "crypto";
+      const cryptoFilter = $('input[name=filter][value="crypto"]');
+      if (cryptoFilter) cryptoFilter.checked = true;
+      S.forkPassed = false;
+      draw();
+      const warning = target.dynamic ? " Custom contracts are not security-audited." : "";
+      showCaStatus(`${displayName(target)} · ${routeName(target)} · ${formatUsd(target.liquidity.usd)} TVL.${warning}`, false);
+    } catch (error) {
+      showCaStatus(error?.message || "Unable to verify this contract.", true);
+    } finally {
+      button.disabled = false;
+      button.textContent = "Find CA";
+    }
+  }
+
   $$('[data-mode]').forEach((button) => button.addEventListener("click", () => {
     S.mode = button.dataset.mode;
     S.forkPassed = false;
@@ -375,6 +625,13 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     refresh();
   }));
   $("#search").addEventListener("input", (event) => { S.search = event.target.value; drawTargets(); });
+  $("#search").addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && ADDRESS_RE.test(event.currentTarget.value.trim())) {
+      event.preventDefault();
+      findContractPool();
+    }
+  });
+  $("#find-ca").addEventListener("click", findContractPool);
   $$('input[name=filter]').forEach((input) => input.addEventListener("change", () => { S.filter = input.value; drawTargets(); }));
   ["interval", "dip", "tranche", "name", "note", "pf", "mf", "seed"].forEach((id) => $("#" + id).addEventListener("input", () => { S.forkPassed = false; refresh(); }));
   ["schedule-on", "dip-on"].forEach((id) => $("#" + id).addEventListener("change", () => {
@@ -390,6 +647,26 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     const steps = ["Validate exact token and pool addresses", "Recheck selected destinations", "Simulate buys, slippage guards and fallback paths"];
     $("#steps").innerHTML = steps.map((step) => `<li><i></i><span>${esc(step)}</span></li>`).join("");
     const rows = $$("#steps li");
+    try {
+      const customTargets = [...S.selected.keys()].map((id) => S.registry.targets.find((target) => target.id === id)).filter((target) => target?.dynamic);
+      const fresh = await Promise.all(customTargets.map((target) => discoverContractTarget(target.address, true)));
+      fresh.forEach((target, index) => {
+        const pinned = customTargets[index];
+        const routeChanged = target.swap.protocol !== pinned.swap.protocol
+          || target.swap.path.length !== pinned.swap.path.length
+          || target.swap.path.some((hop, hopIndex) => {
+            const oldHop = pinned.swap.path[hopIndex];
+            return hop.protocol !== oldHop.protocol || hop.fee !== oldHop.fee || hop.poolAddress.toLowerCase() !== oldHop.poolAddress.toLowerCase();
+          });
+        if (routeChanged) {
+          throw new Error(`${displayName(pinned)} best verified route changed. Find the CA again.`);
+        }
+      });
+    } catch (error) {
+      $("#launch-result").innerHTML = `<div class="state-note error-note"><span class="dot"></span><span>${esc(error?.message || "Custom token recheck failed.")}</span></div>`;
+      $("#sign").disabled = false;
+      return;
+    }
     for (const row of rows) {
       await new Promise((resolve) => setTimeout(resolve, 220));
       row.classList.add("ok");
@@ -405,7 +682,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
   function validate() { refresh(); }
 })();
 9:X
-0:{"P":null,"c":["","create",""],"q":"","i":false,"f":[[["",{"children":["create",{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/2x0poba04p9_2.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"bodyClass":"has-mcta","html":"$5","runtimeVersion":"2d0b01e4e7b6","script":"$6","pageKey":"create"}],["$L7"],"$L8"]}],{},null,false,null]},null,false,"$9"]},null,false,null],"$La",false]],"m":"$undefined","G":["$b",["$Lc"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"DKYr5vm1dhWdXXe3Jr2ri"}
+0:{"P":null,"c":["","create",""],"q":"","i":false,"f":[[["",{"children":["create",{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/2xc67r4mlzs7s.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"bodyClass":"has-mcta","html":"$5","runtimeVersion":"2d0b01e4e7b6","script":"$6","pageKey":"create"}],["$L7"],"$L8"]}],{},null,false,null]},null,false,"$9"]},null,false,null],"$La",false]],"m":"$undefined","G":["$b",["$Lc"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"q4Pa0A_dpirazeg4mNmLG"}
 d:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
 e:"$Sreact.suspense"
 10:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]
@@ -413,7 +690,7 @@ e:"$Sreact.suspense"
 7:["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js","async":true,"nonce":"$undefined"}]
 8:["$","$Ld",null,{"children":["$","$e",null,{"name":"Next.MetadataOutlet","children":"$@f"}]}]
 a:["$","$1","h",{"children":[null,["$","$L10",null,{"children":"$L11"}],["$","div",null,{"hidden":true,"children":["$","$L12",null,{"children":["$","$e",null,{"name":"Next.Metadata","children":"$L13"}]}]}],null]}]
-c:["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/2x0poba04p9_2.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]
+c:["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/2xc67r4mlzs7s.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]
 9:C
 11:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
 14:I[27201,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"IconMark"]
