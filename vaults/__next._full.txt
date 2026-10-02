@@ -3,15 +3,15 @@
 3:I[37457,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default"]
 4:I[81384,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js"],"PrototypePage"]
 b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default",1]
-:HL["/bnb-agent-vaults-site/_next/static/chunks/2e39_ovk4l34n.css","style"]
-5:Td0b,
+:HL["/bnb-agent-vaults-site/_next/static/chunks/05q71nbz1mvq5.css","style"]
+5:Ta3d,
 
 <section class="page-head">
   <div class="wrap">
     <div class="row">
       <div>
         <h1>Read the mandate. Choose the agent.</h1>
-        <p class="lede">Every vault can only use its named markets. Compare its mandate, vault value and exit path before depositing. The directory below is simulated; real transactions require a verified deployment.</p>
+        <p class="lede">Compare each vault's venues, value and track record. Open a vault to read its mandate, fees and exit details before depositing. These examples are simulated.</p>
       </div>
       <div class="summary" id="summary"></div>
     </div>
@@ -28,40 +28,33 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
       <label class="search"><svg width="13" height="13" viewBox="0 0 13 13" aria-hidden="true"><circle cx="5.5" cy="5.5" r="4.5" fill="none" stroke="#6E6A62" stroke-width="1.2"/><path d="M9 9l3 3" stroke="#6E6A62" stroke-width="1.2"/></svg><input id="f-q" placeholder="Search vault or manager"></label>
       <span class="grow"></span>
       <span class="label">Period</span>
-      <div class="seg" id="f-period"><button data-v="7D">7D</button><button class="on" data-v="30D">30D</button><button data-v="90D">90D</button><button data-v="ALL">All</button></div>
-      <div class="seg" id="f-mode"><button class="on" data-v="return">Return</button><button data-v="annualized">Annualized</button></div>
+      <div class="seg" id="f-period"><button data-v="7D">7D</button><button class="on" data-v="30D">30D</button><button data-v="90D">90D</button><button data-v="ALL">ALL</button></div>
       <select class="select" id="f-sort">
-        <option value="mandate">Sort: Simple mandate first</option>
-        <option value="ra">Sort: Return per drawdown</option>
-        <option value="perf">Sort: Return</option>
         <option value="tvl">Sort: Vault value</option>
-        <option value="dd">Sort: Max drawdown</option>
+        <option value="perf">Sort: Return</option>
+        <option value="dd">Sort: Smallest max drop</option>
         <option value="age">Sort: Track record</option>
       </select>
     </div>
 
     <div class="method">
       <span class="tag sim">Simulated</span>
-      <span><b>Prototype methodology.</b> Returns use simulated share value after modeled fees — not advertised APR. Rankings are separated by vault currency because a BNB return and a USDT return are not comparable. Annualized figures are withheld under 30 days of history. Vault value is cash plus the current value of held tokens and lending positions. Share value estimates the value represented by one share, roughly vault value divided by all shares. Contract adjustments and rounding apply; this estimate excludes exit costs and can change before a transaction.</span>
+      <span><b>Illustrative metrics.</b> Return is the percentage change after modeled fees. Max drop is the largest fall from an earlier peak to a later low within the selected period. Vault value and deposit caps are in USD; Cap is the stated total deposit capacity. All figures are simulated.</span>
     </div>
 
     <div class="tbl-scroll">
-      <table class="tbl hover stack cols-3" id="dir">
+      <table class="tbl hover stack directory-table" id="dir">
         <thead>
           <tr>
             <th>Vault</th>
-            <th>Operations &amp; caps</th>
             <th>Venues</th>
-            <th class="r">Share value</th>
-            <th class="r" id="h-perf">30D return</th>
-            <th class="r" id="h-dd">30D max DD</th>
-            <th>Trend</th>
             <th class="r">Vault value</th>
+            <th class="r" id="h-perf">30D Return</th>
+            <th class="r" id="h-dd">30D Max drop</th>
             <th class="r">Depositors</th>
-            <th class="r">Exit cost</th>
           </tr>
         </thead>
-        <tbody><tr><td colspan="10" class="muted" style="padding:40px 0;text-align:center">Loading vaults…</td></tr></tbody>
+        <tbody><tr><td colspan="6" class="muted" style="padding:40px 0;text-align:center">Loading vaults…</td></tr></tbody>
       </table>
     </div>
     <p class="fine" style="padding:18px 0 90px" id="count"></p>
@@ -70,18 +63,18 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
 
 
 
-6:T11cc,
+6:Te0e,
 (function () {
-  const { $, $$, VAULTS, fmt, perf, riskMeter, statusTag, historyTag, navSeries, sparkline, managerLabel, rulesLabel, vaultRisk, vaultVenues } = BAV;
+  const { $, $$, VAULTS, fmt, perf, statusTag, historyTag, managerLabel, vaultVenues } = BAV;
   BAV.shell("vaults.html");
 
-  const st = { asset: "USDT", filter: "all", q: "", period: "30D", mode: "return", sort: "mandate" };
+  const st = { asset: "USDT", filter: "all", q: "", period: "30D", sort: "tvl" };
 
   const tot = VAULTS.reduce((a, v) => a + v.tvl, 0);
   const dep = VAULTS.reduce((a, v) => a + v.followers, 0);
   const agents = new Set(VAULTS.map((v) => v.manager)).size;
   $("#summary").innerHTML = `
-    <div><div class="label">Aggregate AUM</div><div class="v">${fmt.usd(tot)}</div></div>
+    <div><div class="label">Total vault value</div><div class="v">${fmt.usd(tot)}</div></div>
     <div><div class="label">Vaults</div><div class="v">${VAULTS.length}</div></div>
     <div><div class="label">Managers</div><div class="v">${agents}</div></div>
     <div><div class="label">Depositors</div><div class="v">${fmt.n(dep)}</div></div>`;
@@ -93,20 +86,14 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
       render();
     }));
   }
-  seg("f-asset", "asset"); seg("f-filter", "filter"); seg("f-period", "period"); seg("f-mode", "mode");
+  seg("f-asset", "asset"); seg("f-filter", "filter"); seg("f-period", "period");
   $("#f-q").addEventListener("input", (e) => { st.q = e.target.value.toLowerCase(); render(); });
   $("#f-sort").addEventListener("change", (e) => { st.sort = e.target.value; render(); });
 
-  function sliceSeries(v) {
-    const s = navSeries(v);
-    const d = st.period === "ALL" ? s.length : Math.min(s.length, (st.period === "7D" ? 7 : st.period === "30D" ? 30 : 90) + 1);
-    return s.slice(-d);
-  }
-
   function render() {
     const p = st.period, lbl = p === "ALL" ? "Since inception" : p;
-    $("#h-perf").textContent = `${lbl} ${st.mode === "annualized" ? "annualized" : "return"}`;
-    $("#h-dd").textContent = `${lbl} max DD`;
+    $("#h-perf").textContent = `${lbl} Return`;
+    $("#h-dd").textContent = `${lbl} Max drop`;
 
     let rows = VAULTS.filter((v) => {
       if (v.asset !== st.asset) return false;
@@ -115,40 +102,35 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
       return true;
     });
     const key = {
-      mandate: (v) => v.continuous ? 1 : 0,
-      ra: (v) => { const r = v.returns[p], d = v.maxDrawdown[p]; return r == null ? -Infinity : r / Math.max(Math.abs(d || 0), 0.25); },
       tvl: (v) => v.tvl,
-      perf: (v) => perf(v, p, st.mode) ?? -Infinity,
+      perf: (v) => perf(v, p, "return") ?? -Infinity,
       dd: (v) => v.maxDrawdown[p] ?? -Infinity,
       age: (v) => v.runtimeDays,
     }[st.sort];
     rows.sort((a, b) => key(b) - key(a));
 
     $("#dir tbody").innerHTML = rows.map((v) => {
-      const r = perf(v, p, st.mode), dd = v.maxDrawdown[p], ht = historyTag(v);
-      const copy = v.copyOf ? BAV.vault(v.copyOf.slug) : null;
-      const reason = r == null ? (st.mode === "annualized" && v.returns[p] != null ? "Under 30 days" : "Insufficient history") : "";
+      const r = perf(v, p, "return"), dd = v.maxDrawdown[p], ht = historyTag(v);
       return `<tr data-slug="${v.slug}">
         <td><div class="vname"><a class="n" href="${BAV.route("vault/" + v.slug)}">${v.name}</a><span class="m">${managerLabel(v)} · ${v.asset}</span>
-          <span class="tags">${statusTag(v)}${ht ? `<span class="tag">${ht}</span>` : ""}${copy ? `<span class="tag warn">Follows ${copy.name} · ${v.copyOf.lag} later</span>` : ""}</span></div></td>
-        <td><div style="font-size:14px">${rulesLabel(v)}</div>${riskMeter(vaultRisk(v))}</td>
+          <span class="tags">${statusTag(v)}${ht ? `<span class="tag">${ht}</span>` : ""}</span></div></td>
         <td><span class="logo-stack">${vaultVenues(v).map((id) => BAV.logo(id, "md")).join("")}</span></td>
-        <td class="r">${v.sharePrice.toFixed(4)}</td>
-        <td class="r ${fmt.cls(r)}">${r == null ? `<span class="na">${reason}</span>` : fmt.pct(r)}</td>
-        <td class="r">${dd == null ? `<span class="na">—</span>` : fmt.pct(dd)}</td>
-        <td>${sliceSeries(v).length > 2 ? sparkline(sliceSeries(v)) : ""}</td>
-        <td class="r">${fmt.usd(v.tvl)}</td>
+        <td class="r"><span class="directory-value">${fmt.usd(v.tvl)}</span><span class="deposit-cap">Deposit cap: ${v.cap == null ? "No stated cap" : fmt.usd(v.cap)}</span></td>
+        <td class="r ${fmt.cls(r)}">${r == null ? `<span class="na">Insufficient history</span>` : fmt.pct(r)}</td>
+        <td class="r">${dd == null ? `<span class="na">Insufficient history</span>` : fmt.pct(dd)}</td>
         <td class="r">${fmt.n(v.followers)}</td>
-        <td class="r muted">${v.exitCost}</td>
       </tr>`;
-    }).join("") || `<tr><td colspan="10" class="muted" style="padding:40px 0;text-align:center">No vaults match these filters.</td></tr>`;
-    $$("#dir tbody tr[data-slug]").forEach((tr) => tr.addEventListener("click", () => (location.href = BAV.route("vault/" + tr.dataset.slug))));
-    $("#count").textContent = `Showing ${rows.length} of ${VAULTS.filter((v) => v.asset === st.asset).length} ${st.asset}-currency vaults. The simulated figures are illustrations. Cash exits require an actual minimum-proceeds preview; in-kind exits return a proportional token and receipt slice. Unwind cost is paid from the redeemer's slice.`;
+    }).join("") || `<tr><td colspan="6" class="muted" style="padding:40px 0;text-align:center">No vaults match these filters.</td></tr>`;
+    $$("#dir tbody tr[data-slug]").forEach((tr) => tr.addEventListener("click", (e) => {
+      if (e.target.closest("a") || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+      location.href = BAV.route("vault/" + tr.dataset.slug);
+    }));
+    $("#count").textContent = `Showing ${rows.length} of ${VAULTS.filter((v) => v.asset === st.asset).length} ${st.asset}-currency vaults. Simulated examples. Open a vault for the full details.`;
   }
   render();
 })();
 9:X
-0:{"P":null,"c":["","vaults",""],"q":"","i":false,"f":[[["",{"children":["vaults",{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/2e39_ovk4l34n.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"bodyClass":"","html":"$5","runtimeVersion":"3090a84ecdf1","script":"$6","pageKey":"vaults"}],["$L7"],"$L8"]}],{},null,false,null]},null,false,"$9"]},null,false,null],"$La",false]],"m":"$undefined","G":["$b",["$Lc"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"dPPnzpMEBm5sGMRtMoHVc"}
+0:{"P":null,"c":["","vaults",""],"q":"","i":false,"f":[[["",{"children":["vaults",{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/05q71nbz1mvq5.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"bodyClass":"vault-directory","html":"$5","runtimeVersion":"3090a84ecdf1","script":"$6","pageKey":"vaults"}],["$L7"],"$L8"]}],{},null,false,null]},null,false,"$9"]},null,false,null],"$La",false]],"m":"$undefined","G":["$b",["$Lc"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"ra-QdXDjlu173ZddIXDhI"}
 d:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
 e:"$Sreact.suspense"
 10:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]
@@ -156,7 +138,7 @@ e:"$Sreact.suspense"
 7:["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js","async":true,"nonce":"$undefined"}]
 8:["$","$Ld",null,{"children":["$","$e",null,{"name":"Next.MetadataOutlet","children":"$@f"}]}]
 a:["$","$1","h",{"children":[null,["$","$L10",null,{"children":"$L11"}],["$","div",null,{"hidden":true,"children":["$","$L12",null,{"children":["$","$e",null,{"name":"Next.Metadata","children":"$L13"}]}]}],null]}]
-c:["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/2e39_ovk4l34n.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]
+c:["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/05q71nbz1mvq5.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]
 9:C
 11:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
 14:I[27201,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"IconMark"]
