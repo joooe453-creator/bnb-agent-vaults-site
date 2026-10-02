@@ -2,6 +2,14 @@
 (function () {
   "use strict";
 
+  // The web prototype renderer consumes the body; load its shared font in both surfaces.
+  if (!document.querySelector('link[href*="family=Geist"]')) {
+    const font = document.createElement("link");
+    font.rel = "stylesheet";
+    font.href = "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap";
+    document.head.appendChild(font);
+  }
+
   const TODAY = Date.UTC(2026, 9, 2);
   const DAY = 864e5;
   const SLOTS = ["var(--c1)", "var(--c2)", "var(--c3)", "var(--c4)"];
@@ -11,8 +19,8 @@
     !document.querySelector("[data-prototype-page]");
   const assetUrl = (file) => STATIC_PREVIEW ? new URL(String(file), window.location.href).href : `${BASE_PATH}/${String(file).replace(/^\//, "")}`;
   const logoUrl = (file) => STATIC_PREVIEW
-    ? `assets/logos/${file}.jpg`
-    : `${BASE_PATH}/logos/${file}.jpg`;
+    ? `assets/logos/${file}${file === "aave" ? ".png" : ".jpg"}`
+    : `${BASE_PATH}/logos/${file}${file === "aave" ? ".png" : ".jpg"}`;
   const route = (target = "") => {
     const clean = String(target).replace(/^\/+|\/+$/g, "");
     if (STATIC_PREVIEW) {
@@ -427,11 +435,11 @@
   /* ------------------------------------------------------------------ */
   /* Graphics                                                            */
   /* ------------------------------------------------------------------ */
-  const SEAL = `<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18.6" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M20 8.5 31.5 20 20 31.5 8.5 20Z" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M20 14.2 25.8 20 20 25.8 14.2 20Z" fill="#F0B90B"/></svg>`;
+  const SEAL = `<span class="brand-seal" aria-hidden="true"><i></i></span>`;
 
   function logo(key, cls = "") {
     const v = VENUES.find((x) => x.id === key || x.name === key);
-    if (v?.id === "aave") return `<span class="protocol-monogram ${cls}" aria-label="Aave">A</span>`;
+    if (v?.id === "aave") return `<img class="logo ${cls}" src="${logoUrl("aave")}" alt="Aave">`;
     const file = v ? v.logo : key === "bnb" ? "bnbchain" : null;
     if (!file) return "";
     return `<img class="logo ${cls}" src="${logoUrl(file)}" alt="${esc(v ? v.name : "BNB Chain")}">`;
@@ -620,12 +628,12 @@
       el.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.label || "Chart")}">
         <line x1="${m.l}" x2="${W - m.r}" y1="${H - m.b}" y2="${H - m.b}" stroke="var(--line)" stroke-width="1"/>
         ${g}
-        <defs><linearGradient id="navfill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#F0B90B" stop-opacity=".16"/><stop offset="1" stop-color="#F0B90B" stop-opacity="0"/></linearGradient></defs>
+        <defs><linearGradient id="navfill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#AFC5DA" stop-opacity=".16"/><stop offset="1" stop-color="#AFC5DA" stop-opacity="0"/></linearGradient></defs>
         <path d="${area}" fill="url(#navfill)"/>
         <path d="${line}" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
         <circle cx="${x(pts.length - 1)}" cy="${ly}" r="4" fill="var(--gold)" stroke="var(--card)" stroke-width="2"/>
         <rect x="${W - m.r + 4}" y="${ly - 10}" width="${m.r - 4}" height="20" rx="4" fill="var(--gold)"/>
-        <text x="${W - m.r + 10}" y="${ly + 4}" style="fill:#0A0800;font-weight:600">${last.v.toFixed(dec)}</text>
+        <text x="${W - m.r + 10}" y="${ly + 4}" style="fill:#FFFFFF;font-weight:600">${last.v.toFixed(dec)}</text>
         <g class="hover" style="display:none"><line y1="${m.t}" y2="${H - m.b}" stroke="var(--ink-2)" stroke-width="1"/><circle r="5" fill="var(--gold)" stroke="var(--card)" stroke-width="2"/></g>
         <rect x="${m.l}" y="0" width="${W - m.l - m.r}" height="${H}" fill="transparent" class="hit"/>
       </svg><div class="tip"></div>`;
@@ -639,7 +647,7 @@
         $("line", hov).setAttribute("x1", px); $("line", hov).setAttribute("x2", px);
         $("circle", hov).setAttribute("cx", px); $("circle", hov).setAttribute("cy", py);
         const chg = (pts[i].v / pts[0].v - 1) * 100;
-        tip.innerHTML = `<div class="d">${fmt.date(pts[i].t)}</div><b>${pts[i].v.toFixed(4)}</b> Share value &nbsp;<span style="color:#5E636C">${fmt.pct(chg)}</span>`;
+        tip.innerHTML = `<div class="d">${fmt.date(pts[i].t)}</div><b>${pts[i].v.toFixed(4)}</b> Share value &nbsp;<span style="color:#DCE6EE">${fmt.pct(chg)}</span>`;
         tip.style.left = Math.min(Math.max(px, 90), W - 90) + "px";
         tip.style.top = py + "px";
         tip.style.opacity = 1;
@@ -659,45 +667,47 @@
   /* ------------------------------------------------------------------ */
   function shell(active) {
     const nav = [["vaults.html", "Vaults"], ["portfolio.html", "Portfolio"], ["create.html", "Open a vault"]];
+    const q = new URLSearchParams(location.search);
+    const previewWallet = !q.has("vault") ? q.get("wallet") : null;
+    const wrong = previewWallet === "wrongNetwork";
+    const status = `<span class="dot"></span><span class="status-label">Prototype<span class="header-status-more"> · Deployment pending</span></span>`;
     const top = document.createElement("div");
     top.innerHTML = `
-      <div class="notice" data-bav-shell><span><b>Prototype</b></span><span>Simulated examples</span><span>Unaudited contracts</span><span>Deployment required for transactions</span></div>
-      <header class="masthead" data-bav-shell>
+      <header class="masthead app-masthead" data-bav-shell>
         <div class="wrap">
           <a class="brand" href="${route()}">${SEAL}<span class="brand-name">BNB Agent Vaults</span></a>
-          <nav class="nav">${nav.map(([h, l]) => `<a href="${route(h.replace(".html", ""))}" class="${active === h ? "active" : ""}">${l}</a>`).join("")}</nav>
+          <nav class="nav" aria-label="Main navigation">${nav.map(([h, l]) => `<a href="${route(h.replace(".html", ""))}" class="${active === h ? "active" : ""}" ${active === h ? 'aria-current="page"' : ""}>${l}</a>`).join("")}</nav>
           <div class="head-right">
-            <span class="chain"><img class="logo" src="${logoUrl("bnbchain")}" alt="">BNB Chain · prototype</span>
-            <button class="btn sm ghost" data-demo><span class="full">Not deployed</span><span class="short">Prototype</span></button>
-            <button class="menu-btn" aria-label="Menu"><span></span></button>
+            <span class="header-status header-status-desktop" title="No verified deployment exists. Transactions are disabled.">${status}</span>
+            <span class="chain ${wrong ? "wrong-network" : ""}" title="${wrong ? "Wrong network · design preview" : "BNB Chain"}">${wrong ? "Wrong network" : `<img class="logo" src="${logoUrl("bnbchain")}" alt=""><span class="chain-label">BNB Chain</span>`}</span>
+            <button class="btn sm header-wallet" data-demo>${previewWallet === "connected" ? "Preview wallet" : "Connect wallet"}</button>
           </div>
+          <span class="header-status header-status-mobile" title="Prototype · Deployment pending">${status.replace('<span class="header-status-more"> · Deployment pending</span>', "")}</span>
         </div>
       </header>`;
     document.body.prepend(...top.children);
     const foot = document.createElement("div");
     foot.innerHTML = footerHTML();
     document.body.append(...foot.children);
+    window.addEventListener("bav:wallet-preview", (event) => {
+      const button = $(".header-wallet");
+      if (button && !q.has("vault")) button.textContent = event.detail?.connected ? "Preview wallet" : "Connect wallet";
+    });
     wireShell();
   }
 
   function footerHTML() {
-    return `<footer class="footer" data-bav-shell><div class="wrap">
-      <div class="foot-grid">
-        <div><a class="brand" href="${route()}">${SEAL}<span class="brand-name">BNB Agent Vaults</span></a>
-          <p>Non-custodial ERC-4626 vaults on BNB Chain, operated by AI agents inside a pre-committed mandate.</p></div>
-        <div><h5>Product</h5><a href="${route("vaults")}">Vault directory</a><a href="${route("create")}">Open a vault</a><a href="${route("portfolio")}">Portfolio</a></div>
-        <div><h5>Developers</h5><a href="${route("create")}">Vault Manifest</a><a href="${route("#terms")}">MCP + skills</a><a href="${route("#terms")}">Contracts (pending audit)</a></div>
-        <div><h5>Protocol</h5><a href="${route("#terms")}">Fee caps</a><a href="${route("#terms")}">Timelocks</a><a href="${route("#terms")}">Risk council</a><a href="${route("#terms")}">Security model</a></div>
-      </div>
-      <div class="disclosure">
-        <div class="label">Important information</div>
-        <div>
-          <p>BNB Agent Vaults is a prototype. Smart contracts have not been audited and are not deployed to BNB Smart Chain mainnet. All vaults, managers, balances and performance figures shown are simulated for design purposes and do not represent real assets or results.</p>
-          <p>Mandate limits reduce, but do not eliminate, risk. Depositors remain exposed to market, liquidation, oracle, smart-contract, counterparty and liquidity risk, and may lose some or all of their capital. Annualized figures are a mathematical restatement of past returns, not a forecast or APY. Nothing on this site is investment advice or an offer to sell any security.</p>
-        </div>
-      </div>
-      <div class="foot-base"><span>© 2026 BNB Agent Vaults — design prototype</span><span>BNB Chain · ERC-4626 · ERC-8004</span></div>
-    </div></footer>`;
+    if (document.body.classList.contains("landing-page")) {
+      return `<footer class="footer landing-footer" id="contracts" data-bav-shell><div class="wrap landing-footer-grid">
+        <div><strong>BNB Agent Vaults</strong><span>Prototype. Unaudited. No live vaults. All performance shown is simulated.</span></div>
+        <div><strong>Product</strong><a href="${route("vaults")}">Vaults</a><a href="${route("create")}">Open a vault</a><a href="${route("portfolio")}">Portfolio</a></div>
+        <div><strong>Agents</strong><a href="#mcp">MCP / Skill</a><a href="${assetUrl("skill.md")}">Download skill</a></div>
+        <div><strong>Contracts &amp; security</strong><span>Addresses published after verified deployment</span><span>Independent audit: not yet</span></div>
+      </div></footer>`;
+    }
+    return `<footer class="footer app-footer" data-bav-shell><div class="wrap app-footer-row">
+      <strong>BNB Agent Vaults</strong><a href="${route("#how")}">Product</a><a href="${route("#mcp")}">MCP / Skill</a><a href="${route("#contracts")}">Contracts &amp; security</a><span class="ft-note">Prototype · Unaudited · Not deployed</span>
+    </div><details class="wrap footer-legal"><summary>Important information</summary><p>BNB Agent Vaults is a prototype. Smart contracts have not received an independent audit and are not deployed to BNB Smart Chain mainnet. Example vaults, managers, balances and performance figures are simulated and do not represent real assets or results. Public supply-rate snapshots show their own source and timestamp.</p><p>Mandate limits reduce, but do not eliminate, risk. Depositors remain exposed to market, oracle, smart-contract, counterparty and liquidity risk, and may lose some or all of their capital. Annualized figures restate past returns, not a forecast or APY. Nothing on this site is investment advice or an offer to sell any security.</p></details></footer>`;
   }
 
   function wireShell() {

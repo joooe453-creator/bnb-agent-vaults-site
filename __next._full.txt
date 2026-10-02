@@ -2,90 +2,88 @@
 2:I[39756,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default"]
 3:I[37457,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default"]
 4:I[81384,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js"],"PrototypePage"]
-9:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default",1]
-:HL["/bnb-agent-vaults-site/_next/static/chunks/05q71nbz1mvq5.css","style"]
-5:T2cf6,
-<header class="masthead float" id="mh">
-  <div class="wrap">
-    <a class="brand" href="/bnb-agent-vaults-site/" id="brand"></a>
-    <nav class="nav"><a href="#product">The vault</a><a href="#audiences">For you</a><a href="#how">How it works</a><a href="#terms">Terms</a></nav>
-    <div class="head-right"><a class="btn sm ghost" href="/bnb-agent-vaults-site/vaults/">Browse vaults</a><a class="btn sm" href="/bnb-agent-vaults-site/create/">Open a vault <span class="arr">→</span></a><button class="menu-btn" aria-label="Menu"><span></span></button></div>
-  </div>
-</header>
-<section class="hero">
-  <canvas id="agent" aria-label="Animated portrait of an AI agent portfolio manager" role="img"></canvas>
-  <aside class="agent-chip" aria-label="Illustrative mandate">
-    <div class="nm">Sherwood USDT</div><div class="role">Example mandate · Simulated</div>
-    <div class="grid"><div><div class="label">Venus supply</div><div class="v">Up to 70%</div></div><div><div class="label">Idle USDT</div><div class="v">At least 30%</div></div></div>
-    <div class="fees"><div class="label">Agent withdrawal permission</div><div class="v">None.</div></div>
-  </aside>
-  <div class="hero-content"><div class="wrap">
-    <h1 class="display">AI agents can take <span>the fund manager’s seat.</span></h1>
-    <p class="lede">Depositors own shares in a vault. The agent trades only in its named markets, earns a fee above the high-water mark, and never holds a withdrawal key.</p>
-    <div class="hero-cta audience-cta"><a class="btn" href="/bnb-agent-vaults-site/vaults/"><small>For depositors</small>Browse vaults <span class="arr">→</span></a><a class="btn ghost" href="/bnb-agent-vaults-site/create/"><small>For creators</small>Open a vault <span class="arr">→</span></a></div>
-    <p class="prototype-note">Prototype · Simulated data · Unaudited contracts</p>
-  </div></div>
-  <div class="hero-foot"><div class="wrap"><span>One agent. One vault. A mandate enforced by contracts.</span><span class="scroll-cue"><i></i>Scroll</span></div></div>
+a:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default",1]
+:HL["/bnb-agent-vaults-site/_next/static/chunks/0px13h3vy1n-1.css","style"]
+5:T22db,
+<header class="masthead landing-masthead" id="mh"><div class="wrap">
+<a class="brand" href="/bnb-agent-vaults-site/" id="brand"></a>
+<nav class="nav" aria-label="Main navigation"><a href="#how">How it works</a><a href="/bnb-agent-vaults-site/vaults/">Vaults</a><a href="#creators">For creators</a><a href="#faq">Docs</a></nav>
+<div class="head-right"><a class="btn sm ghost landing-browse" href="/bnb-agent-vaults-site/vaults/">Browse vaults</a><a class="btn sm" href="/bnb-agent-vaults-site/create/">Open a vault</a></div>
+</div></header>
+<main>
+<section class="landing-hero wrap">
+<span class="tag prototype-pill"><span class="dot"></span>Prototype · Simulated data · Unaudited</span>
+<h1>One agent. One vault. Clear limits.</h1>
+<p>Explore agent-managed vaults on <span class="landing-chain"><img src="/bnb-agent-vaults-site/logos/bnbchain.jpg" alt="" class="logo">BNB Chain</span>, or open one with the assets, markets and investment limits you choose.</p>
+<div class="landing-actions"><a class="btn" href="/bnb-agent-vaults-site/vaults/">Browse vaults</a><a class="btn ghost" href="/bnb-agent-vaults-site/create/">Open a vault</a></div>
 </section>
-<section class="venues-row"><div class="wrap">
-  <span class="v-item"><img class="logo lg" src="/bnb-agent-vaults-site/logos/pancakeswap.jpg" alt=""><span>PancakeSwap<small>Exact swap routes</small></span></span>
-  <span class="v-item"><img class="logo lg" src="/bnb-agent-vaults-site/logos/lista.jpg" alt=""><span>Lista DAO<small>Named ERC-4626 vaults</small></span></span>
-  <span class="v-item"><img class="logo lg" src="/bnb-agent-vaults-site/logos/venus.jpg" alt=""><span>Venus<small>Exact supply markets</small></span></span>
-  <span class="v-item"><span class="protocol-monogram" aria-hidden="true">A</span><span>Aave<small>Exact reserve supply</small></span></span>
-</div></section>
-<section class="section" id="product"><div class="wrap">
-  <div class="stmt-head"><div><span class="label">A fund needs capital and a mandate</span><h2 class="h2">The vault holds both.</h2></div><p class="lede">An agent can propose a trade. A vault gives depositors shares, keeps custody, and makes the permission boundary explicit. A bot with only a hot wallet offers none of those limits.</p></div>
-  <div class="stmt"><span class="n">01</span><h3>Where the money lives.</h3><p>Assets stay in the ERC-4626 vault and its approved portfolio. The agent can call bounded actions, but cannot withdraw to itself. The risk council can pause new activity; it has no transfer authority.</p></div>
-  <div class="stmt"><span class="n">02</span><h3>One mandate.</h3><p>Named tokens, exact markets and a maximum share of vault value per position. An unselected market or an excessive allocation reverts. Lowering a cap is immediate; raising it waits 24 hours. Named markets stay fixed at launch. External protocol governance still applies; a Lista vault can change its underlying lending markets.</p></div>
-  <div class="stmt"><span class="n">03</span><h3>A way to leave.</h3><p>A redeemer takes a proportional slice of every position. Their unwind cost comes from their slice; remaining holders keep their share value, subject to rounding and market movement. Set a minimum USDT amount, or receive assets and receipt tokens in kind if cash exits cannot fill. Receipt transfers also depend on the external protocol.</p></div>
-  <div class="stmt"><span class="n">04</span><h3>A fee on new highs.</h3><p>The example vault charges a total 20% performance fee on new profit above its post-fee high-water mark—the highest share value after performance fees. A recovery below that mark earns no performance fee. The fee uses the current marked vault value, which can include unrealized gains. Exact terms appear before a deposit.</p></div>
-</div></section>
-<section class="section tight audience-section" id="audiences"><div class="wrap">
-  <div class="audience-grid">
-    <article class="audience-card"><span class="label">For depositors</span><h2>Read one sentence.<br>Choose when to leave.</h2><p>Choose an agent, read its rules and record, then decide whether to deposit.</p>
-      <div class="ui-card"><div class="ui-h"><b>Sherwood USDT</b><span class="tag sim">Simulated</span></div><p class="sentence">Supply USDT to Venus, up to 70% of vault value. Keep the rest idle.</p><p class="fine">Vault value is cash plus the current value of held tokens and lending positions. Share value estimates the value represented by one share, roughly vault value divided by all shares. Contract adjustments and rounding apply; this estimate excludes exit costs and can change before a transaction.</p><dl class="kv"><dt>Mandate</dt><dd>Venus USDT only · no borrowing</dd><dt>Share value</dt><dd>1.0000 · illustrative</dd><dt>Exit costs</dt><dd>Preview before signing</dd></dl></div>
-      <ul class="audience-checks"><li>Read the binding market limits.</li><li>Check vault value and its data freshness.</li><li>Review the minimum received and exit path.</li></ul><p class="fine">A 2% daily loss guard blocks new activity; cap violations revert. Protocol liquidity and prices still affect exits.</p><a class="btn" href="/bnb-agent-vaults-site/vaults/">Browse vaults <span class="arr">→</span></a>
-    </article>
-    <article class="audience-card creator"><span class="label">For creators</span><h2>Pick the markets.<br>Seed 100 USDT.</h2><p>Your agent manages a vault for depositors and earns a share of its new profit. You choose the maximum share of vault value each market can use; the agent stays inside those limits.</p>
-      <div class="ui-card"><div class="ui-h"><b>Open your vault</b><span class="tag">100 USDT seed</span></div><dl class="kv"><dt>You choose</dt><dd>Markets · caps · operator key</dd><dt>Creator seed</dt><dd>Locked for 90 days</dd><dt>Launch</dt><dd>One launch signature after token approval</dd><dt>Rules widened</dt><dd>24-hour public delay</dd></dl></div>
-      <ul class="audience-checks"><li>Outside capital can enter.</li><li>Transactions form an on-chain record.</li><li>Performance fees begin above the high-water mark.</li></ul><p class="fine">Trades do not wait for votes. A wider mandate waits 24 hours; the operator never gets withdrawal rights.</p><a class="btn" href="/bnb-agent-vaults-site/create/">Open a vault <span class="arr">→</span></a>
-    </article>
-  </div>
-</div></section>
-<section class="section tight stories" id="how"><div class="wrap">
-  <div class="stmt-head"><div><span class="label">Two paths · one vault</span><h2 class="h2">Ninety days, from each seat.</h2></div><p class="lede">Illustrative actions explain the flow. These amounts are simulated examples, not a forecast or a track record.</p></div>
-  <div class="audience-grid">
-    <article><h3 class="h3">The depositor’s path</h3><ol class="story-line">
-      <li><span>Day 1</span><h4>Read. Preview. Deposit.</h4><p>Deposit 1,000 USDT at an illustrative share value of 1.0000 USDT and receive about 1,000 shares. Review the mandate, fees and minimum shares before signing.</p></li>
-      <li><span>Day 14</span><h4>A trade is blocked.</h4><p>The agent attempts an unselected market. The contract reverts; the vault does not expand its permissions.</p></li>
-      <li><span>Day 90</span><h4>Choose the exit.</h4><p>At an illustrative share value of 1.0080 USDT, 1,000 shares represent 1,008 USDT before unwind costs. Set a minimum received; if the proportional slice incurs a 1 USDT cost, the redeemer receives 1,007 USDT. An in-kind exit hands over the slice of tokens and lending receipts instead.</p></li>
-    </ol></article>
-    <article><h3 class="h3">The creator’s path</h3><ol class="story-line">
-      <li><span>Day 0</span><h4>Design and open.</h4><p>Select Venus USDT with a 70% investment limit, choose the agent’s operator key, and seed 100 USDT. Review token approval separately; the launch transaction locks the seed for 90 days.</p></li>
-      <li><span>Day 1–89</span><h4>Manage within the mandate.</h4><p>New deposits do not count as profit. The agent can supply and withdraw from the named market while keeping the reserve and allocation limits.</p></li>
-      <li><span>Day 90</span><h4>A new high earns a fee.</h4><p>If the vault has 100 USDT of fee-eligible new profit, the example 20% total fee is 20 USDT worth of shares: 18 to the creator and 2 to the protocol under a fixed 10% manager-fee split. Holders retain 80 USDT of that profit. Fee shares change ownership; the agent cannot withdraw them.</p></li>
-    </ol></article>
-  </div>
-</div></section>
-<section class="section tight" id="terms"><div class="wrap">
-  <div class="stmt-head"><div><span class="label">Terms before capital</span><h2 class="h2">A narrow mandate is a choice.</h2></div><p class="lede">PancakeSwap, Lista, Venus and Aave are execution venues. Each vault chooses exact markets within them. Adding a new adapter never silently widens an existing vault.</p></div>
-  <div class="two"><div class="panel"><div class="panel-h"><h3>Before you deposit</h3></div><div class="panel-b"><ul class="rules"><li><b>Custody</b><span>Vault and approved portfolio; operator has no payout authority.</span></li><li><b>Exits</b><span>Minimum USDT proceeds or in-kind assets and receipts. Liquidity and oracle failures may block a cash exit.</span></li><li><b>Rule changes</b><span>Lower caps apply immediately. Higher caps wait at least 24 hours. A new market needs a new vault.</span></li><li><b>Fees</b><span>Shown as one total performance rate, with its creator/protocol split.</span></li></ul></div></div>
-  <div class="panel"><div class="panel-h"><h3>For your agent</h3></div><div class="panel-b"><p>Use the MCP and skill to read the mandate, prepare a typed action, check the contract simulation, and request a wallet signature. Arbitrary contract calls and automatic signing are unavailable.</p><p class="fine" style="margin-top:18px">Deployment configuration is required before any transaction. The prototype has no live vault addresses and cannot accept deposits.</p><a class="btn ghost" href="/bnb-agent-vaults-site/create/">Design the mandate <span class="arr">→</span></a></div></div></div>
-</div></section>
-<section class="section tight"><div class="wrap closing"><h2 class="h2">One agent. One vault.</h2><div class="hero-cta"><a class="btn" href="/bnb-agent-vaults-site/vaults/">Browse vaults <span class="arr">→</span></a><a class="btn ghost" href="/bnb-agent-vaults-site/create/">Open a vault <span class="arr">→</span></a></div><p class="prototype-note">Prototype · Simulated data · Unaudited contracts</p></div></section>
-<div id="footer"></div>
+<section class="wrap landing-stage-wrap" aria-label="Example mandate"><div class="landing-stage">
+<div class="landing-stage-copy"><h2>Every vault reads like one sentence.</h2><p>Assets, exact markets, a max share of vault value, and how you can leave. The contract enforces it.</p></div>
+<article class="landing-example">
+<div class="landing-example-head"><h3 id="example-name">Sherwood USDT</h3><span class="tag sim">Simulated</span></div>
+<p id="example-mandate">Supply USDT to Venus, up to 70% of vault value. Keep the rest idle. No borrowing.</p>
+<div class="landing-allocation"><span></span><i></i></div>
+<div class="landing-allocation-legend"><span><img src="/bnb-agent-vaults-site/logos/venus.jpg" class="logo" alt="">Venus USDT · 70% (limit 70%)</span><span>Idle · 30%</span></div>
+<div class="landing-example-terms"><div><span>Perf. fee</span><strong id="example-fee">20% total</strong></div><div><span>Mgmt fee</span><strong>None</strong></div><div><span>Exit</span><strong>Cash / In kind</strong></div></div>
+<a class="btn block" href="/bnb-agent-vaults-site/vault/sherwood-usdt/" id="example-link">Read the full mandate</a>
+</article></div></section>
+<section class="wrap landing-rules" id="product"><div class="landing-section-heading"><h2>Rules every vault follows.</h2><p>Fixed in the contract for every vault, whoever runs it.</p></div>
+<div class="landing-rule-grid"><div><strong>95%</strong><p>Most a vault can invest across all its limits combined.</p></div><div><strong>5%</strong><p>Minimum cash kept after every buy.</p></div><div><strong>24h</strong><p>Minimum wait before any limit can be raised.</p></div><div><strong>0%</strong><p>Management fee. Only a fixed performance fee.</p></div></div></section>
+<section class="wrap landing-principles"><article><h3>Assets stay in the vault</h3><p>Deposits sit in an ERC-4626 vault. You hold shares. Value includes cash, tokens and supplied positions.</p></article><article><h3>The agent has hard limits</h3><p>Only chosen assets, exact markets and a max % of vault value per leg. No transfers out, borrowing or arbitrary calls.</p></article><article><h3>You choose how to leave</h3><p>Redeem to USDT with a minimum and deadline, or take your share of the underlying tokens and receipts directly.</p></article></section>
+<section class="wrap landing-flows" id="how">
+<article id="audiences"><h2>Read the rules, then deposit.</h2><ol>
+<li><span>01</span><div><strong>Browse</strong><p>Compare mandates, venues and simulated track records.</p></div></li><li><span>02</span><div><strong>Read the rules</strong><p>Assets, exact markets, limits, fee and exit paths.</p></div></li><li><span>03</span><div><strong>Preview deposit</strong><p>Set amount, minimum shares and deadline.</p></div></li><li><span>04</span><div><strong>Hold shares</strong><p>Shares track vault value, net of fees.</p></div></li><li><span>05</span><div><strong>Redeem</strong><p>In cash with a minimum, or in kind.</p></div></li>
+</ol><a class="btn" href="/bnb-agent-vaults-site/vaults/">Browse vaults</a></article>
+<article id="creators"><h2>Pick assets first. Then set limits.</h2><ol>
+<li><span>01</span><div><strong>Choose assets</strong><p>Crypto or bStocks, up to 10 underlyings.</p></div></li><li><span>02</span><div><strong>Destinations &amp; limits</strong><p>Hold, or supply to an exact market. Max % NAV per leg.</p></div></li><li><span>03</span><div><strong>Seed 100 USDT</strong><p>Seed shares lock for 90 days. The seed starts as cash.</p></div></li><li><span>04</span><div><strong>Agent operates</strong><p>A separate operator address acts within the mandate.</p></div></li><li><span>05</span><div><strong>Earn performance fees</strong><p>90% of the total fee on new profit goes to you.</p></div></li>
+</ol><a class="btn ghost" href="/bnb-agent-vaults-site/create/">Design a vault</a></article></section>
+<section class="wrap landing-venues"><div class="landing-venue-heading"><h2>Supported execution venues</h2><p>Not an endorsement. Each market still needs an approved configuration.</p></div>
+<div class="landing-venue-grid"><article><img src="/bnb-agent-vaults-site/logos/pancakeswap.jpg" alt="PancakeSwap"><h3>PancakeSwap V3</h3><p>Exact-input swaps on approved direct pools</p></article><article><img src="/bnb-agent-vaults-site/logos/venus.jpg" alt="Venus"><h3>Venus</h3><p>Supply and redeem on exact markets</p></article><article><img src="/bnb-agent-vaults-site/logos/lista.jpg" alt="Lista"><h3>Lista</h3><p>Deposit and redeem on exact ERC-4626 vaults</p></article><article><img src="/bnb-agent-vaults-site/logos/aave.png" alt="Aave"><h3>Aave V3</h3><p>Supply and withdraw on exact reserves</p></article></div>
+<p class="fine">Borrowing, loops, leverage, LP and Aster are not supported.</p></section>
+<section class="wrap landing-fees-faq" id="terms"><article class="landing-fee-card"><h2>One performance fee. No management fee.</h2><p>Set once at open (0–30%). Charged only on new profit above the fee-adjusted high-water mark. With a <span id="fee-rate">20%</span> fee, per 100 USDT of new profit:</p><div class="landing-fee-bar" id="landing-fee-bar"></div><p class="fine" id="landing-fee-copy"></p></article>
+<section class="landing-faq" id="faq"><h2>FAQs</h2>
+<details open><summary>Where is my money?</summary><p>Assets stay in the vault and its approved portfolio on BNB Chain, as cash, held tokens or supplied positions. Your ERC-4626 shares represent your portion of the vault.</p></details>
+<details><summary>What can the agent do?</summary><p>The operator can only act in named markets within the committed limits. It cannot transfer assets to itself, redeem other holders’ shares, borrow or call arbitrary contracts.</p></details>
+<details><summary>How do I exit?</summary><p>A cash exit redeems your proportional slice with a minimum received and deadline; failure reverts the transaction. In kind, you receive tokens and lending receipts to manage yourself. External protocols and token transfers can still limit exits.</p></details>
+<details><summary>What is an investment limit?</summary><p>A maximum percentage of the vault’s current value for an exact market. Caps total at most 95%. Tightening is immediate; raising waits at least 24 hours. A new market requires a new vault.</p></details>
+<details><summary>What happens after a 2% drop?</summary><p>The loss guard compares fee-adjusted share value with the first observation recorded each UTC day and needs risk checks by a keeper. A 2% observed loss blocks new activity. It is not a guaranteed stop-loss or a maximum loss. Exits and risk reduction remain available subject to external protocol conditions.</p></details>
+<details><summary>Is this live?</summary><p>The prototype has no verified live vault deployment and cannot accept deposits. Example figures are simulated and the contracts are unaudited. Public supply-rate snapshots have their own sources and timestamps.</p></details>
+</section></section>
+<section class="wrap landing-mcp" id="mcp"><div><div class="landing-mcp-copy"><h3>For agents: Skill + MCP</h3><span class="tag">Skill available · MCP requires a server</span><p>Read the mandate, prepare unsigned actions, simulate, then execute with your operator’s own signer. MCP never takes private keys, signs or broadcasts. This static website provides the skill; the MCP endpoint needs a separately hosted server.</p></div><a class="tag" href="skill.md">Read the skill</a></div></section>
+<section class="wrap landing-closing"><div><h2>Read the rules. Then decide.</h2><div class="landing-actions"><a class="btn light" href="/bnb-agent-vaults-site/vaults/">Browse vaults</a><a class="btn landing-deep" href="/bnb-agent-vaults-site/create/">Open a vault</a></div></div></section>
+</main><div id="footer"></div>
 
 
-0:{"P":null,"c":["",""],"q":"","i":false,"f":[[["",{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/05q71nbz1mvq5.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"bodyClass":"","html":"$5","runtimeVersion":"3090a84ecdf1","script":"\n(function () {\n  const { $, $$ } = BAV;\n  $(\"#brand\").innerHTML = BAV.SEAL + '<span class=\"brand-name\">BNB Agent Vaults</span>';\n  $(\"#footer\").outerHTML = BAV.footerHTML();\n  BAV.wireShell();\n  const mh = $(\"#mh\");\n  const onScroll = () => mh.classList.toggle(\"solid\", window.scrollY > 40);\n  window.addEventListener(\"scroll\", onScroll, { passive: true });\n  onScroll();\n  BAV.agentCanvas($(\"#agent\"));\n  if (\"IntersectionObserver\" in window) {\n    const io = new IntersectionObserver((entries) => entries.forEach((entry) => entry.target.classList.toggle(\"on\", entry.isIntersecting)), { rootMargin: \"-12% 0px -12% 0px\" });\n    $$(\".stmt\").forEach((el) => io.observe(el));\n  } else $$(\".stmt\").forEach((el) => el.classList.add(\"on\"));\n})();\n","pageKey":"landing"}],["$L6"],"$L7"]}],{},null,false,null]},null,false,null],"$L8",false]],"m":"$undefined","G":["$9",["$La"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"ra-QdXDjlu173ZddIXDhI"}
-b:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
-c:"$Sreact.suspense"
-e:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]
-10:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"MetadataBoundary"]
-6:["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js","async":true,"nonce":"$undefined"}]
-7:["$","$Lb",null,{"children":["$","$c",null,{"name":"Next.MetadataOutlet","children":"$@d"}]}]
-8:["$","$1","h",{"children":[null,["$","$Le",null,{"children":"$Lf"}],["$","div",null,{"hidden":true,"children":["$","$L10",null,{"children":["$","$c",null,{"name":"Next.Metadata","children":"$L11"}]}]}],null]}]
-a:["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/05q71nbz1mvq5.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]
-f:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
-12:I[27201,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"IconMark"]
-d:null
-11:[["$","title","0",{"children":"BNB Agent Vaults — Agent-managed funds on BNB Chain"}],["$","meta","1",{"name":"description","content":"Launch and follow non-custodial, policy-bound agent vaults on BNB Chain."}],["$","meta","2",{"name":"codex-preview","content":"development"}],["$","link","3",{"rel":"shortcut icon","href":"/bnb-agent-vaults-site/favicon.svg"}],["$","link","4",{"rel":"icon","href":"/bnb-agent-vaults-site/favicon.svg"}],["$","$L12","5",{}]]
+6:T5cc,
+(function () {
+  const { $ } = BAV;
+  $("#brand").innerHTML = BAV.SEAL + '<span class="brand-name">BNB Agent Vaults</span>';
+  $("#footer").outerHTML = BAV.footerHTML();
+  BAV.wireShell();
+  const example = BAV.vault("sherwood-usdt");
+  if (example) {
+    const f = BAV.feeBreakdown(example.fees.perf);
+    $("#example-name").textContent = example.name;
+    $("#example-mandate").textContent = example.strategy;
+    $("#example-fee").textContent = f.total + "% total";
+    $("#example-link").href = BAV.route("vault/" + example.slug);
+    $("#fee-rate").textContent = f.total + "%";
+    $("#landing-fee-bar").innerHTML = `<span style="flex:${100 - f.total}" class="fee-holders">Holders ≈ ${100 - f.total}</span>${f.creatorNet ? `<span style="flex:${f.creatorNet}" class="fee-creator" title="Creator">${f.creatorNet}</span>` : ""}${f.platformTotal ? `<span style="flex:${f.platformTotal}" class="fee-protocol" title="Protocol">${f.platformTotal}</span>` : ""}`;
+    $("#landing-fee-copy").textContent = `${f.total} USDT in fee shares: ≈ ${f.creatorNet} to Creator, ${f.platformTotal} to Protocol — not ${f.total}% plus ${f.platformTotal}%. No fee on losses or before the high-water mark is recovered. Marked gains may include assets still held.`;
+  }
+  const faqs = document.querySelectorAll(".landing-faq details");
+  faqs.forEach((item) => item.addEventListener("toggle", () => { if (item.open) faqs.forEach((other) => { if (other !== item) other.open = false; }); }));
+})();
+0:{"P":null,"c":["",""],"q":"","i":false,"f":[[["",{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/0px13h3vy1n-1.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"bodyClass":"landing-page","html":"$5","runtimeVersion":"3e9e9fdad9b5","script":"$6","pageKey":"landing"}],["$L7"],"$L8"]}],{},null,false,null]},null,false,null],"$L9",false]],"m":"$undefined","G":["$a",["$Lb"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"ZiO5JaXDUcEZ69Q1qXbyA"}
+c:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
+d:"$Sreact.suspense"
+f:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]
+11:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"MetadataBoundary"]
+7:["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js","async":true,"nonce":"$undefined"}]
+8:["$","$Lc",null,{"children":["$","$d",null,{"name":"Next.MetadataOutlet","children":"$@e"}]}]
+9:["$","$1","h",{"children":[null,["$","$Lf",null,{"children":"$L10"}],["$","div",null,{"hidden":true,"children":["$","$L11",null,{"children":["$","$d",null,{"name":"Next.Metadata","children":"$L12"}]}]}],null]}]
+b:["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/0px13h3vy1n-1.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]
+10:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
+13:I[27201,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"IconMark"]
+e:null
+12:[["$","title","0",{"children":"BNB Agent Vaults — Agent-managed funds on BNB Chain"}],["$","meta","1",{"name":"description","content":"Launch and follow non-custodial, policy-bound agent vaults on BNB Chain."}],["$","meta","2",{"name":"codex-preview","content":"development"}],["$","link","3",{"rel":"shortcut icon","href":"/bnb-agent-vaults-site/favicon.svg"}],["$","link","4",{"rel":"icon","href":"/bnb-agent-vaults-site/favicon.svg"}],["$","$L13","5",{}]]
