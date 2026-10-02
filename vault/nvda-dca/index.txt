@@ -3,8 +3,8 @@
 3:I[37457,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default"]
 4:I[81384,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js"],"PrototypePage"]
 b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"default",1]
-:HL["/bnb-agent-vaults-site/_next/static/chunks/1ohh9w0f6ucsh.css","style"]
-5:T1265,
+:HL["/bnb-agent-vaults-site/_next/static/chunks/2e39_ovk4l34n.css","style"]
+5:T13e4,
 
 <section class="vhead">
   <div class="wrap">
@@ -32,7 +32,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
       <!-- Performance -->
       <div class="panel">
         <div class="panel-h">
-          <h3>Illustrative NAV per share</h3>
+          <h3>Illustrative share value</h3>
           <div class="seg" id="p-period"><button data-v="7D">7D</button><button class="on" data-v="30D">30D</button><button data-v="90D">90D</button><button data-v="ALL">All</button></div>
         </div>
         <div class="chart-meta">
@@ -43,10 +43,10 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
         <div class="chart-foot"><span id="p-range"></span><span id="p-src"></span></div>
         <div class="panel-b" style="border-top:1px solid var(--line-2)">
           <div class="tbl-scroll"><table class="tbl stack cols-3" id="perf-tbl">
-            <thead><tr><th>Period</th><th class="r">Net return</th><th class="r">Annualized</th><th class="r">Max drawdown</th><th class="r">Start NAV</th><th class="r">End NAV</th></tr></thead>
+            <thead><tr><th>Period</th><th class="r">Net return</th><th class="r">Annualized</th><th class="r">Max drawdown</th><th class="r">Start share value</th><th class="r">End share value</th></tr></thead>
             <tbody></tbody>
           </table></div>
-          <p class="fine" style="margin-top:14px">Prototype return = simulated NAV/share(t₁) ÷ simulated NAV/share(t₀) − 1 after modeled fees. These figures are not live on-chain results or an advertised APR.</p>
+          <p class="fine" style="margin-top:14px">Prototype return = simulated share value(t₁) ÷ simulated share value(t₀) − 1 after modeled fees. These figures are not live on-chain results or an advertised APR.</p>
         </div>
       </div>
 
@@ -64,10 +64,10 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
       <!-- Allocation caps + rule changes -->
       <div class="two">
         <div class="panel">
-          <div class="panel-h"><h3>Capital budgets</h3><span class="label">Manifest · simulated NAV</span></div>
+          <div class="panel-h"><h3>Capital budgets</h3><span class="label">Manifest · simulated vault value</span></div>
           <div class="panel-b">
             <div class="alloc-bar" id="alloc-bar" role="img"></div>
-            <table class="tbl" id="alloc-tbl"><thead><tr><th>Exact market operation</th><th class="r">Max NAV</th><th class="r">Max value now</th></tr></thead><tbody></tbody></table>
+            <table class="tbl" id="alloc-tbl"><thead><tr><th>Exact market operation</th><th class="r">Investment limit</th><th class="r">Max value now</th></tr></thead><tbody></tbody></table>
           </div>
         </div>
         <div class="panel">
@@ -81,6 +81,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
         <div class="panel-h"><h3>Illustrative positions</h3></div>
         <div class="panel-b tbl-scroll">
           <table class="tbl stack" id="positions"><thead><tr><th>Venue</th><th>Position</th><th class="r">Value</th><th>Valued by</th><th class="r">Status</th></tr></thead><tbody></tbody></table>
+          <p class="fine" style="margin-top:14px">Vault value is cash plus the current value of held tokens and lending positions. Share value estimates the value represented by one share, roughly vault value divided by all shares. Contract adjustments and rounding apply; this estimate excludes exit costs and can change before a transaction.</p>
         </div>
       </div>
     </div>
@@ -114,7 +115,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
 
 
 
-6:T7d41,
+6:T7e62,
 (function () {
   const { $, $$, esc, fmt, perf, riskMeter, statusTag, historyTag, navSeries, lineChart, hexAddr, short, ASSETS, SLOTS, toast, demo, logo, CATALOG: C, vaultMarkets, vaultRisk, managerLabel, rulesLabel, platformFeeForRisk, feeBreakdown } = BAV;
   BAV.shell("vaults.html");
@@ -143,7 +144,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
 
   /* Key figures */
   $("#keyfig").innerHTML = `
-    <div><div class="label">NAV / share</div><div class="v">${v.sharePrice.toFixed(4)}</div><div class="s">Simulated ledger</div></div>
+    <div><div class="label">Share value</div><div class="v">${v.sharePrice.toFixed(4)}</div><div class="s">Simulated ledger</div></div>
     <div><div class="label">Assets under mgmt.</div><div class="v">${fmt.usd(v.tvl)}</div><div class="s">${v.cap ? "Capacity " + fmt.usd(v.cap, 0) : "No capacity cap"}</div></div>
     <div><div class="label">Since inception</div><div class="v ${fmt.cls(v.returns.ALL)}">${fmt.pct(v.returns.ALL)}</div><div class="s">Net of fees, in ${A}</div></div>
     <div><div class="label">Max drawdown</div><div class="v">${fmt.pct(v.maxDrawdown.ALL)}</div><div class="s">Since inception</div></div>
@@ -162,8 +163,8 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     $("#p-big").innerHTML = complete ? `<span class="${fmt.cls(r)}">${fmt.pct(r)}</span>` : `<span class="muted" style="font-size:22px">Not enough history yet</span>`;
     $("#p-sub").textContent = complete ? `Net return, ${label}` : `A complete ${period} window does not exist yet — showing available data.`;
     $("#p-range").textContent = `${fmt.date(s[0].t)} → ${fmt.date(s[s.length - 1].t)}`;
-    $("#p-src").textContent = `Source: simulated NAV series · benchmark ${v.benchmark}`;
-    lineChart($("#chart"), s, { height: window.innerWidth < 720 ? 230 : 300, label: `${v.name} NAV per share, ${label}` });
+    $("#p-src").textContent = `Source: simulated share-value series · benchmark ${v.benchmark}`;
+    lineChart($("#chart"), s, { height: window.innerWidth < 720 ? 230 : 300, label: `${v.name} share value, ${label}` });
   };
   $$("#p-period button").forEach((b) => b.addEventListener("click", () => { period = b.dataset.v; drawPerf(); }));
   drawPerf();
@@ -179,7 +180,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
   }).join("");
 
   /* Rules — the same sentence and rules the manager signed at launch */
-  const marketChip = (m, r) => `<span class="chip ro">${logo(m.venue)}${esc(C.label(m))} · max ${C.capTxt(C.allocationCap(r, m.id))} NAV${m.a === "lend" && m.apy != null ? ` · APY snapshot ${C.pct(m.apy)}` : m.a === "borrow" ? ` · ${C.levTxt(C.effLev(m, r.lev))} leverage` : ""}</span>`;
+  const marketChip = (m, r) => `<span class="chip ro">${logo(m.venue)}${esc(C.label(m))} · max ${C.capTxt(C.allocationCap(r, m.id))} of vault value${m.a === "lend" && m.apy != null ? ` · APY snapshot ${C.pct(m.apy)}` : m.a === "borrow" ? ` · ${C.levTxt(C.effLev(m, r.lev))} leverage` : ""}</span>`;
   function aiSummary() {
     const r = vaultRisk(v), lev = C.maxLeverage(v.rules), hasLoop = v.rules.some((x) => x.a === "borrow");
     const base = r === "Low"
@@ -187,15 +188,15 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
       : r === "Medium"
         ? `A ${A}-counted vault that loops assets of the same family at up to ${C.levTxt(lev)}. It earns the gap between collateral yield and borrow cost, times leverage, and loses if borrowing costs more than the collateral pays. Leaving costs more because positions are unwound on DEXs.`
         : `It holds assets that move against ${A}${hasLoop ? `, with loops up to ${C.levTxt(lev)} that can be liquidated` : ""}, so expect real swings.${v.rules.some((x) => x.g === "stocks") ? " Tokenized stock prices move on weekends, so Monday opens can gap." : ""}`;
-    return `${base} Its selected operations can use at most ${C.capTxt(C.totalAllocation(v.rules))} of NAV, leaving at least ${C.capTxt(C.minIdleAllocation(v.rules))} idle. ${human ? "A person makes the trades, from the owner's wallet." : `${v.manager}, an AI agent, makes the trades with its own key.`} Manager's note: “${v.strategy}”`;
+    return `${base} Its selected operations can use at most ${C.capTxt(C.totalAllocation(v.rules))} of vault value, leaving at least ${C.capTxt(C.minIdleAllocation(v.rules))} idle. ${human ? "A person makes the trades, from the owner's wallet." : `${v.manager}, an AI agent, makes the trades with its own key.`} Manager's note: “${v.strategy}”`;
   }
   function drawRules() {
     $("#v-sentence").innerHTML = C.describe(v.rules, esc(v.name));
     $("#v-legs").innerHTML = v.rules.map((r) => `<div class="leg ro"><div class="leg-t"><b>${C.GROUPS[r.g].name} · ${C.ACTIONS[r.a].name}</b><div class="chips" style="margin-top:10px">${C.ruleMarkets(r).map((m) => marketChip(m, r)).join("")}</div></div></div>`).join("");
     const f = v.fees, split = feeBreakdown(f.perf, f.platform), hasLoop = v.rules.some((r) => r.a === "borrow");
     $("#rules").innerHTML = [
-      ["Cannot", `Use any market not named above, exceed its NAV allocation cap, or send funds to the agent. Borrowing and LP positions are unavailable in phase one. At least ${C.capTxt(C.minIdleAllocation(v.rules))} stays idle.`],
-      ["You pay", `${split.total}% of profit above the high-water mark. The creator receives ${split.creatorNet}% and the protocol receives ${split.platformTotal}% under the fixed 10% manager-fee share. The fee uses marked NAV and can include unrealized gains. ${f.mgmt ? `${f.mgmt}% annualized management fee during active strategy time.` : "No management fee."} No entry or exit fee.`],
+      ["Cannot", `Use any market not named above, exceed its investment limit, or send funds to the agent. Borrowing and LP positions are unavailable in phase one. At least ${C.capTxt(C.minIdleAllocation(v.rules))} stays idle.`],
+      ["You pay", `${split.total}% of profit above the post-fee high-water mark. The creator receives ${split.creatorNet}% and the protocol receives ${split.platformTotal}% under the fixed 10% manager-fee share. The fee uses the current marked vault value and can include unrealized gains. ${f.mgmt ? `${f.mgmt}% annualized management fee during active strategy time.` : "No management fee."} No entry or exit fee.`],
       ["Leave", v.continuous ? "Redeem a proportional slice with minimum USDT proceeds, or receive the tokens and lending receipts in kind. Liquidity and oracles can prevent a cash exit. External protocol pauses can also block receipt transfers. Only the creator seed is locked for 90 days." : "Historical basket design reference. This sample cannot accept deposits or execute a redemption."],
     ].map(([k, t]) => `<li><b>${k}</b><span>${t}</span></li>`).join("");
     $("#ai").textContent = aiSummary();
@@ -220,7 +221,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
       ? `<div class="h4">${esc(pc.what)}</div>
          <div class="state-note"><span class="dot" style="background:var(--warn)"></span><span>Takes effect in <b>${pc.hours} hours</b>. Review the wider limits and exit cost before the change applies.</span></div>
          <button class="btn sm ghost block" id="rc-red">Redeem before it applies</button>`
-      : `<p style="font-size:14px;color:var(--ink-2)">Lower NAV caps apply immediately. Higher caps require a public 24-hour delay. Named markets are fixed at launch; a new market requires a new vault with an approved template. A new adapter never silently widens this vault.</p>`)
+      : `<p style="font-size:14px;color:var(--ink-2)">Lower investment limits apply immediately. Higher caps require a public 24-hour delay. Named markets are fixed at launch; a new market requires a new vault with an approved template. A new adapter never silently widens this vault.</p>`)
       + `<p class="fine" style="margin-top:12px">This prototype does not submit rule changes or transactions.</p>`;
     if ($("#rc-red")) $("#rc-red").addEventListener("click", () => openTab("red"));
   }
@@ -255,13 +256,13 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
         <label for="amt" class="label">${cash ? esc(assetSymbol()) + " amount" : "Shares to redeem"}</label>
         <div class="amount"><input id="amt" inputmode="decimal" placeholder="0.00" required><span class="unit">${cash ? esc(assetSymbol()) : v.symbol}</span></div>
         ${!cash ? `<label class="check" style="display:flex;gap:10px;align-items:flex-start;margin:14px 0"><input type="checkbox" id="in-kind"><span>Receive assets and lending receipts in kind<small class="fine" style="display:block">No USDT conversion. You redeem receipt tokens yourself; their liquidity and value can change.</small></span></label>` : ""}
-        <dl class="kv"><dt>${cash ? "Estimated shares" : "Indicative cash value"}</dt><dd id="est">Enter an amount</dd><dt>NAV data</dt><dd>${live ? live.staleNav ? "Unavailable / stale · cash path disabled" : "On-chain read · refreshed before signing" : "Simulated example only"}</dd>${!cash ? `<dt>Your unlocked shares</dt><dd>${readable ? esc(String(live.maxRedeem ?? live.shareBalance ?? "Read before signing")) : "Connect to read"}</dd>` : ""}</dl>
+        <dl class="kv"><dt>${cash ? "Estimated shares" : "Indicative cash value"}</dt><dd id="est">Enter an amount</dd><dt>Value data</dt><dd>${live ? live.staleNav ? "Unavailable / stale · cash path disabled" : "On-chain read · refreshed before signing" : "Simulated example only"}</dd>${!cash ? `<dt>Your unlocked shares</dt><dd>${readable ? esc(String(live.maxRedeem ?? live.shareBalance ?? "Read before signing")) : "Connect to read"}</dd>` : ""}</dl>
         <label class="field received-minimum" id="minimum-field"><span>Minimum ${cash ? "shares" : esc(assetSymbol())} received <em>transaction reverts below this</em></span><input id="minimum-received" inputmode="decimal" placeholder="Required after preview" required></label>
         <label class="field"><span>Quote validity <em>rechecked before signing</em></span><select id="quote-deadline"><option value="5">5 minutes</option><option value="2">2 minutes</option><option value="10">10 minutes</option></select></label>
-        <div class="state-note"><span>Cash exits take a proportional slice. You pay its unwind cost. The remaining NAV/share is preserved within protocol rounding, subject to market movement. A failed minimum reverts the whole cash exit.</span></div>
+        <div class="state-note"><span>Cash exits take a proportional slice. You pay its unwind cost. The remaining share value is preserved within protocol and valuation rounding, subject to market movement. A failed minimum reverts the whole cash exit.</span></div>
         <button type="button" class="btn ghost block" id="wallet-connect" ${ready && !busy ? "" : "disabled"}>${account ? `Reconnect ${short(account)}` : "Connect wallet"}</button>
         <button type="submit" class="btn block" id="go" style="margin-top:10px" disabled>${ready ? account ? cash ? "Review & deposit" : "Review & redeem" : "Connect wallet first" : "Deployment required"}</button>
-        <p class="fine" style="margin-top:12px">${cash ? "If allowance is insufficient, approve only this deposit amount, then sign the deposit. An existing allowance may need a reset signature first. Fees and NAV can change between this preview and inclusion." : "Creator seed shares stay locked for 90 days. A pause blocks new activity; in-kind exit can remain available even when NAV or a cash route is unavailable."}</p>
+        <p class="fine" style="margin-top:12px">${cash ? "If allowance is insufficient, approve only this deposit amount, then sign the deposit. An existing allowance may need a reset signature first. Fees and vault value can change between this preview and inclusion." : "Creator seed shares stay locked for 90 days. A pause blocks new activity; in-kind exit can remain available even when vault value or a cash route is unavailable."}</p>
         <div id="ticket-status" class="live-status fine" role="status" aria-live="polite">${ready ? account ? "Enter an amount to preview." : "A verified deployment is configured. Connect to read balances and terms." : "This is a simulated example. No live vault address is configured; no funds can be sent."}</div>
       </form>`;
     const form = $("#vault-transaction-form"), amountInput = $("#amt"), minimum = $("#minimum-received"), button = $("#go"), inKind = $("#in-kind");
@@ -332,7 +333,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     const feeBps = live.performanceFeeBps;
     const protocolShareBps = live.protocolFeeShareBps;
     if (!template || !Array.isArray(capBps) || !Number.isInteger(feeBps) || protocolShareBps !== 1000 || !live.protocolFeeRecipient) { throw new Error("Live mandate or fee terms could not be verified. Signing remains unavailable."); }
-    $("#keyfig").innerHTML = `<div><div class="label">NAV / share</div><div class="v">${esc(live.pricePerShare || "Unavailable")}</div><div class="s">${live.staleNav ? "Stale NAV · cash path blocked" : `Read at block ${live.blockNumber}`}</div></div><div><div class="label">Actual total assets</div><div class="v">${esc(live.totalAssets || "Unavailable")}</div><div class="s">${esc(assetSymbol())} accounting value</div></div><div><div class="label">Your shares</div><div class="v">${esc(live.shareBalance)}</div><div class="s">${esc(live.symbol || v.symbol)}</div></div><div><div class="label">Unlocked shares</div><div class="v">${esc(live.maxRedeem)}</div><div class="s">Creator seed lock included</div></div><div><div class="label">Pause state</div><div class="v">${live.paused ? "Paused" : "Active"}</div><div class="s">In-kind exits checked separately</div></div><div><div class="label">Cash exit cost</div><div class="v">Quote required</div><div class="s">Minimum received enforced</div></div>`;
+    $("#keyfig").innerHTML = `<div><div class="label">Share value</div><div class="v">${esc(live.pricePerShare || "Unavailable")}</div><div class="s">${live.staleNav ? "Valuation unavailable / stale · cash path blocked" : `Read at block ${live.blockNumber}`}</div></div><div><div class="label">Vault value</div><div class="v">${esc(live.totalAssets || "Unavailable")}</div><div class="s">${esc(assetSymbol())} accounting value</div></div><div><div class="label">Your shares</div><div class="v">${esc(live.shareBalance)}</div><div class="s">${esc(live.symbol || v.symbol)}</div></div><div><div class="label">Unlocked shares</div><div class="v">${esc(live.maxRedeem)}</div><div class="s">Creator seed lock included</div></div><div><div class="label">Pause state</div><div class="v">${live.paused ? "Paused" : "Active"}</div><div class="s">In-kind exits checked separately</div></div><div><div class="label">Cash exit cost</div><div class="v">Quote required</div><div class="s">Minimum received enforced</div></div>`;
     const marketName = (leg, index) => `${["PancakeSwap hold", "Venus supply", "Lista vault", "Aave supply"][leg.kind]} · market ${index + 1}`;
     const actualRows = template.legs.map((leg, index) => ({ name: marketName(leg, index), address: leg.kind === 0 ? leg.token : leg.market, cap: Number(capBps[index]) / 100 }));
     const actualIdle = 100 - actualRows.reduce((sum, row) => sum + row.cap, 0);
@@ -342,11 +343,11 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
     $("#alloc-tbl tbody").innerHTML = allRows.map((row) => `<tr><td>${esc(row.name)}<small class="fine mono" style="display:block">${esc(row.address)}</small></td><td class="r">${row.cap}%</td><td class="r">${live.totalAssets ? (Number(live.totalAssets) * row.cap / 100).toFixed(2) + " " + esc(assetSymbol()) : "Unavailable"}</td></tr>`).join("");
     $("#v-tags").innerHTML = `<span class="tag">Verified configuration · chain ${deployment.chainId}</span><span class="tag">${esc(live.symbol || v.symbol)}</span><span class="tag ${live.paused ? "warn" : ""}">${live.paused ? "Paused" : "Active"}</span>`;
     $("#creator").innerHTML = `<dl class="kv"><dt>Creator</dt><dd class="mono">${esc(live.owner)}</dd><dt>Agent operator</dt><dd class="mono">${esc(live.agent)}</dd><dt>Seed unlock</dt><dd>${new Date(live.seedUnlockAt * 1000).toLocaleString()}</dd></dl>`;
-    $("#v-sentence").textContent = `${template.label}. Per-market NAV caps: ${capBps.map((cap) => `${Number(cap) / 100}%`).join(", ")}.`;
+    $("#v-sentence").textContent = `${template.label}. Per-market investment limits (% of vault value): ${capBps.map((cap) => `${Number(cap) / 100}%`).join(", ")}.`;
     $("#v-sentence").closest(".panel").querySelector(".panel-h .tag").textContent = `Verified mandate · block ${live.blockNumber}`;
     $("#alloc-bar").closest(".panel").querySelector(".panel-h .label").textContent = `Actual caps · block ${live.blockNumber}`;
     $("#v-legs").textContent = "Read from the configured on-chain template; historical charts below remain simulated examples.";
-    $("#rules").innerHTML = `<li><b>Fee</b><span>${feeBps / 100}% total on marked NAV above the high-water mark (including unrealized gains): ${(feeBps / 100 * (1 - protocolShareBps / 10000)).toFixed(2)}% creator + ${(feeBps / 100 * protocolShareBps / 10000).toFixed(2)}% protocol. No management fee.</span></li><li><b>Leave</b><span>Proportional cash exit with a minimum received, or assets and receipts in kind. Creator seed shares unlock at ${live.seedUnlockAt ? new Date(Number(live.seedUnlockAt) * 1000).toLocaleString() : "the on-chain unlock time"}.</span></li>`;
+    $("#rules").innerHTML = `<li><b>Fee</b><span>${feeBps / 100}% total on new profit above the post-fee high-water mark (the highest share value after performance fees). Profit is measured from current vault value and can include unrealized gains: ${(feeBps / 100 * (1 - protocolShareBps / 10000)).toFixed(2)}% creator + ${(feeBps / 100 * protocolShareBps / 10000).toFixed(2)}% protocol. No management fee.</span></li><li><b>Leave</b><span>Proportional cash exit with a minimum received, or assets and receipts in kind. Creator seed shares unlock at ${live.seedUnlockAt ? new Date(Number(live.seedUnlockAt) * 1000).toLocaleString() : "the on-chain unlock time"}.</span></li>`;
     if (live.pendingCapsHash && !/^0x0+$/.test(live.pendingCapsHash)) {
       $("#rc-tag").innerHTML = '<span class="tag warn">Pending on chain</span>';
       $("#rc").textContent = `A wider cap change is announced. Earliest execution: ${new Date(Number(live.pendingCapsExecutableAt) * 1000).toLocaleString()}. Review the new limits before it applies.`;
@@ -407,14 +408,14 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
       <dt>Share token</dt><dd>${v.symbol}</dd>
       <dt>Managed by</dt><dd>${human ? "A person" : "An AI agent"}</dd>
       <dt>Rules</dt><dd>${rulesLabel(v)}</dd>
-      <dt>Maximum deployed</dt><dd>${C.capTxt(C.totalAllocation(v.rules))} of NAV</dd>
-      <dt>Minimum idle reserve</dt><dd>${C.capTxt(C.minIdleAllocation(v.rules))} of NAV</dd>
+      <dt>Maximum deployed</dt><dd>${C.capTxt(C.totalAllocation(v.rules))} of vault value</dd>
+      <dt>Minimum idle reserve</dt><dd>${C.capTxt(C.minIdleAllocation(v.rules))} of vault value</dd>
       <dt>Benchmark</dt><dd>${v.benchmark}</dd>
       <dt>Total performance fee</dt><dd>${split.total.toFixed(2)}%</dd>
       <dt>Creator receives</dt><dd>${split.creatorNet.toFixed(2)}% of profit</dd>
       <dt>Protocol receives</dt><dd>${split.platformTotal.toFixed(2)}% of profit under the 10% manager-fee share</dd>
       <dt>Creator management fee</dt><dd>${f.mgmt.toFixed(2)}%</dd>
-      <dt>High-water mark</dt><dd>Vault-level</dd>
+      <dt>High-water mark</dt><dd>Highest share value after performance fees</dd>
       <dt>Widening caps</dt><dd>24-hour public delay</dd>
       <dt>Redemption</dt><dd>Proportional cash or in-kind exit</dd>
       <dt>Entry / exit fee</dt><dd>None</dd>`;
@@ -429,7 +430,7 @@ b:I[68027,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"defau
   initTransactions();
 })();
 9:X
-0:{"P":null,"c":["","vault","nvda-dca",""],"q":"","i":false,"f":[[["",{"children":["vault",{"children":[["slug","nvda-dca","d",[]],{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/1ohh9w0f6ucsh.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"bodyClass":"has-mcta","html":"$5","runtimeVersion":"5ee517dd22c8","script":"$6","pageKey":"vault"}],["$L7"],"$L8"]}],{},null,false,null]},null,false,null]},null,false,"$9"]},null,false,null],"$La",false]],"m":"$undefined","G":["$b",["$Lc"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"JKjKTt1lDe3LOv3VZAt17"}
+0:{"P":null,"c":["","vault","nvda-dca",""],"q":"","i":false,"f":[[["",{"children":["vault",{"children":[["slug","nvda-dca","d",[]],{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/2e39_ovk4l34n.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"antialiased","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"bodyClass":"has-mcta","html":"$5","runtimeVersion":"3090a84ecdf1","script":"$6","pageKey":"vault"}],["$L7"],"$L8"]}],{},null,false,null]},null,false,null]},null,false,"$9"]},null,false,null],"$La",false]],"m":"$undefined","G":["$b",["$Lc"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"dPPnzpMEBm5sGMRtMoHVc"}
 d:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
 e:"$Sreact.suspense"
 10:I[97367,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]
@@ -437,7 +438,7 @@ e:"$Sreact.suspense"
 7:["$","script","script-0",{"src":"/bnb-agent-vaults-site/_next/static/chunks/2fge-lh9cr66d.js","async":true,"nonce":"$undefined"}]
 8:["$","$Ld",null,{"children":["$","$e",null,{"name":"Next.MetadataOutlet","children":"$@f"}]}]
 a:["$","$1","h",{"children":[null,["$","$L10",null,{"children":"$L11"}],["$","div",null,{"hidden":true,"children":["$","$L12",null,{"children":["$","$e",null,{"name":"Next.Metadata","children":"$L13"}]}]}],null]}]
-c:["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/1ohh9w0f6ucsh.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]
+c:["$","link","0",{"rel":"stylesheet","href":"/bnb-agent-vaults-site/_next/static/chunks/2e39_ovk4l34n.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]
 9:C
 11:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
 14:I[27201,["/bnb-agent-vaults-site/_next/static/chunks/3fntmmi971322.js"],"IconMark"]

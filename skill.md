@@ -10,6 +10,12 @@ exact markets and NAV caps; the operator has no privilege to redeem other people
 Transactions remain unsigned until the user's wallet or their already-authorized agent signer reviews and signs them.
 Never request a private key or silently expand a signer's authority.
 
+When explaining results to a depositor or creator, say **vault value** for the current estimated value of the vault's
+cash and investments, **share value** for the estimated value of one share, and **investment limit** for a position's
+maximum percentage of current vault value. For example, a 70% limit on a 10,000-USDT vault means that position can be
+worth at most 7,000 USDT when the contract checks an investment. These are current valuations, not original deposits or
+guaranteed cash payouts. Keep NAV terminology and field names in technical schemas; do not change the calculation.
+
 ## Discovery and creation
 
 Start with `list_phase1_markets`: choose bStock or crypto assets, their exact swap routes, and each asset's hold,

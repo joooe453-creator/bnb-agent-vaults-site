@@ -181,7 +181,7 @@
       return Object.entries(n).map(([k, c]) => (c > 1 ? `${k} (${c} markets)` : k));
     };
     function rulePhrase(r) {
-      const ms = ruleMarkets(r), names = ms.map((m) => `${m.name} (${capTxt(allocationCap(r, m.id))} NAV cap)`);
+      const ms = ruleMarkets(r), names = ms.map((m) => `${m.name} (up to ${capTxt(allocationCap(r, m.id))} of vault value)`);
       if (r.a === "lend") {
         // Name the coins actually lent when there are only one or two; otherwise the family.
         const toks = [...new Set(ms.map((m) => m.tokens[0]))];
@@ -190,7 +190,7 @@
       }
       if (r.a === "trade") return `hold ${few(names, "tokens")}`;
       if (r.a === "lp") return `provide liquidity to ${few(names, "pools")}`;
-      const pairs = ms.map((m) => `${label(m)} (${capTxt(allocationCap(r, m.id))} NAV cap)`);
+      const pairs = ms.map((m) => `${label(m)} (up to ${capTxt(allocationCap(r, m.id))} of vault value)`);
       return `loop ${few(pairs, "markets")} up to <em>${levTxt(Math.max(...ms.map((m) => effLev(m, r.lev))))}</em>`;
     }
     // The one sentence depositors read. `name` must already be HTML-escaped.
@@ -200,7 +200,7 @@
       rules.forEach((r) => {
         if (r.a === "trade" || r.a === "lp") {
           if (!merged[r.a]) { merged[r.a] = []; parts.push(r.a); }
-          merged[r.a].push(...ruleMarkets(r).map((m) => `${m.name} (${capTxt(allocationCap(r, m.id))} NAV cap)`));
+          merged[r.a].push(...ruleMarkets(r).map((m) => `${m.name} (up to ${capTxt(allocationCap(r, m.id))} of vault value)`));
         } else parts.push(r);
       });
       const phrases = parts.map((p) => (p === "trade" ? `hold ${few(merged.trade, "tokens")}` : p === "lp" ? `provide liquidity to ${few(merged.lp, "pools")}` : rulePhrase(p)));
@@ -217,7 +217,7 @@
     {
       slug: "sherwood-usdt", name: "Sherwood USDT", manager: "Sherwood", agentId: 1611, agentVaults: 1, symbol: "avSUS", asset: "USDT", benchmark: "Idle USDT", managerType: "agent", official: true, continuous: true,
       rules: [{ g: "stable", a: "lend", m: ["venus-supply-usdt"], caps: { "venus-supply-usdt": 70 } }],
-      strategy: "Supply USDT to Venus, up to 70% of NAV. Keep the rest idle. No borrowing.",
+      strategy: "Supply USDT to Venus, up to 70% of the vault's current value. Keep the rest idle. No borrowing.",
       runtimeDays: 90, returns: { "7D": 0.06, "30D": 0.26, "90D": 0.8, ALL: 0.8 }, maxDrawdown: { "7D": 0, "30D": 0, "90D": -0.02, ALL: -0.02 },
       tvl: 10080, followers: 10, status: "Simulated", sharePrice: 1.008, fees: { perf: 20, mgmt: 0, platform: 0 }, cap: null, exitCost: "Quote required",
       positions: [
@@ -639,7 +639,7 @@
         $("line", hov).setAttribute("x1", px); $("line", hov).setAttribute("x2", px);
         $("circle", hov).setAttribute("cx", px); $("circle", hov).setAttribute("cy", py);
         const chg = (pts[i].v / pts[0].v - 1) * 100;
-        tip.innerHTML = `<div class="d">${fmt.date(pts[i].t)}</div><b>${pts[i].v.toFixed(4)}</b> NAV / share &nbsp;<span style="color:#5E636C">${fmt.pct(chg)}</span>`;
+        tip.innerHTML = `<div class="d">${fmt.date(pts[i].t)}</div><b>${pts[i].v.toFixed(4)}</b> Share value &nbsp;<span style="color:#5E636C">${fmt.pct(chg)}</span>`;
         tip.style.left = Math.min(Math.max(px, 90), W - 90) + "px";
         tip.style.top = py + "px";
         tip.style.opacity = 1;
