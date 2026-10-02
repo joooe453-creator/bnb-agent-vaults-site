@@ -1,6 +1,6 @@
 ---
 name: bnb-agent-vaults
-description: Design, inspect, and prepare bounded BNB Chain mandate vault creation, deposits, pro-rata redemptions, and PancakeSwap/Venus/Lista/Aave execution through the Sherwood MCP. Use for a continuous mandate vault or its agent operator; existing basket/schedule manifests remain reference plans.
+description: Design bStock and crypto baskets with per-asset hold, vault, or supply-market destinations, then resolve exact approved BNB Chain configurations and prepare bounded creation, deposits, redemptions, and PancakeSwap/Venus/Lista/Aave actions through the Sherwood MCP.
 ---
 
 # BNB Agent Vaults
@@ -12,18 +12,29 @@ Never request a private key or silently expand a signer's authority.
 
 ## Discovery and creation
 
-Call `get_execution_deployment`. An `undeployed` record is a hard execution gate: design a mandate, but never invent
-contract addresses, claim a fork pass, or treat a mainnet registry as testnet configuration. Choose an exact returned
-template and verify its chain, asset, receipts, pools, feeds and configuration hash. For schema and tool arguments, read
+Start with `list_phase1_markets`: choose bStock or crypto assets, their exact swap routes, and each asset's hold,
+vault or supply-market destination. Do not replace this product flow with a list of protocol templates. A vault accepts
+the selected asset; collateral-only markets are not lending destinations for that asset.
+
+Call `get_execution_deployment` and `resolve_asset_selection`. The resolver binds the complete selected basket to an
+internal reviewed configuration, orders caps to its legs, and rejects changed routes, mismatched destinations or ambiguity.
+Individual approved legs do not authorize arbitrary combinations. An `undeployed` record is a hard execution gate:
+design and export the basket, but never invent contract addresses, claim a fork pass, or treat a mainnet registry as
+testnet configuration. Catalog membership alone is not execution approval. Verify the resolved configuration's chain,
+asset, receipts, pools, feeds and hash. For schema and tool arguments, read
 [execution.md](references/execution.md).
 
-For creation, use separate creator, dedicated agent and risk-council keys. Set one cap for each template leg; caps total
+For creation, use separate creator, dedicated agent and risk-council keys. Set one NAV cap per selected asset; caps total
 at most 9,500 bps. Seed exactly 100 accounting-asset units and disclose its 90-day share lock. The launch transaction
-creates both contracts and seeds the creator atomically; token approval may require a separate transaction. Total
+creates both contracts and seeds idle accounting assets atomically; the agent purchases later within the mandate.
+Basket weights are agent planning targets, while caps are the enforced maximums; never describe weights or schedules
+as contract-enforced allocation. Token approval may require a separate transaction. Total
 performance fee is fixed at creation (0–3,000 bps), charged as shares above the post-fee watermark. Of those fee shares,
 90% goes to the fixed creator recipient and 10% to the fixed protocol recipient; a 20% total means approximately18%/2%
-of new marked profit, with share rounding. Management fees are absent in this version. Validate with `validate_mandate`, prepare with `prepare_mandate_creation`, then verify factory
-approval and call `simulate_mandate_creation` after approval. A mined `VaultCreated` event and `factory.isVault` identify the actual result.
+of new marked profit, with share rounding. Management fees are absent in this version. Use `prepare_asset_vault_creation`,
+verify factory approval, then call `simulate_asset_vault_creation` with the identical selection after token approval.
+Low-level `prepare_mandate_creation` remains available for callers that already hold a reviewed configuration ID.
+A mined `VaultCreated` event and `factory.isVault` identify the actual result.
 
 ## Operating a vault
 

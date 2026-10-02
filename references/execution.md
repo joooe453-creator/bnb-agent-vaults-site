@@ -1,18 +1,56 @@
 # Continuous mandate execution
 
-MCP is the site's `/mcp` route. This repository contains the implementation; publishing/hosting it is a separate release.
+MCP is the `/mcp` route on a server-enabled deployment. GitHub Pages hosts the static preview and downloads only;
+it cannot serve MCP POST requests. This repository contains the server implementation; hosting it is a separate release.
 `get_execution_deployment` returns deployment@1.0 and the actual schema templates. Default record is undeployed on chain97.
 
 ## Mandate
 
 Required: `schema: bnb-agent-vaults/mandate@1.0`, `chainId`, `creator`, separate `agent`, `performanceFeeBps`, full `template`,
 `arbitraryCalls: false`, `minIdleBps: 500`, `ruleChangeDelaySeconds: 86400`, `seedLockSeconds: 7776000`, `dailyLossBps: 200`.
-Copy the exact template from deployment discovery. Its `caps` length equals `legs.length`, sum <=9500. Its config hash is
+Users choose assets and destinations. Resolve that selection to an internal exact configuration instead of asking them
+to choose a protocol template. Its `caps` length equals `legs.length`, sum <=9500. Its config hash is
 `keccak256(abi.encode(asset, route, legs))`; caps and fees are separate vault-level terms read from the created vault.
 Kinds: `0` hold, `1` Venus, `2` Lista ERC-4626, `3` Aave. Venus provider is its exact comptroller; Aave provider is its exact
 PoolAddressesProvider; Lista and hold provider are zero. Swap routes are direct accounting-asset/target V3 pools.
 
 ## Tools
+
+`resolve_asset_selection`: `{selection}` where selection is:
+
+```json
+{
+  "chainId": 56,
+  "accountingAsset": "0xACCOUNTING_ASSET",
+  "positions": [{
+    "token": "0xTARGET",
+    "swap": {
+      "protocol": "v3", "poolAddress": "0xEXACT_POOL", "fee": 100,
+      "path": [{"tokenIn": "0xTARGET", "tokenOut": "0xACCOUNTING_ASSET", "protocol": "v3", "poolAddress": "0xEXACT_POOL", "fee": 100}]
+    },
+    "destination": {"mode": "vault", "protocol": "Lista", "marketAddress": "0xEXACT_ERC4626"},
+    "capBps": 7000
+  }],
+  "automation": {"mode": "agent-managed", "rebalancingEnabled": false},
+  "managementFeeBps": 0,
+  "seedAmount": "100"
+}
+```
+
+The addresses above are placeholders, not executable examples. A direct accounting-asset supply uses `swap:null`;
+accounting cash held idle is not an extra hold leg. Destination modes are `hold`, `vault` and `supply-market`.
+For Aave, catalog `marketAddress` identifies the aToken; the resolver matches the approved receipt and retains the approved
+Pool/Provider. For Venus and Lista, it identifies the vToken/ERC4626 market. Provider/feed addresses are internal reviewed
+configuration, never inferred from ticker or supplied by the user. Selection order may differ from leg order; returned caps
+are reordered. Multi-hop/V2, duplicate underlyings, unreviewed combinations and ambiguous configurations fail closed.
+
+`prepare_asset_vault_creation` and `simulate_asset_vault_creation`:
+`{selection, account, name, symbol, agent, performanceFeeBps, minSeedShares: raw string, deadline: Unix seconds}`.
+They resolve the same complete selection, then use canonical preparation and existing runtime/provenance/simulation checks.
+Matching alone is not live factory approval or market health. Schedule/dip/rebalance and buy-once basket instructions can
+be exported as plans but are not contract automation; the resolver only accepts `agent-managed` with rebalance off.
+Creation seeds idle funds; it does not purchase the basket. A supply failure reverts swap+deposit, leaving accounting cash;
+it does not silently switch the selected destination to hold.
 
 `prepare_mandate_creation`: `{account, templateId, name, symbol, agent, performanceFeeBps, capBps: number[],
 minSeedShares: raw string, deadline: Unix seconds}`. The factory has its own deadline and caller-bound creator. Seed shares
@@ -51,8 +89,8 @@ Chain56 templates under config/*.bsc.json are only for isolated mainnet fork tes
 
 ## Protocol provenance and receipt reconciliation
 
-The server exposes14 tools:9 continuous discovery/validation/preparation/simulation/health/receipt tools and5 historical
-reference tools. `get_execution_health` reports a canonical block, RPC `finalized` head, factory approvals and dependency
+The server exposes17 tools:12 continuous selection/discovery/validation/preparation/simulation/health/receipt tools and5
+catalog/reference tools. `get_execution_health` reports a canonical block, RPC `finalized` head, factory approvals and dependency
 drift. Per-action simulation is still required; health alone does not prove market liquidity or valid NAV.
 
 Deployment `provenance@1.0` pins runtime hashes, EIP1967 implementation/admin/beacon slots, captured implementation,
