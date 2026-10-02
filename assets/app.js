@@ -14,6 +14,8 @@
   const DAY = 864e5;
   const SLOTS = ["var(--c1)", "var(--c2)", "var(--c3)", "var(--c4)"];
   const BASE_PATH = window.__BAV_BASE_PATH__ || "";
+  const MARKETING_ORIGIN = window.__BAV_MARKETING_ORIGIN__ || BASE_PATH;
+  const APP_ORIGIN = window.__BAV_APP_ORIGIN__ || BASE_PATH;
   const STATIC_PREVIEW = window.__BAV_STATIC_PREVIEW__ === true ||
     window.location.protocol === "file:" ||
     !document.querySelector("[data-prototype-page]");
@@ -28,7 +30,8 @@
       const [page, slug] = clean.split("/");
       return slug ? `${page}.html?slug=${slug}` : `${page}.html`;
     }
-    return `${BASE_PATH}/${clean}${clean && !clean.includes("#") ? "/" : ""}`;
+    const origin = clean && !clean.startsWith("#") ? APP_ORIGIN : MARKETING_ORIGIN;
+    return `${String(origin).replace(/\/$/, "")}/${clean}${clean && !clean.includes("#") ? "/" : ""}`;
   };
 
   /* ------------------------------------------------------------------ */
