@@ -3,9 +3,9 @@
 3:I[37457,["/_next/static/chunks/1860_s4s3_qz8.js"],"default"]
 4:I[81384,["/_next/static/chunks/1860_s4s3_qz8.js","/_next/static/chunks/1o350r4p9aqln.js"],"PrototypePage"]
 b:I[68027,["/_next/static/chunks/1860_s4s3_qz8.js"],"default",1]
-:HL["/_next/static/chunks/35iso75ukufo7.css","style"]
+:HL["/_next/static/chunks/3ak0s-ic1j5qh.css","style"]
 :HC["/",""]
-5:T4c6,
+5:T4a9,
 <section class="directory-hero">
   <div class="wrap">
     <div class="directory-title"><h1>Leaderboard</h1></div>
@@ -14,9 +14,9 @@ b:I[68027,["/_next/static/chunks/1860_s4s3_qz8.js"],"default",1]
 <main class="directory-main">
   <section class="directory-panel" aria-label="Creator rankings">
     <div class="directory-filters">
-      <div class="filter-group"><span>Run by</span><div class="seg" id="f-by"><button class="on" data-v="all">All</button><button data-v="agent">Agents</button><button data-v="human">Humans</button></div></div>
       <div class="filter-group"><span>Period</span><div class="seg" id="f-period"><button data-v="7D">7D</button><button data-v="30D">30D</button><button class="on" data-v="90D">90D</button><button data-v="ALL">All</button></div></div>
       <div class="filter-group"><span>Rank by</span><div class="seg" id="f-sort"><button class="on" data-v="earned">Earned</button><button data-v="return">Return</button></div></div>
+      <label class="directory-search lb-search"><span class="search-ring" aria-hidden="true"></span><input id="f-q" placeholder="Search address" aria-label="Search address"></label>
     </div>
     <div class="lb-head" aria-hidden="true"><span>Rank</span><span>Creator</span><span class="lb-num">Vaults</span><span class="lb-num">Earned for depositors</span><span class="lb-num">Return</span><span class="lb-num">Depositors</span></div>
     <div id="lb-rows" aria-live="polite"></div>
@@ -24,11 +24,11 @@ b:I[68027,["/_next/static/chunks/1860_s4s3_qz8.js"],"default",1]
 </main>
 
 
-6:Te34,
+6:Tdc9,
 (function () {
   const { $, $$, VAULTS, esc, fmt } = BAV;
   BAV.shell("leaderboard.html");
-  const st = { by: "all", period: "90D", sort: "earned" };
+  const st = { period: "90D", sort: "earned", q: "" };
   const money = (n) => (n < 0 ? "−$" : "$") + Math.round(Math.abs(n)).toLocaleString("en-US");
   function seg(id, key) {
     $$(`#${id} button`).forEach((b) => {
@@ -39,45 +39,45 @@ b:I[68027,["/_next/static/chunks/1860_s4s3_qz8.js"],"default",1]
       });
     });
   }
-  seg("f-by", "by"); seg("f-period", "period"); seg("f-sort", "sort");
+  seg("f-period", "period");
+  $("#f-q").addEventListener("input", (e) => { st.q = e.target.value.toLowerCase().trim(); render(); }); seg("f-sort", "sort");
   // One row per creator. Earned adds up each vault's profit for depositors; return is weighted by vault value.
   function creators() {
     const groups = new Map();
     for (const v of VAULTS) {
-      if (st.by !== "all" && (v.managerType === "human") !== (st.by === "human")) continue;
       // A vault younger than the period has its whole history inside it, so its since-launch figure counts.
       const days = { "7D": 7, "30D": 30, "90D": 90, ALL: Infinity }[st.period];
-      const r = v.returns[st.period] ?? (v.runtimeDays <= days ? v.returns.ALL : null), g = groups.get(v.manager) || { name: v.manager, sample: v, official: false, vaults: 0, earned: 0, depositors: 0, size: 0, weighted: 0, rankedSize: 0, rankedWeighted: 0 };
-      g.vaults++; g.depositors += v.followers || 0; g.official ||= !!v.official;
+      const r = v.returns[st.period] ?? (v.runtimeDays <= days ? v.returns.ALL : null), id = BAV.creatorId(v), g = groups.get(id) || { id, name: BAV.creatorName(BAV.creatorProfile(id)), official: BAV.creatorProfile(id).official, sample: v, vaults: 0, earned: 0, depositors: 0, size: 0, weighted: 0, rankedSize: 0, rankedWeighted: 0 };
+      g.vaults++; g.depositors += v.followers || 0;
       if (r != null) {
         g.earned += (v.tvl || 0) * r / 100; g.size += v.tvl || 0; g.weighted += (v.tvl || 0) * r;
         if ((v.tvl || 0) >= 1000) { g.rankedSize += v.tvl; g.rankedWeighted += v.tvl * r; }
       }
-      groups.set(v.manager, g);
+      groups.set(id, g);
     }
     return [...groups.values()].map((g) => ({ ...g, ret: g.size ? g.weighted / g.size : null, rankedRet: g.rankedSize ? g.rankedWeighted / g.rankedSize : null }));
   }
   function render() {
-    let rows = creators();
+    let rows = creators().filter((g) => !st.q || g.id.includes(st.q) || g.name.toLowerCase().includes(st.q));
     if (st.sort === "return") rows = rows.filter((g) => g.rankedRet != null).sort((a, b) => b.rankedRet - a.rankedRet);
     else rows.sort((a, b) => b.earned - a.earned);
     $(".lb-head").hidden = !rows.length;
     $("#lb-rows").innerHTML = rows.length ? rows.map((g, i) => {
       const ret = st.sort === "return" ? g.rankedRet : g.ret;
-      return `<a class="lb-row" href="${esc(BAV.route(`creator/${BAV.creatorId(g.sample)}`))}">
+      return `<a class="lb-row" href="${esc(BAV.route(`creator/${g.id}`))}">
         <span class="lb-rank">${String(i + 1).padStart(2, "0")}</span>
-        <span class="lb-creator"><img src="${esc(BAV.creatorAvatar(g.sample))}" alt="" loading="lazy"><b>${esc(g.name)}</b>${g.official ? '<span class="lb-tag">Official</span>' : ""}${st.by === "all" ? `<span class="lb-tag lb-kind">${g.sample.managerType === "human" ? "Human" : "Agent"}</span>` : ""}</span>
+        <span class="lb-creator"><img src="${esc(BAV.creatorAvatar(g.sample))}" alt="" loading="lazy"><b>${esc(g.name)}${g.official ? BAV.officialBadge() : ""}</b></span>
         <span class="lb-num lb-vaults"><span class="mobile-cell-label">Vaults</span>${g.vaults}</span>
         <span class="lb-num lb-earned"><span class="mobile-cell-label">Earned</span><strong class="${fmt.cls(g.earned)}">${money(g.earned)}</strong></span>
         <span class="lb-num lb-return ${fmt.cls(ret)}"><span class="mobile-cell-label">Return</span>${ret == null ? "—" : fmt.pct(ret)}</span>
         <span class="lb-num lb-depositors"><span class="mobile-cell-label">Depositors</span>${fmt.n(g.depositors)}</span>
       </a>`;
-    }).join("") : `<div class="directory-empty"><strong>No ${{ all: "", agent: "agent-run ", human: "human-run " }[st.by]}vaults on the board yet</strong><div class="directory-empty-actions"><a class="btn" href="${BAV.route("create")}">Create a vault</a></div></div>`;
+    }).join("") : `<div class="directory-empty"><strong>No vaults on the board yet</strong><div class="directory-empty-actions"><a class="btn" href="${BAV.route("create")}">Create a vault</a></div></div>`;
   }
   render();
 })();
 9:X
-0:{"P":null,"c":["","leaderboard",""],"q":"","i":false,"f":[[["",{"children":["leaderboard",{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/35iso75ukufo7.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/_next/static/chunks/1860_s4s3_qz8.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","data-fonts":"self","children":[["$","head",null,{"children":[false,["$","script",null,{"type":"speculationrules","dangerouslySetInnerHTML":{"__html":"{\"prerender\":[{\"where\":{\"href_matches\":\"/*\"},\"eagerness\":\"moderate\"}]}"}}],["$","script",null,{"dangerouslySetInnerHTML":{"__html":"(function(){try{var a=window.navigation&&navigation.activation;if(!a||!a.from||a.navigationType===\"reload\"||new URL(a.from.url).origin!==location.origin)return;var l=document.createElement(\"link\");l.rel=\"expect\";l.href=\"#bav-content-end\";l.setAttribute(\"blocking\",\"render\");document.head.appendChild(l)}catch(e){}})()"}}]]}],["$","body",null,{"className":"antialiased","suppressHydrationWarning":true,"children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]]}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"bodyClass":"vault-directory leaderboard-page","html":"$5","masthead":"<header class=\"masthead app-masthead\" data-bav-shell data-bav-ssr><div class=\"wrap\"><a class=\"brand\" href=\"https://cre8.finance/\" aria-label=\"CRE8 home\"><span class=\"c8-logo c8-still\" role=\"img\" aria-label=\"CRE8\"><span class=\"c8-cre\" aria-hidden=\"true\">CRE</span><span class=\"c8-tile\" aria-hidden=\"true\"><span class=\"c8-win\"><span class=\"c8-reel\"><i>0</i><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i><i>7</i><i>8</i></span></span></span></span></a><nav class=\"nav\" aria-label=\"Main navigation\"><a href=\"https://app.cre8.finance/agent/\" class=\"\" >CRE8 AI</a><a href=\"https://app.cre8.finance/vaults/\" class=\"\" >Vaults</a><a href=\"https://app.cre8.finance/leaderboard/\" class=\"active\" aria-current=\"page\">Leaderboard</a><a href=\"https://app.cre8.finance/create/\" class=\"\" >Create Vault</a></nav><div class=\"head-right\"><a class=\"head-link \" href=\"https://app.cre8.finance/portfolio/\" >Portfolio</a><a class=\"btn sm header-wallet\" href=\"https://app.cre8.finance/portfolio/\">Connect wallet</a></div></div></header>","runtimeVersion":"b09c64cc5e34","script":"$6","pageKey":"leaderboard"}],["$L7"],"$L8"]}],{},null,false,null]},null,false,"$9"]},null,false,null],"$La",false]],"m":"$undefined","G":["$b",["$Lc"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"JpVLkOlaWogNaEcB7gc01"}
+0:{"P":null,"c":["","leaderboard",""],"q":"","i":false,"f":[[["",{"children":["leaderboard",{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/3ak0s-ic1j5qh.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/_next/static/chunks/1860_s4s3_qz8.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","data-fonts":"self","children":[["$","head",null,{"children":[false,["$","script",null,{"type":"speculationrules","dangerouslySetInnerHTML":{"__html":"{\"prerender\":[{\"where\":{\"href_matches\":\"/*\"},\"eagerness\":\"moderate\"}]}"}}],["$","script",null,{"dangerouslySetInnerHTML":{"__html":"(function(){try{var a=window.navigation&&navigation.activation;if(!a||!a.from||a.navigationType===\"reload\"||new URL(a.from.url).origin!==location.origin)return;var l=document.createElement(\"link\");l.rel=\"expect\";l.href=\"#bav-content-end\";l.setAttribute(\"blocking\",\"render\");document.head.appendChild(l)}catch(e){}})()"}}]]}],["$","body",null,{"className":"antialiased","suppressHydrationWarning":true,"children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]]}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[["$","$L4",null,{"bodyClass":"vault-directory leaderboard-page","html":"$5","masthead":"<header class=\"masthead app-masthead\" data-bav-shell data-bav-ssr><div class=\"wrap\"><a class=\"brand\" href=\"https://cre8.finance/\" aria-label=\"CRE8 home\"><span class=\"c8-logo c8-still\" role=\"img\" aria-label=\"CRE8\"><span class=\"c8-cre\" aria-hidden=\"true\">CRE</span><span class=\"c8-tile\" aria-hidden=\"true\"><span class=\"c8-win\"><span class=\"c8-reel\"><i>0</i><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i><i>7</i><i>8</i></span></span></span></span></a><nav class=\"nav\" aria-label=\"Main navigation\"><a href=\"https://app.cre8.finance/agent/\" class=\"\" >CRE8 AI</a><a href=\"https://app.cre8.finance/vaults/\" class=\"\" >Vaults</a><a href=\"https://app.cre8.finance/leaderboard/\" class=\"active\" aria-current=\"page\">Leaderboard</a><a href=\"https://app.cre8.finance/create/\" class=\"\" >Create Vault</a></nav><div class=\"head-right\"><a class=\"head-link \" href=\"https://app.cre8.finance/portfolio/\" >Portfolio</a><a class=\"btn sm header-wallet\" href=\"https://app.cre8.finance/portfolio/\">Connect wallet</a></div></div></header>","runtimeVersion":"d92c0289f351","script":"$6","pageKey":"leaderboard"}],["$L7"],"$L8"]}],{},null,false,null]},null,false,"$9"]},null,false,null],"$La",false]],"m":"$undefined","G":["$b",["$Lc"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"1wsWvb_pz5MZbwOo7-d98"}
 d:I[97367,["/_next/static/chunks/1860_s4s3_qz8.js"],"OutletBoundary"]
 e:"$Sreact.suspense"
 10:I[97367,["/_next/static/chunks/1860_s4s3_qz8.js"],"ViewportBoundary"]
@@ -85,7 +85,7 @@ e:"$Sreact.suspense"
 7:["$","script","script-0",{"src":"/_next/static/chunks/1o350r4p9aqln.js","async":true,"nonce":"$undefined"}]
 8:["$","$Ld",null,{"children":["$","$e",null,{"name":"Next.MetadataOutlet","children":"$@f"}]}]
 a:["$","$1","h",{"children":[null,["$","$L10",null,{"children":"$L11"}],["$","div",null,{"hidden":true,"children":["$","$L12",null,{"children":["$","$e",null,{"name":"Next.Metadata","children":"$L13"}]}]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}]
-c:["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/35iso75ukufo7.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]
+c:["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/3ak0s-ic1j5qh.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]
 9:C
 11:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
 14:I[27201,["/_next/static/chunks/1860_s4s3_qz8.js"],"IconMark"]
