@@ -846,6 +846,13 @@
         walletButton.disabled = false;
       }
     });
+    // Every page is a full load. A wallet connected earlier in this browser is read again silently (eth_accounts and
+    // eth_chainId only): nothing is prompted or signed, and a locked wallet, a revoked site or another network keeps "Connect wallet".
+    let rememberedWallet = false;
+    try { rememberedWallet = Boolean(localStorage.getItem("cre8.wallet.session")); } catch { /* storage unavailable: connect explicitly */ }
+    if (walletButton && rememberedWallet) {
+      loadSiteWallet().then(async (client) => client.restoreSiteWallet(await client.loadSiteDeployment())).catch(() => { /* stays "Connect wallet" */ });
+    }
     wireShell();
   }
 
